@@ -80,7 +80,7 @@ QtPy==1.9.0
 requests==2.24.0
 rope==0.17.0
 Rtree==0.8.3
-setuptools==49.6.0.post20200814
+setuptools==49.6.0
 six==1.15.0
 snowballstemmer==2.0.0
 sortedcontainers==2.2.2
