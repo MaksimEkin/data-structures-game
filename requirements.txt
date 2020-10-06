@@ -6,7 +6,7 @@ dnspython==1.16.0
 gunicorn==20.0.4
 pip==20.2.2
 pytz==2020.1
-setuptools==49.6.0.post20200925
+setuptools==49.6.0
 sqlparse==0.3.1
 wheel==0.35.1
 pymongo[tls,srv]==3.6.1
