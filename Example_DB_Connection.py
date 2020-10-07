@@ -95,7 +95,7 @@ if __name__ == '__main__':
     test_create(User_collection, "Ryan", "ryanb4@umbc.edu")
     test_read(User_collection, "email", "ryanb4@umbc.edu")
     #test_update(User_collection, "email", "ryanb4@umbc.edu")
-
+"""
     Game_collection = db.Active_Games
 
     add_Activegame(db, 1,2,3,4,'4(2(3)(1))(6(5))')
@@ -107,3 +107,4 @@ if __name__ == '__main__':
 
     for user in get_rankings(User_collection):
         pprint.pprint(user)
+"""
