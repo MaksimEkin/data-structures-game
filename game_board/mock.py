@@ -3,7 +3,7 @@ from datetime import datetime
 class MockDB():
     def read_game(game_id):
         board = {
-            'id_'                       : 'database_id',
+            #'id_'                       : 'database_id',
             'game_id'                   : str(game_id),
             'graph'                     : {'nodes': 'node4(node2(node3)(node1))(node6(node5))',
                                           'node_points': {'node1': 1, 'node2': 2, 'node3': 3, 'node4': 4, 'node5': 5, 'node6': 6},

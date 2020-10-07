@@ -1,4 +1,11 @@
 # ========================================================================
+# General
+# ========================================================================
+DIFFICULTY_LEVELS = ['Hard', 'Medium', 'Easy']
+CARDS_PER_PLAYER = 3
+
+
+# ========================================================================
 # Available cards (actions) for each data structure.
 # ========================================================================
 CARDS = {
@@ -11,7 +18,7 @@ CARDS = {
 # Node points for game difficulty.
 # ========================================================================
 POINTS = {
-    'High'  : {'min':1, 'max':100},
-    'Medium': {'min':1, 'max':50},
-    'Easy'  : {'min':1, 'max':25}
+    DIFFICULTY_LEVELS[0] : {'min':1, 'max':100},
+    DIFFICULTY_LEVELS[1] : {'min':1, 'max':50},
+    DIFFICULTY_LEVELS[2] : {'min':1, 'max':25}
 }
