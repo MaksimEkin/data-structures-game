@@ -56,7 +56,7 @@ def new_board(difficulty, player_ids, data_structures, online):
         'player_names': [''],
         'player_points': {str(id):0 for id in player_ids},
         'turn': random.choice(player_ids),
-        'cards': generate_cards(player_ids, list(graph['node_points'].keys()), data_structures[0], difficulty),
+        'cards': distribute_cards(player_ids, list(graph['node_points'].keys()), data_structures[0], difficulty),
         'gold_node': False,
         'difficulty': difficulty,
         'num_players': len(player_ids),
@@ -107,7 +107,7 @@ def cheat_check(game_board, card=-1, player_id=-1, rebalance=-1):
     return False, ''
 
 
-def generate_cards(player_ids, nodes, data_structure, difficulty):
+def distribute_cards(player_ids, nodes, data_structure, difficulty):
     '''
     Distribute cards to the users.
 
@@ -123,26 +123,44 @@ def generate_cards(player_ids, nodes, data_structure, difficulty):
     # Minimum and maximum possible node value
     min_point = config.POINTS[str(difficulty)]['min']
     max_point = config.POINTS[str(difficulty)]['max']
+    # Card types for the DS
+    card_types = config.CARDS[str(data_structure)]
 
-    # Pick cards for each player
+    # generate the deck of cards
+    cards = list()
+    for ii in range(len(player_ids) * config.CARDS_PER_PLAYER):
+        # can not pick node dependent anymore
+        if len(nodes) == 0:
+            card_types = [action for action in card_types if "node#" not in action]
+
+        # pick a card
+        picked_card = random.choice(card_types)
+
+        # node specific action
+        if 'node#' in picked_card:
+            node_choice = str(random.choice(nodes))
+            nodes.remove(node_choice)
+            cards.append(picked_card.replace('node#', node_choice))
+        # point dependent action
+        else:
+            cards.append(picked_card.replace('#', str(random.randint(min_point, max_point))))
+
+    # Shuffle the deck of cards
+    random.shuffle(cards)
+
+    # pick cards for each player
     for player in player_ids:
-        # cards (actions) for the current player
-        cards = random.choices(config.CARDS[str(data_structure)], k=int(config.CARDS_PER_PLAYER))
-        cards_= list()
-
-        for card in cards:
-            # node specific action
-            if 'node#' in card:
-                cards_.append(card.replace('node#', str(random.choice(nodes))))
-            # point dependent action
-            else:
-                cards_.append(card.replace('#', str(random.randint(min_point, max_point))))
         # assign the cards to the player
-        board_cards[str(player)] = cards_
+        player_cards = list()
+        for ii in range(config.CARDS_PER_PLAYER):
+            player_cards.append(cards.pop())
+
+        board_cards[str(player)] = player_cards
 
     return board_cards
 
-def new_card(data_structure, nodes, difficulty):
+
+def pick_a_card(game_board, data_structure, difficulty):
     '''
     Pick a new card.
 
@@ -154,9 +172,13 @@ def new_card(data_structure, nodes, difficulty):
     # Minimum and maximum possible node value
     min_point = config.POINTS[str(difficulty)]['min']
     max_point = config.POINTS[str(difficulty)]['max']
+    # Card types for the DS
+    card_types = config.CARDS[str(data_structure)]
+
+    nodes = list(game_board['graph']['node_points'].keys())
 
     # Pick a card
-    card = random.choice(config.CARDS[str(data_structure)])
+    card = random.choice(card_types)
 
     # node specific action
     if 'node#' in card:

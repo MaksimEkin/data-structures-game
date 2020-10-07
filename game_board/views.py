@@ -7,6 +7,7 @@ from rest_framework.response import Response
 
 from .database import game_board_db as db
 from . import utils
+from . import config
 
 from datetime import datetime
 import json
@@ -26,6 +27,10 @@ def api_overview(request):
 
 @api_view(['GET', 'POST'])
 def start_game(request, difficulty, player_ids, data_structures, online):
+
+    if difficulty not in config.DIFFICULTY_LEVELS:
+        return Response({'error': 'Difficulty level not found!',
+                         'options': config.DIFFICULTY_LEVELS})
 
     player_ids = player_ids.split(',')
     data_structures = data_structures.split(',')
@@ -79,7 +84,6 @@ def action(request, card, player_id, game_id):
     Error, board = utils.load_board(game_id)
     if Error:
         return Response({'error': board})
-
 
     cheat, reason = utils.cheat_check(game_board=board, card=card, player_id=player_id)
     if cheat:
