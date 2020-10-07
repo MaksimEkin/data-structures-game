@@ -171,14 +171,15 @@ def pick_a_card(game_board):
     min_point = config.POINTS[str(game_board['difficulty'])]['min']
     max_point = config.POINTS[str(game_board['difficulty'])]['max']
     # Card types for the DS
-    card_types = config.CARDS[str(game_board['data_structure'])]
+    card_types = config.CARDS[str(game_board['curr_data_structure'])]
 
     nodes = list(game_board['graph']['node_points'].keys())
-    for key, value in game_board['cards'].items():
-        # remove the node based action card from options
-        if 'node' in value:
-            node = value.split(' ')
-            nodes.remove(node[1])
+    for player, hand in game_board['cards'].items():
+        for curr_card in hand:
+            # remove the node based action card from options
+            if 'node' in curr_card:
+                node = curr_card.split(' ')
+                nodes.remove(node[1])
 
         # no available nodes left for the node based action cards
         if len(nodes) == 0:

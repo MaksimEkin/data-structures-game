@@ -95,6 +95,15 @@ def action(request, card, player_id, game_id):
              'gold_node': 'node5', 'balanced': False}
     board['graph'] = graph
 
+    # Remove the played card
+    board['cards'][player_id].remove(card)
+    # Pick a new card
+    board['cards'][player_id].append(utils.pick_a_card(board))
+    # Change turn
+    next_player_index = (board['player_ids'].index(board['turn']) + 1) % len(board['player_ids'])
+    board['turn'] = board['player_ids'][next_player_index]
+
+
     try:
         db_response = db.update_game(game_id, board)
     except Exception as e:
