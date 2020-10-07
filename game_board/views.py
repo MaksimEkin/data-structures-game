@@ -8,6 +8,7 @@ from rest_framework.response import Response
 
 from .database import game_board_db as db
 from .mock import MockDB as mock_db
+from . import utils
 
 from datetime import datetime
 
@@ -15,7 +16,7 @@ from datetime import datetime
 @api_view(['GET'])
 def api_overview(request):
     api_urls = {
-        'Start Game'      : '/start_game/<int:difficulty>/<str:player_ids>/<str:data_structures>/<bool:online>',
+        'Start Game'      : '/start_game/<str:difficulty>/<str:player_ids>/<str:data_structures>/<bool:online>',
         'Game Board'      : '/board/<int:id>',
         'Re-balance Tree' : '/rebalance/<str:graph>',
         'Action'          : '/action/<str:card>'
@@ -25,9 +26,17 @@ def api_overview(request):
 
 @api_view(['GET', 'POST'])
 def start_game(request, difficulty, player_ids, data_structures, online):
+
+    player_ids = player_ids.split(',')
+    data_structures = data_structures.split(',')
+    nodes = ['node1', 'node2', 'node3']
+
+    Cards = utils.generate_cards(player_ids, nodes, data_structures[0], 3, difficulty)
+
     sample = {
         'to-do' : 'Currently being implemented!',
-        'ids' : player_ids.split(',')
+        'Cards' : Cards,
+        'pick' : utils.new_card(data_structures[0], nodes, difficulty)
     }
     return Response(sample)
 
