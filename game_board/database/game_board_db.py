@@ -43,7 +43,7 @@ def read_game(game_id: str):
         return 'nah bro idk about it'
     return value_returned
 
-def remove_game(game_id: int):
+def remove_game(game_id: str):
     DATABASE_URL1 = os.environ.get('DATABASE_URL1')
     client = MongoClient(DATABASE_URL1)
     value_returned = client.InitialDB.Active_Games.delete_one({"game_id": game_id}).acknowledged
