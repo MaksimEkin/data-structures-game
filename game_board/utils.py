@@ -160,22 +160,30 @@ def distribute_cards(player_ids, nodes, data_structure, difficulty):
     return board_cards
 
 
-def pick_a_card(game_board, data_structure, difficulty):
+def pick_a_card(game_board):
     '''
     Pick a new card.
 
-    :string data_structure: current data structure
-    :list nodes: nodes in the graph
-    :string difficulty: game difficulty. See config.py
+    :dict game_board: game board state
     :return: string card
     '''
     # Minimum and maximum possible node value
-    min_point = config.POINTS[str(difficulty)]['min']
-    max_point = config.POINTS[str(difficulty)]['max']
+    min_point = config.POINTS[str(game_board['difficulty'])]['min']
+    max_point = config.POINTS[str(game_board['difficulty'])]['max']
     # Card types for the DS
-    card_types = config.CARDS[str(data_structure)]
+    card_types = config.CARDS[str(game_board['data_structure'])]
 
     nodes = list(game_board['graph']['node_points'].keys())
+    for key, value in game_board['cards'].items():
+        # remove the node based action card from options
+        if 'node' in value:
+            node = value.split(' ')
+            nodes.remove(node[1])
+
+        # no available nodes left for the node based action cards
+        if len(nodes) == 0:
+            card_types = [action for action in card_types if "node#" not in action]
+            break
 
     # Pick a card
     card = random.choice(card_types)
