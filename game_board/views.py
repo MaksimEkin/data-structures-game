@@ -18,9 +18,9 @@ from bson import json_util, ObjectId
 def api_overview(request):
     api_urls = {
         'Start Game'      : '/start_game/<str:difficulty>/<str:player_ids>/<str:data_structures>/<bool:online>',
-        'Game Board'      : '/board/<int:id>',
-        'Re-balance Tree' : '/rebalance/<str:graph>/<str:player_id>/<str:game_id>',
-        'Action'          : '/action/<str:card>/<str:player_id>/<str:game_id>'
+        'Game Board'      : '/board/<str:id>',
+        'Re-balance Tree' : '/rebalance/<str:graph>/<str:game_id>',
+        'Action'          : '/action/<str:card>/<str:game_id>'
     }
     return Response(api_urls)
 
