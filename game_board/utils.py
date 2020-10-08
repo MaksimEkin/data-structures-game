@@ -47,7 +47,9 @@ def new_board(difficulty, player_ids, data_structures, online):
     # Call Nick's AVL lib here
     graph =  {'nodes': 'node4(node2(node3)(node1))(node6(node5))',
               'node_points': {'node1': 1, 'node2': 2, 'node3': 3, 'node4': 4, 'node5': 5, 'node6': 6},
-              'gold_node': 'node5', 'balanced': True}
+              'gold_node': 'node5',
+              'root_node': 'node3',
+              'balanced': True}
 
     board = {
         'game_id': str(uuid.uuid1()),
@@ -72,7 +74,7 @@ def new_board(difficulty, player_ids, data_structures, online):
     return board
 
 
-def cheat_check(game_board, card=-1, player_id=-1, rebalance=-1):
+def cheat_check(game_board, card=-1, rebalance=-1):
     '''
     Check if the action that is attempted is valid.
 
@@ -86,10 +88,6 @@ def cheat_check(game_board, card=-1, player_id=-1, rebalance=-1):
     # Check if the game have ended
     if game_board['end_game'] == True:
         return True, str('Game has finished!')
-
-    # Check if the user is in the game
-    if player_id != -1 and (player_id not in game_board['player_ids']):
-        return True, str('Player ' + str(player_id) + ' is not in the game!')
 
     # Check if it is the given player's turn
     if game_board['turn'] != player_id:

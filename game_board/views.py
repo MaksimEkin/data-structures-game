@@ -54,20 +54,22 @@ def board(request, game_id):
 
 
 @api_view(['GET', 'POST'])
-def rebalance(request, graph, player_id, game_id):
+def rebalance(request, graph, game_id):
 
     Error, board = utils.load_board(game_id)
     if Error:
         return Response({'error': board})
 
-    cheat, reason = utils.cheat_check(game_board=board, player_id=player_id, rebalance=True)
+    cheat, reason = utils.cheat_check(game_board=board, rebalance=True)
     if cheat:
         return Response({'cheat_detected': reason})
 
     # Do the rebalance action with Nick's AVL lib here
-    graph = {'nodes': 'node4(node2(node3)(node1))(node6))',
-             'node_points': {'node1': 1, 'node2': 2, 'node3': 3, 'node4': 4, 'node5': 5, 'node6': 6},
-             'gold_node': 'node5', 'balanced': True}
+    graph =  {'nodes': 'node4(node2(node3)(node1))(node6(node5))',
+              'node_points': {'node1': 1, 'node2': 2, 'node3': 3, 'node4': 4, 'node5': 5, 'node6': 6},
+              'gold_node': 'node5',
+              'root_node': 'node3',
+              'balanced': True}
     board['graph'] = graph
 
     try:
@@ -79,26 +81,28 @@ def rebalance(request, graph, player_id, game_id):
 
 
 @api_view(['GET', 'POST'])
-def action(request, card, player_id, game_id):
+def action(request, card, game_id):
 
     Error, board = utils.load_board(game_id)
     if Error:
         return Response({'error': board})
 
-    cheat, reason = utils.cheat_check(game_board=board, card=card, player_id=player_id)
+    cheat, reason = utils.cheat_check(game_board=board, card=card)
     if cheat:
         return Response({'cheat_detected': reason})
 
     # Do the card action with Nick's AVL lib here
-    graph = {'nodes': 'node4(node2(node3)(node1))(node6))',
-             'node_points': {'node1': 1, 'node2': 2, 'node3': 3, 'node4': 4, 'node5': 5, 'node6': 6},
-             'gold_node': 'node5', 'balanced': False}
+    graph =  {'nodes': 'node4(node2(node3)(node1))(node6(node5))',
+              'node_points': {'node1': 1, 'node2': 2, 'node3': 3, 'node4': 4, 'node5': 5, 'node6': 6},
+              'gold_node': 'node5',
+              'root_node': 'node3',
+              'balanced': False}
     board['graph'] = graph
 
     # Remove the played card
-    board['cards'][player_id].remove(card)
+    board['cards'][board['turn']].remove(card)
     # Pick a new card
-    board['cards'][player_id].append(utils.pick_a_card(board))
+    board['cards'][board['turn']].append(utils.pick_a_card(board))
     # Change turn
     next_player_index = (board['player_ids'].index(board['turn']) + 1) % len(board['player_ids'])
     board['turn'] = board['player_ids'][next_player_index]
