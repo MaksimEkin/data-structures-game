@@ -89,12 +89,8 @@ def cheat_check(game_board, card=-1, rebalance=-1):
     if game_board['end_game'] == True:
         return True, str('Game has finished!')
 
-    # Check if it is the given player's turn
-    if game_board['turn'] != player_id:
-        return True, str('Player ' + str(player_id) + ' can not play now!')
-
     # Check if the user has the claimed card
-    if card != -1 and (card not in game_board['cards'][str(player_id)]):
+    if card != -1 and (card not in game_board['cards'][game_board['turn']]):
         return True, str('Player does not have the card ' + str(card) + '!')
 
     # Check if the graph is in rebalance state
