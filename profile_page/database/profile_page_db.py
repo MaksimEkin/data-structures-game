@@ -1,7 +1,5 @@
 from pymongo import MongoClient
-import pprint
 import os
-import random
 
 def create_user(user_data):
     user_email = user_data['email']
@@ -17,6 +15,7 @@ def create_user(user_data):
         return 'nah bro idk about it'
 
 '''
+# Example Usage
 if __name__ == '__main__':
     user = {'badges': [31, 24, 83],
      'current story level': 9,
