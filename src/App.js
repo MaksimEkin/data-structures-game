@@ -8,7 +8,7 @@ function App() {
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
         <p>
-          The Data Structures Game!
+            The Data Structures Game!
         </p>
       </header>
     </div>

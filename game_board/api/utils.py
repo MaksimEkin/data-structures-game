@@ -1,5 +1,5 @@
-from . import config
-from .database import game_board_db as db
+from game_board import config
+from game_board.database import game_board_db as db
 
 from datetime import datetime
 from bson import json_util, ObjectId
@@ -45,6 +45,8 @@ def new_board(difficulty, player_ids, data_structures, online):
     '''
 
     # Call Nick's AVL lib here
+    # if data_structures[0] == 'AVL'
+    #   graph = avl.create_avl('difficulty')
     graph =  {'nodes': 'node4(node2(node3)(node1))(node6(node5))',
               'node_points': {'node1': 1, 'node2': 2, 'node3': 3, 'node4': 4, 'node5': 5, 'node6': 6},
               'gold_node': 'node5',
