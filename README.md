@@ -4,7 +4,6 @@ The Data Structures Game is a competitive online game. The goal of this game is 
 
 <div align="center", style="font-size: 50px">
 
-| [:video_game: Play Now](https://data-structures-game.herokuapp.com) (Coming Soon) | [:space_invader: API](https://data-structures-game.herokuapp.com/game_board/api) |
-| --- | --- |
+[:video_game: Play Now](https://data-structures-game.herokuapp.com) (Coming Soon) [:space_invader: API](https://data-structures-game.herokuapp.com/game_board/api)
 
 </div>
