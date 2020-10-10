@@ -3,7 +3,10 @@
 ''' TO-DO
 - Rebalancing is currently automatic and handled during insertion/deletion
 - Need to specify how to handle duplicate node values (removing with id)
+- add "node[id]"
+- add root node
 - Search by id
+- uuid for node
 '''
 import sys
 sys.path.append('../')
