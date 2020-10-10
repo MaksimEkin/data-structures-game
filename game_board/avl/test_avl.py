@@ -1,31 +1,19 @@
-from avl_handler import AVLHandler
-from avl import AVLTree
+from avl_handler import *
+#from avl import AVLTree
 
 
 def main(): 
 
-	handler = AVLHandler('Hard')
-	print(f"Generated Tree. . .")
-	handler.tree.printKeys(handler.root, "", True)  # print tree
-	
-	key = 29
-	handler.addNode(key)
-	print(f"\nAdded {key}. . .")
-	handler.tree.printKeys(handler.root, "", True)  # print tree
-	
-	key = 28
-	print(f"\nRemoved {key}. . .")
-	handler.delNode(key)
-	handler.tree.printKeys(handler.root, "", True)  # print tree
-	
-	print(f"\nPrint tree by id values. . .")
-	handler.delNode(key)
-	handler.tree.printIds(handler.root, "", True)  # print tree
-
-	print()
-	graph = handler.get_gamestate()
-	for idx in graph:
-		print(f"{idx} : {graph[idx]}")
+	game_state = avlNew(4, 100, debug=True)
+	print('=======================================================')
+	game_state = avlAction('Delete node0', game_state, debug = True)
+	print('=======================================================')
+	game_state = avlAction('Delete node0', game_state, debug = True)
+	print('=======================================================')
+	game_state = avlAction('Delete node1', game_state, debug = True)
+	print('=======================================================')
+	game_state = avlAction('Insert 33', game_state, debug = True)
+	print('=======================================================')	
 	
 if __name__ == '__main__':
 	
