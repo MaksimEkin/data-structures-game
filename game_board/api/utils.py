@@ -1,4 +1,5 @@
 from game_board import config
+from game_board import rules
 from game_board.database import game_board_db as db
 
 from datetime import datetime
@@ -8,18 +9,66 @@ import random
 import uuid
 import json
 
-def load_board(game_id):
+
+def create_board_db(new_board):
+    '''
+    Create a new board in the database.
+    :param new_board:
+    :return dict:
+    '''
+    error = False
+
+    try:
+        game_id = db.create_game(new_board)
+        game_id = json.loads(json_util.dumps(game_id))
+
+    except Exception as e:
+        error = True
+        return {'error': error, 'reason': str(e)}
+
+    return {'error': error, 'game_id': game_id}
+
+
+def update_board_db(board):
+    '''
+    Update the game board in the database.
+
+    :param board:
+    :return dict:
+    '''
+    error = False
+    try:
+        # Game ended
+        if board['graph']['root_node'] == board['graph']['gold_node']:
+            db.remove_game(board['game_id'])
+            board['end_game'] = True
+
+        # Game continues
+        else:
+            db_response = db.update_game(board['game_id'], board)
+
+    except Exception as e:
+        error = True
+        return {'error': error, 'reason': str(e)}
+
+    return {'error': error, 'game_board': board}
+
+
+def load_board_db(game_id):
     '''
     Load a game board state from database.
 
     :string game_id: id of the game board
     :return: game board dict or error
     '''
+    error = False
+
     try:
         # game_board = mock_db.read_game('game_id1234')
         game_board = db.read_game(str(game_id))
         if game_board == "nah bro idk about it":
-            return True, 'Game Not Found!'
+            error = True
+            return {'error':error, 'reason':'Game Not Found!'}
 
         # Serialize
         game_board = json.loads(json_util.dumps(game_board))
@@ -28,12 +77,13 @@ def load_board(game_id):
         del game_board['_id']
 
     except Exception as e:
-        return True, str(e)
+        error = True
+        return {'error':error, 'reason':str(e)}
 
-    return False, game_board
+    return {'error':error, 'game_board':game_board}
 
 
-def new_board(difficulty, player_ids, data_structures, online):
+def new_board(difficulty, player_ids, data_structures):
     '''
     Create new board dictionary.
 
@@ -47,28 +97,27 @@ def new_board(difficulty, player_ids, data_structures, online):
     # Call Nick's AVL lib here
     # if data_structures[0] == 'AVL'
     #   graph = avl.create_avl('difficulty')
-    graph =  {'nodes': 'node4(node2(node3)(node1))(node6(node5))',
-              'node_points': {'node1': 1, 'node2': 2, 'node3': 3, 'node4': 4, 'node5': 5, 'node6': 6},
-              'gold_node': 'node5',
-              'root_node': 'node3',
-              'balanced': True}
+    graph = {'nodes': 'node4(node2(node3)(node1))(node6(node5))',
+             'node_points': {'node1': 1, 'node2': 2, 'node3': 3, 'node4': 4, 'node5': 5, 'node6': 6},
+             'gold_node': 'node5',
+             'root_node': 'node3',
+             'balanced': True}
 
     board = {
         'game_id': str(uuid.uuid1()),
         'graph': graph,
         'player_ids': player_ids,
         'player_names': [''],
-        'player_points': {str(id):0 for id in player_ids},
+        'player_points': {str(id): 0 for id in player_ids},
         'turn': random.choice(player_ids),
         'cards': distribute_cards(player_ids, list(graph['node_points'].keys()), data_structures[0], difficulty),
-        'gold_node': False,
         'difficulty': difficulty,
         'num_players': len(player_ids),
-        'online': online,
+        'online': False,
         'curr_data_structure': data_structures[0],
-        'selected_data_structures': data_structures,
-        'timed_game': False,
-        'seconds_until_next_ds': 60,
+        # 'selected_data_structures': data_structures,
+        # 'timed_game': False,
+        # 'seconds_until_next_ds': 60,
         'time_created': datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
         'end_game': False
     }
@@ -86,21 +135,16 @@ def cheat_check(game_board, card=-1, rebalance=-1):
     :bool rebalance:
     :return: True if invalid action, and string for reason.
     '''
+    check = rules.general(game_board, card)
+    if check['cheat']:
+        return check
 
-    # Check if the game have ended
-    if game_board['end_game'] == True:
-        return True, str('Game has finished!')
-
-    # Check if the user has the claimed card
-    if card != -1 and (card not in game_board['cards'][game_board['turn']]):
-        return True, str('Player does not have the card ' + str(card) + '!')
-
-    # Check if the graph is in rebalance state
-    if rebalance != -1 and (game_board['graph']['balanced'] == True):
-        return True, str('Tree is already balanced!')
-
+    if game_board['curr_data_structure'] == 'AVL':
+        check = rules.AVL(game_board, rebalance)
+        if check['cheat']:
+            return check
     # No cheat detected
-    return False, ''
+    return {'cheat': False}
 
 
 def distribute_cards(player_ids, nodes, data_structure, difficulty):
@@ -193,4 +237,3 @@ def pick_a_card(game_board):
         card_ = card.replace('#', str(random.randint(min_point, max_point)))
 
     return card_
-
