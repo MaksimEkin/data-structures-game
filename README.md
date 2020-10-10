@@ -1,1 +1,1 @@
-# data-structures-game
+<h1><img align="left" width="40" height="50" src="img/dsg.png"> The Data Structures Game</h1>
