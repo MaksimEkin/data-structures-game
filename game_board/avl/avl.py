@@ -47,7 +47,7 @@ class AVLTree(object):
 		else:
 			return root
 	
-	def delete_node(self, root, key):
+	def delete_node(self, root, key, balance=True):
 		""" recursively remove node
 		
 		Keyword arguments:
@@ -82,6 +82,54 @@ class AVLTree(object):
 		root.height = 1 + max(self.getHeight(root.left), # update height
 							  self.getHeight(root.right))
 	
+	
+		# Update the balance factor and balance the tree
+		if balance:
+			return(self.rebalance(root))
+		else:
+			return root
+	
+			
+	def delete_node_id(self, root, nid, balance=True):
+		""" recursively remove node by id
+		
+		Keyword arguments:
+		root -- current node being compared
+		id -- id of node being removed
+		"""    
+		
+		if root and root.nid != nid:
+			if root.left and not root.right:	# go left only
+				root.left = self.delete_node_id(root.left, nid)
+			elif not root.left and root.right:	# go left only
+				root.right = self.delete_node_id(root.right, nid)
+			elif root.left and root.right:		# do both
+				root.left = self.delete_node_id(root.left, nid)
+				root.right = self.delete_node_id(root.right, nid)
+			else:								# do neither
+				return root	
+			
+		elif not root:
+			return root
+			
+		else:
+			if root.left is None:
+				temp = root.right
+				root = None
+				return temp
+			elif root.right is None:
+				temp = root.left
+				root = None
+				return temp
+			temp = self.getMinNode(root.right)
+			root.key = temp.key
+			root.right = self.delete_node(root.right,
+										  temp.key)
+		if root is None:
+			return root
+			
+		root.height = 1 + max(self.getHeight(root.left), # update height
+							  self.getHeight(root.right))
 	
 		# Update the balance factor and balance the tree
 		if balance:

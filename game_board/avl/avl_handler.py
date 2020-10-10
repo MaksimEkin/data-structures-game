@@ -33,7 +33,7 @@ class AVLHandler(object):
 	def from_scratch(cls, expected_height, point_cap):	
 		
 		handler = cls()
-		handler.num_nodes = 0
+		handler.uid = 0
 		handler.golden_id = None  # id of golden node
 		handler.balanced = True  # currently balancing is done in tandem when insert/remove is called
 		handler.point_cap = point_cap
@@ -46,8 +46,8 @@ class AVLHandler(object):
 	def from_graph(cls, graph):
 		
 		handler = cls()
-		handler.num_nodes = len(graph['nodes'])
-		handler.golden_id = int(graph['gold_node'][4:])  # remove 'node' from id
+		handler.uid = tryint(graph['uid'])
+		handler.golden_id = tryint(graph['gold_node'][4:])  # remove 'node' from id
 		handler.balanced = graph['balanced']
 		handler.__parse_graph(graph)  # deserialize graph
 		return handler
@@ -66,13 +66,13 @@ class AVLHandler(object):
 		while(self.root.height < self.expected_height):
 			self.addNewNode(randint(0, val_cap), self.point_cap)
 		
-		self.golden_id = randint(0, self.num_nodes - 1) # randomly choose golden node
+		self.golden_id = randint(0, self.uid - 1) # randomly choose golden node
 		
 		# fail safe to make sure root is not golden node.
 		# if random is seeded with a constant root can be made golden
 		timeout = 0
 		while(self.root.nid == self.golden_id and timeout < 10):
-			self.golden_id = randint(0, self.num_nodes - 1)
+			self.golden_id = randint(0, self.uid - 1)
 			timeout += 1
 			
 			
@@ -118,40 +118,41 @@ class AVLHandler(object):
 		
 		point_val = randint(5, point_cap)
 		point_val -= (point_val % 5)  # make all point values divisible by 5
-		self.root = self.tree.insert_node(self.root, key, self.num_nodes, point_val)
-		self.num_nodes += 1
+		self.root = self.tree.insert_node(self.root, key, self.uid, point_val)
+		self.uid += 1
 	
 		
 	def addNode(self, key, nid, val):
 		""" add node to tree by value """
-		if self.root and self.tree.isIn(self.root, key):  # not adding duplicates 
-			return 										# isIn is costly, refactor later
+		# ~ if self.root and self.tree.isIn(self.root, key):  # not adding duplicates 
+			# ~ return 										# isIn is costly, refactor later
+		# commented out above because I need to handle this inside avl
 		
 		self.root = self.tree.insert_node(self.root, key, nid, val)
 		
 		
 	def delNode(self, key):
 		""" remove node from tree by value """
-		if self.num_nodes <= 0 or not self.tree.isIn(self.root, key):  # can't remove what's not there
-			return 
+		# ~ if self.num_nodes <= 0 or not self.tree.isIn(self.root, key):  # can't remove what's not there
+			# ~ return 
+		# commented out above because I need to handle this inside avl
 		
 		self.root = self.tree.delete_node(self.root, key)
-		self.num_nodes -= 1
 		
 		
 	def delNodeByID(self, nid):
 		""" remove node from tree by value """
-		if self.num_nodes <= 0 or not self.tree.isIn(self.root, key):  # can't remove what's not there
-			return 
-		
-		self.root = self.tree.delete_node(self.root, key)
-		self.num_nodes -= 1			
+		# ~ if self.num_nodes <= 0 or not self.tree.isIn(self.root, key):  # can't remove what's not there
+			# ~ return 
+		# commented out above because I need to handle this inside avl	
+		self.root = self.tree.delete_node_id(self.root, nid)		
 			
 		
 	def get_gamestate(self):
 		""" return dictionary with the gamestate """
 		out_dict = {}
 		out_dict['nodes'] = self.tree.getAdjList(self.root)
+		out_dict['uid'] = self.uid
 		out_dict['node_points'] = self.tree.getVals(self.root)
 		out_dict['node_keys'] = self.tree.getKeys(self.root)
 		out_dict['gold_node'] = 'node' + str(self.golden_id)
@@ -161,7 +162,7 @@ class AVLHandler(object):
 
 
 	def debug_print(self, use_id=False):
-		print(f"Tree with {self.num_nodes} nodes. . .")
+		#print(f"Tree with {self.num_nodes} nodes. . .")
 		if use_id:
 			self.tree.printIds(self.root, "", True)
 		else:
@@ -185,24 +186,34 @@ def avlAction(command, graph, debug=False):
 	""" take an action on the tree """
 	
 	handler = AVLHandler.from_graph(graph)
+	c,t = command.split()  # get command and target
+	if c == 'Delete':
+		nid = tryint(t[4:])
+		handler.delNodeByID(nid)
+		if debug:
+			print(f'Tried to delete node of id {nid}')
+	elif c == 'Insert':
+		key = tryint(t)
+		handler.addNewNode(key, 25)  # point cap fixed at 25 rn, what should it be?
+		if debug:
+			print(f'Tried to add new node with key {key}')
+	else:
+		raise Exception('Invalid command passed to AVL Handler')
+	
 	if debug:
 		handler.debug_print(use_id=False)
 		print('\n\nNow with ids. . .')
 		handler.debug_print(use_id=True)
-	
-	# ~ c,t = command.split()  # get command and target
-	# ~ if c == 'Delete':
-		# ~ nid = tryint(t[4:])
-		# ~ handler.delNode(
-	# ~ elif c == 'Insert':
-		
-	# ~ else:
-		# ~ raise Exception('Invalid command passed to AVL Handler')
+	return handler.get_gamestate()
 	
 	
-def rebalance(graph, debug=False):
+def avlRebalance(graph, debug=False):
 	handler = AVLHandler.from_graph(graph)
-	return 
+	if debug:
+		handler.debug_print(use_id=False)
+		print('\n\nNow with ids. . .')
+		handler.debug_print(use_id=True)
+	return handler.get_gamestate()
 	""" rebalance graph and return """
 	
 	
