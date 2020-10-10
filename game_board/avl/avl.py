@@ -4,24 +4,26 @@ This is an AVL tree implementation that was used in the Data Structures
 Game for CMSC 447, Fall 2020. The code was adapted from: https://www.programiz.com/dsa/avl-tree
 """
 
+# Removed to reduce coupling
 import sys
-sys.path.append('../')
-from config import *
+# ~ sys.path.append('../')
+# ~ from config import *
 
 
 class TreeNode(object):
-    def __init__(self, key, nid):
+    def __init__(self, key, nid, val):
         self.key = key
         self.left = None
         self.right = None
         self.height = 1
         self.nid = nid
+        self.val = val
 
 
 class AVLTree(object):
 	
 	
-	def insert_node(self, root, key, nid):
+	def insert_node(self, root, key, nid, val, balance=True):
 		""" recursively insert new node 
 		
 		Keyword arguments:
@@ -31,34 +33,19 @@ class AVLTree(object):
 		"""  
 		
 		if not root:  				# base case
-			return TreeNode(key, nid)
+			return TreeNode(key, nid, val)
 		elif key < root.key:  		# go left
-			root.left = self.insert_node(root.left, key, nid)
+			root.left = self.insert_node(root.left, key, nid, val)
 		else:  						# go right
-			root.right = self.insert_node(root.right, key, nid)
+			root.right = self.insert_node(root.right, key, nid, val)
 			
 		root.height = 1 + max(self.getHeight(root.left), # update height
 							  self.getHeight(root.right))
 	
-		# Update the balance factor and balance the tree
-		''' Currently balancing is automatic. We need to discuss how mistakes 
-		    in balancing made by the user are handled '''
-		#return(self.__rebalance_helper(root))
-		balanceFactor = self.getBalance(root)
-		if balanceFactor > 1:
-			if self.getBalance(root.left) >= 0:
-				return self.rightRotate(root)
-			else:
-				root.left = self.leftRotate(root.left)
-				return self.rightRotate(root)
-		if balanceFactor < -1:
-			if self.getBalance(root.right) <= 0:
-				return self.leftRotate(root)
-			else:
-				root.right = self.rightRotate(root.right)
-				return self.leftRotate(root)
-		return root  
-		
+		if balance:
+			return(self.rebalance(root))
+		else:
+			return root
 	
 	def delete_node(self, root, key):
 		""" recursively remove node
@@ -97,9 +84,10 @@ class AVLTree(object):
 	
 	
 		# Update the balance factor and balance the tree
-		''' Currently balancing is automatic. We need to discuss how mistakes 
-		    in balancing made by the user are handled '''
-		return(self.__rebalance_helper(root))
+		if balance:
+			return(self.rebalance(root))
+		else:
+			return root
 	
 	
 	def isIn(self, root, key):
@@ -120,27 +108,90 @@ class AVLTree(object):
 			return True							# found
 	
 	
-	def getVals(self, root):
-		""" get key vals for each id 
-		
-		this could be easily updated to points as well
-		"""
-		out = {}
-		out = self.getVals_helper(root, out)
-		return out
+	def getKeys(self, root):
+		""" get keys for each id  """
+		keys = {}
+		keys = self.__getKeys_helper(root, keys)
+		return keys
 	
 	
-	def getVals_helper(self, root, vals):
+	def __getKeys_helper(self, root, keys):
 		""" helper function for getVals """
 		
 		if root.left:
-			self.getVals_helper(root.left, vals)
+			self.__getKeys_helper(root.left, keys)
 		if root.right:
-			self.getVals_helper(root.right, vals)
+			self.__getKeys_helper(root.right, keys)
+		if root.nid not in keys:
+			keys['node' + str(root.nid)] = root.key	
+		
+		return keys
+		
+	def getVals(self, root):
+		""" get point values for each id """
+		vals = {}
+		vals = self.__getVals_helper(root, vals)
+		return vals
+	
+	
+	def __getVals_helper(self, root, vals):
+		""" helper function for getVals """
+		
+		if root.left:
+			self.__getVals_helper(root.left, vals)
+		if root.right:
+			self.__getVals_helper(root.right, vals)
 		if root.nid not in vals:
-			vals[root.nid] = root.key	
+			vals['node' + str(root.nid)] = root.val	
 		
 		return vals
+		
+	
+	def getAdjList(self, root):
+		""" create adjacency list from the nodes in the tree
+		
+		Adjacency list will be in the form of dict of lists of dicts
+		First dict is the global adjacency list
+		List will contain all adjacent nodes (max 2 for AVL) 
+		Inner dict will contain key, nid, val for each node
+		"""
+		adj = {}
+		adj = self.getAdjList_helper(root, adj)
+		return adj
+	
+	
+	def getAdjList_helper(self, root, vals):
+		""" helper function for getVals """
+		
+		if root:
+			vals[root.nid] = []
+			
+			if root.left and not root.right:
+				self.getAdjList_helper(root.left, vals)
+				vals[root.nid].append({'key': root.left.key, 
+									   'nid': 'node' + str(root.left.nid), 
+									   'val': root.left.val})
+			elif not root.left and root.right:
+				self.getAdjList_helper(root.right, vals)
+				vals[root.nid].append({'key': root.right.key, 
+									   'nid': 'node' + str(root.right.nid), 
+					                   'val': root.right.val})
+			elif root.left and root.right:
+				self.getAdjList_helper(root.left, vals)
+				self.getAdjList_helper(root.right, vals)
+				vals[root.nid].append({'key': root.left.key, 
+									   'nid': 'node' + str(root.left.nid), 
+									   'val': root.left.val})
+				vals[root.nid].append({'key': root.right.key, 
+									   'nid': 'node' + str(root.right.nid), 
+					                   'val': root.right.val})
+			else:
+				return
+		
+			return vals	
+	
+		else:
+			return
 	
 	def getNewick(self, root):
 		""" get newick string format of tree """
@@ -243,7 +294,7 @@ class AVLTree(object):
 		return self.getHeight(root.left) - self.getHeight(root.right)
 
 
-	def __rebalance_helper(self, root):
+	def rebalance(self, root):
 		""" Help rebalance the tree """
 		balanceFactor = self.getBalance(root)
 		
@@ -261,12 +312,6 @@ class AVLTree(object):
 				return self.leftRotate(root)
 		return root
 
-	# ~ def preOrder(self, root):  # preorder print
-		# ~ if not root:
-			# ~ return
-		# ~ print("{0} ".format(root.key), end="")
-		# ~ self.preOrder(root.left)
-		# ~ self.preOrder(root.right)
 
 if __name__ == '__main__':
 	
