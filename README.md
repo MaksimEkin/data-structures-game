@@ -2,9 +2,18 @@
 
 The Data Structures Game is a competitive online game. The goal of this game is to help reinforce data structures concepts to students. Players will be able to take turns and test their data structures prowess as they try to free the golden node. Correctly maneuvering your way through the AVL tree will reward you with points. Test yourself against your friends, both in the lobby and on the leaderboards!
 
-<center>
+
+<div style="text-align: center;">
+    <table>
+        <tr>
+            <td>Foo1</td> <td>Foo2</td>
+        </tr>
+    </table>
+</div>
+
+<div style="text-align: center;">
 
 | [:video_game: Play Now](https://data-structures-game.herokuapp.com) (Coming Soon) | [:space_invader: API](https://data-structures-game.herokuapp.com/game_board/api) |
 | --- | --- |
 
-</center>
+</div>
