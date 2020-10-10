@@ -69,7 +69,7 @@ def load_board_db(game_id):
         game_board = db.read_game(str(game_id))
         if game_board == "nah bro idk about it":
             error = True
-            return {'error':error, 'reason':'Game Not Found!'}
+            return {'error': error, 'reason':'Game Not Found!'}
 
         # Serialize
         game_board = json.loads(json_util.dumps(game_board))

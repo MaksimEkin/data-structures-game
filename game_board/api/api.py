@@ -2,6 +2,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from game_board.api import utils
+from game_board.avl import avl_handler as avl
 from .. import config
 
 import json
@@ -30,12 +31,12 @@ def start_game(request, difficulty, player_ids, data_structures):
     data_structures = data_structures.split(',')
 
     new_board = utils.new_board(difficulty, player_ids, data_structures)
-    return Response(new_board)
-    #status = utils.create_board_db(new_board)
-    #if status['error']:
-    #    return Response({'error': status['reason']})
 
-    #return Response({'game_id': status['game_id']})
+    status = utils.create_board_db(new_board)
+    if status['error']:
+        return Response({'error': status['reason']})
+
+    return Response({'game_id': status['game_id']})
 
 
 @api_view(['GET'])
@@ -45,7 +46,10 @@ def board(request, game_id):
     if status['error']:
         return Response({'error': status['reason']})
 
-    return Response(board)
+    # remove nicks ?? uid
+    del status['game_board']['graph']['uid']
+
+    return Response(status['game_board'])
 
 
 @api_view(['GET'])
@@ -100,14 +104,9 @@ def action(request, card, game_id):
         return Response({'invalid_action': check['reason']})
 
     # Do the card action with Nick's AVL lib here
-    # if board['curr_datastructure'] == 'AVL'
-    #   new_graph = avl.action('Delete node2', old_graph)
+    if board['curr_data_structure'] == 'AVL':
+        graph = avl.avlAction(card, board['graph'])
 
-    graph =  {'nodes': 'node4(node2(node3)(node1))(node6(node5))',
-              'node_points': {'node1': 1, 'node2': 2, 'node3': 3, 'node4': 4, 'node5': 5, 'node6': 6},
-              'gold_node': 'node5',
-              'root_node': 'node3',
-              'balanced': False}
     board['graph'] = graph
 
     # Remove the played card
