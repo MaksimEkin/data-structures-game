@@ -30,11 +30,12 @@ def start_game(request, difficulty, player_ids, data_structures):
     data_structures = data_structures.split(',')
 
     new_board = utils.new_board(difficulty, player_ids, data_structures)
-    status = utils.create_board_db(new_board)
-    if status['error']:
-        return Response({'error': status['reason']})
+    return Response(new_board)
+    #status = utils.create_board_db(new_board)
+    #if status['error']:
+    #    return Response({'error': status['reason']})
 
-    return Response({'game_id': status['game_id']})
+    #return Response({'game_id': status['game_id']})
 
 
 @api_view(['GET'])

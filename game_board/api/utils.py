@@ -1,6 +1,7 @@
 from game_board import config
 from game_board import rules
 from game_board.database import game_board_db as db
+from game_board.avl import avl_handler as avl
 
 from datetime import datetime
 from bson import json_util, ObjectId
@@ -94,14 +95,12 @@ def new_board(difficulty, player_ids, data_structures):
     :return: game board dict
     '''
 
-    # Call Nick's AVL lib here
-    # if data_structures[0] == 'AVL'
-    #   graph = avl.create_avl('difficulty')
-    graph = {'nodes': 'node4(node2(node3)(node1))(node6(node5))',
-             'node_points': {'node1': 1, 'node2': 2, 'node3': 3, 'node4': 4, 'node5': 5, 'node6': 6},
-             'gold_node': 'node5',
-             'root_node': 'node3',
-             'balanced': True}
+    # if it is an AVL
+    if data_structures[0] == 'AVL':
+        graph = avl.avlNew(config.HEIGHT[str(difficulty)], config.POINTS[str(difficulty)]['max'])
+    # Currently only gives AVL
+    else:
+        graph = avl.avlNew(config.HEIGHT[str(difficulty)], config.POINTS[str(difficulty)])
 
     board = {
         'game_id': str(uuid.uuid1()),
@@ -110,7 +109,11 @@ def new_board(difficulty, player_ids, data_structures):
         'player_names': [''],
         'player_points': {str(id): 0 for id in player_ids},
         'turn': random.choice(player_ids),
-        'cards': distribute_cards(player_ids, list(graph['node_points'].keys()), data_structures[0], difficulty),
+        'cards': distribute_cards(player_ids,
+                                  list(graph['node_points'].keys()),
+                                  data_structures[0],
+                                  difficulty,
+                                  graph['gold_node']),
         'difficulty': difficulty,
         'num_players': len(player_ids),
         'online': False,
@@ -147,7 +150,7 @@ def cheat_check(game_board, card=-1, rebalance=-1):
     return {'cheat': False}
 
 
-def distribute_cards(player_ids, nodes, data_structure, difficulty):
+def distribute_cards(player_ids, nodes, data_structure, difficulty, gold_node):
     '''
     Distribute cards to the users.
 
@@ -165,6 +168,9 @@ def distribute_cards(player_ids, nodes, data_structure, difficulty):
     max_point = config.POINTS[str(difficulty)]['max']
     # Card types for the DS
     card_types = config.CARDS[str(data_structure)]
+
+    # Remove the golden node from node options
+    nodes.remove(gold_node)
 
     # generate the deck of cards
     cards = list()
@@ -214,6 +220,7 @@ def pick_a_card(game_board):
     card_types = config.CARDS[str(game_board['curr_data_structure'])]
 
     nodes = list(game_board['graph']['node_points'].keys())
+    nodes.remove(game_board['graph']['gold_node'])
     for player, hand in game_board['cards'].items():
         for curr_card in hand:
             # remove the node based action card from options

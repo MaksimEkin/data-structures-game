@@ -25,4 +25,4 @@ def AVL(game_board, rebalance=-1):
         return {'cheat': True, 'reason': str('You must balance the tree first!')}
 
     # No cheat detected
-    return {'cheat': False}
+    return {cheat': False}
