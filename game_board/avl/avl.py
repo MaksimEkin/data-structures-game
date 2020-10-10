@@ -309,6 +309,15 @@ class AVLTree(object):
 		if not root:
 			return 0
 		return self.getHeight(root.left) - self.getHeight(root.right)
+	
+		
+	def isBalanced(self, root):
+		""" Get balance factor of the node """
+		balanceFactor = self.getBalance(root)
+		if abs(balanceFactor) > 1:
+			return False
+		else:
+			return True
 
 
 	def rebalance(self, root):

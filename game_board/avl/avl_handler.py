@@ -1,8 +1,8 @@
 """ Handles AVL tree state """
 
 import re
-from .avl import TreeNode
-from .avl import AVLTree
+from avl import TreeNode
+from avl import AVLTree
 from random import seed
 from random import randint
 seed(42)  # fixed seed for debugging
@@ -106,22 +106,25 @@ class AVLHandler(object):
 	def addNewNode(self, key, b=True):
 		""" add node to tree by value """
 		self.root = self.tree.insert_node(self.root, key, self.uid, balance=b)
+		self.balanced = self.tree.isBalanced(self.root)
 		self.uid += 1
 	
 		
 	def addNode(self, key, nid, b=True):
 		""" add node to tree by value """
 		self.root = self.tree.insert_node(self.root, key, nid, balance=b)
-		
+		self.balanced = self.tree.isBalanced(self.root)
 		
 	def delNode(self, key, b=True):
 		""" remove node from tree by value """
 		self.root = self.tree.delete_node(self.root, key, balance=b)
+		self.balanced = self.tree.isBalanced(self.root)
 		
 		
 	def delNodeByID(self, nid, b=True):
 		""" remove node from tree by value """
-		self.root = self.tree.delete_node_id(self.root, nid, balance=b)		
+		self.root = self.tree.delete_node_id(self.root, nid, balance=b)
+		self.balanced = self.tree.isBalanced(self.root)		
 			
 		
 	def get_gamestate(self):
