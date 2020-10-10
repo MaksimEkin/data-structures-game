@@ -27,8 +27,8 @@ POINTS = {
 # ========================================================================
 # Number of nodes given the difficulty
 # ========================================================================
-NODES = {
-    DIFFICULTY_LEVELS[0] : 5,
-    DIFFICULTY_LEVELS[1] : 10,
-    DIFFICULTY_LEVELS[2] : 20
+HEIGHT = {
+    DIFFICULTY_LEVELS[0] : 6,
+    DIFFICULTY_LEVELS[1] : 4,
+    DIFFICULTY_LEVELS[2] : 3
 }
