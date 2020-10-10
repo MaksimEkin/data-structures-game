@@ -4,26 +4,21 @@ This is an AVL tree implementation that was used in the Data Structures
 Game for CMSC 447, Fall 2020. The code was adapted from: https://www.programiz.com/dsa/avl-tree
 """
 
-# Removed to reduce coupling
 import sys
-# ~ sys.path.append('../')
-# ~ from config import *
-
 
 class TreeNode(object):
-    def __init__(self, key, nid, val):
+    def __init__(self, key, nid):
         self.key = key
         self.left = None
         self.right = None
         self.height = 1
         self.nid = nid
-        self.val = val
 
 
 class AVLTree(object):
 	
 	
-	def insert_node(self, root, key, nid, val, balance=True):
+	def insert_node(self, root, key, nid, balance=True):
 		""" recursively insert new node 
 		
 		Keyword arguments:
@@ -33,12 +28,13 @@ class AVLTree(object):
 		"""  
 		
 		if not root:  				# base case
-			return TreeNode(key, nid, val)
+			return TreeNode(key, nid)
 		elif key < root.key:  		# go left
-			root.left = self.insert_node(root.left, key, nid, val)
-		else:  						# go right
-			root.right = self.insert_node(root.right, key, nid, val)
-			
+			root.left = self.insert_node(root.left, key, nid)
+		elif key > root.key:  		# go right
+			root.right = self.insert_node(root.right, key, nid)	
+		else:						# no duplicates
+			return root
 		root.height = 1 + max(self.getHeight(root.left), # update height
 							  self.getHeight(root.right))
 	
@@ -164,7 +160,7 @@ class AVLTree(object):
 	
 	
 	def __getKeys_helper(self, root, keys):
-		""" helper function for getVals """
+		""" helper function for getKeys """
 		
 		if root.left:
 			self.__getKeys_helper(root.left, keys)
@@ -175,72 +171,45 @@ class AVLTree(object):
 		
 		return keys
 		
-	def getVals(self, root):
-		""" get point values for each id """
-		vals = {}
-		vals = self.__getVals_helper(root, vals)
-		return vals
-	
-	
-	def __getVals_helper(self, root, vals):
-		""" helper function for getVals """
-		
-		if root.left:
-			self.__getVals_helper(root.left, vals)
-		if root.right:
-			self.__getVals_helper(root.right, vals)
-		if root.nid not in vals:
-			vals['node' + str(root.nid)] = root.val	
-		
-		return vals
-		
 	
 	def getAdjList(self, root):
 		""" create adjacency list from the nodes in the tree
 		
-		Adjacency list will be in the form of dict of lists of dicts
+		Adjacency list will be in the form of dict of lists
 		First dict is the global adjacency list
-		List will contain all adjacent nodes (max 2 for AVL) 
-		Inner dict will contain key, nid, val for each node
+		List will contain all adjacent node ids(max 2 for AVL) 
 		"""
 		adj = {}
 		adj = self.getAdjList_helper(root, adj)
 		return adj
 	
 	
-	def getAdjList_helper(self, root, vals):
+	def getAdjList_helper(self, root, adj):
 		""" helper function for getVals """
 		
 		if root:
-			vals[root.nid] = []
+			adj['node' + str(root.nid)] = []
 			
 			if root.left and not root.right:
-				self.getAdjList_helper(root.left, vals)
-				vals[root.nid].append({'key': root.left.key, 
-									   'nid': 'node' + str(root.left.nid), 
-									   'val': root.left.val})
+				self.getAdjList_helper(root.left, adj)
+				adj['node' + str(root.nid)].append('node' + str(root.left.nid))
 			elif not root.left and root.right:
-				self.getAdjList_helper(root.right, vals)
-				vals[root.nid].append({'key': root.right.key, 
-									   'nid': 'node' + str(root.right.nid), 
-					                   'val': root.right.val})
+				self.getAdjList_helper(root.right, adj)
+				adj['node' + str(root.nid)].append('node' + str(root.right.nid))
 			elif root.left and root.right:
-				self.getAdjList_helper(root.left, vals)
-				self.getAdjList_helper(root.right, vals)
-				vals[root.nid].append({'key': root.left.key, 
-									   'nid': 'node' + str(root.left.nid), 
-									   'val': root.left.val})
-				vals[root.nid].append({'key': root.right.key, 
-									   'nid': 'node' + str(root.right.nid), 
-					                   'val': root.right.val})
+				self.getAdjList_helper(root.left, adj)
+				self.getAdjList_helper(root.right, adj)
+				adj['node' + str(root.nid)].append('node' + str(root.left.nid))
+				adj['node' + str(root.nid)].append('node' + str(root.right.nid))
 			else:
 				return
 		
-			return vals	
+			return adj	
 	
 		else:
 			return
-	
+			
+			
 	def getNewick(self, root):
 		""" get newick string format of tree """
 		out = ''

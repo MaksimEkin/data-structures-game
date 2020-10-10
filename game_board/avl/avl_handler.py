@@ -57,23 +57,15 @@ class AVLHandler(object):
 		""" generate game board if it doesnt exists """
 		if self.tree:
 			return
-				
-		# ensures that enough unique key values will exist to fill to height				
-		val_cap = pow(self.expected_height, 2) * 2 
-		self.tree = AVLTree()	
-		self.addNewNode(randint(0, val_cap), self.point_cap)
-		
+			
+		self.tree = AVLTree()
+		self.addNewNode(randint(0, self.point_cap))	
 		while(self.root.height < self.expected_height):
-			self.addNewNode(randint(0, val_cap), self.point_cap)
+			self.addNewNode(randint(0, self.point_cap))	
 		
 		self.golden_id = randint(0, self.uid - 1) # randomly choose golden node
-		
-		# fail safe to make sure root is not golden node.
-		# if random is seeded with a constant root can be made golden
-		timeout = 0
-		while(self.root.nid == self.golden_id and timeout < 10):
-			self.golden_id = randint(0, self.uid - 1)
-			timeout += 1
+		if(self.root.nid == self.golden_id):
+			self.golden_id = self.root.left.nid
 			
 			
 	def __parse_graph(self, graph):
@@ -83,81 +75,64 @@ class AVLHandler(object):
 		
 		self.tree = AVLTree()
 		insertion_dict = {}
-		nodes = graph['nodes']
-		root_id = graph['root_node'][4:]  # strip 'node' from id
-
-		for k in nodes:
-			if str(k) == root_id:  # root info not in adjacency list, parsed separately
-				insertion_dict[root_id] = {'key': graph['node_keys'][graph['root_node']], 
-										   'val': graph['node_points'][graph['root_node']]}
-								
-			if len(nodes[k]) > 0:  # not a null entry
-				for i in range(len(nodes[k])):
-					nid, mini_dict = self.__parse_graph_helper(nodes[k][i])
-					if nid not in insertion_dict:
-						insertion_dict[nid] = mini_dict	
-			else:
-				continue
-				
+		nids = graph['adjacency_list']
+		keys = graph['node_points']
+		
+		for i in nids:
+			i_int = i[4:]
+			if i_int not in insertion_dict:
+				insertion_dict[i_int] = keys[i]
+			
+			if len(nids[i]) > 0:  # node has children
+				for k in nids[i]:
+					k_int = k[4:]
+					if k_int not in insertion_dict:
+						insertion_dict[k_int] = keys[k]
+		
+		# ~ for nid in insertion_dict:
+			# ~ print(f'nid: {nid}, entry: {insertion_dict[nid]}')
 		for nid in sorted(insertion_dict, key=alphanum_key):
-			self.addNode(tryint(insertion_dict[nid]['key']), tryint(nid), tryint(insertion_dict[nid]['val']))
+			self.addNode(tryint(insertion_dict[nid]), tryint(nid)) 
+
 	
-	
-	def __parse_graph_helper(self, entry): 
-		""" turn inner node dict into a key and insertion dict """
+	# ~ def __parse_graph_helper(self, entry): 
+		# ~ """ turn inner node dict into a key and insertion dict """
 		
-		nid = entry['nid'][4:]  # strip 'node' from id
-		out = {'key': entry['key'], 'val': entry['val']}
-		return nid, out
+		# ~ nid = entry['nid'][4:]  # strip 'node' from id
+		# ~ out = {'key': entry['key'], 'val': entry['val']}
+		# ~ return nid, out
 		
 	
-	def addNewNode(self, key, point_cap):
+	def addNewNode(self, key, b=True):
 		""" add node to tree by value """
-		if self.tree.isIn(self.root, key):  # not adding duplicates 
-			return 							# isIn is costly, refactor later
-		
-		point_val = randint(5, point_cap)
-		point_val -= (point_val % 5)  # make all point values divisible by 5
-		self.root = self.tree.insert_node(self.root, key, self.uid, point_val)
+		self.root = self.tree.insert_node(self.root, key, self.uid, balance=b)
 		self.uid += 1
 	
 		
-	def addNode(self, key, nid, val):
+	def addNode(self, key, nid, b=True):
 		""" add node to tree by value """
-		# ~ if self.root and self.tree.isIn(self.root, key):  # not adding duplicates 
-			# ~ return 										# isIn is costly, refactor later
-		# commented out above because I need to handle this inside avl
-		
-		self.root = self.tree.insert_node(self.root, key, nid, val)
+		self.root = self.tree.insert_node(self.root, key, nid, balance=b)
 		
 		
-	def delNode(self, key):
+	def delNode(self, key, b=True):
 		""" remove node from tree by value """
-		# ~ if self.num_nodes <= 0 or not self.tree.isIn(self.root, key):  # can't remove what's not there
-			# ~ return 
-		# commented out above because I need to handle this inside avl
-		
-		self.root = self.tree.delete_node(self.root, key)
+		self.root = self.tree.delete_node(self.root, key, balance=b)
 		
 		
-	def delNodeByID(self, nid):
+	def delNodeByID(self, nid, b=True):
 		""" remove node from tree by value """
-		# ~ if self.num_nodes <= 0 or not self.tree.isIn(self.root, key):  # can't remove what's not there
-			# ~ return 
-		# commented out above because I need to handle this inside avl	
-		self.root = self.tree.delete_node_id(self.root, nid)		
+		self.root = self.tree.delete_node_id(self.root, nid, balance=b)		
 			
 		
 	def get_gamestate(self):
 		""" return dictionary with the gamestate """
 		out_dict = {}
-		out_dict['nodes'] = self.tree.getAdjList(self.root)
-		out_dict['uid'] = self.uid
-		out_dict['node_points'] = self.tree.getVals(self.root)
-		out_dict['node_keys'] = self.tree.getKeys(self.root)
+		out_dict['adjacency_list'] = self.tree.getAdjList(self.root)
+		out_dict['node_points'] = self.tree.getKeys(self.root)
 		out_dict['gold_node'] = 'node' + str(self.golden_id)
 		out_dict['root_node'] = 'node' + str(self.root.nid)
 		out_dict['balanced'] = self.balanced
+		out_dict['uid'] = self.uid
 		return out_dict
 
 
@@ -189,12 +164,12 @@ def avlAction(command, graph, debug=False):
 	c,t = command.split()  # get command and target
 	if c == 'Delete':
 		nid = tryint(t[4:])
-		handler.delNodeByID(nid)
+		handler.delNodeByID(nid, b=False)
 		if debug:
 			print(f'Tried to delete node of id {nid}')
 	elif c == 'Insert':
 		key = tryint(t)
-		handler.addNewNode(key, 25)  # point cap fixed at 25 rn, what should it be?
+		handler.addNewNode(key, b=False) 
 		if debug:
 			print(f'Tried to add new node with key {key}')
 	else:
