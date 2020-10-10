@@ -2,7 +2,6 @@
 # General
 # ========================================================================
 DIFFICULTY_LEVELS = ['Hard', 'Medium', 'Easy']
-
 CARDS_PER_PLAYER = 3
 
 
@@ -22,4 +21,14 @@ POINTS = {
     DIFFICULTY_LEVELS[0] : {'min':1, 'max':100},
     DIFFICULTY_LEVELS[1] : {'min':1, 'max':50},
     DIFFICULTY_LEVELS[2] : {'min':1, 'max':25}
+}
+
+
+# ========================================================================
+# Number of nodes given the difficulty
+# ========================================================================
+NODES = {
+    DIFFICULTY_LEVELS[0] : 5,
+    DIFFICULTY_LEVELS[1] : 10,
+    DIFFICULTY_LEVELS[2] : 20
 }
