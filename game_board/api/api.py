@@ -14,7 +14,7 @@ def api_overview(request):
     api_urls = {
         'Start Game'      : '/start_game/<str:difficulty>/<str:player_ids>/<str:data_structures>',
         'Game Board'      : '/board/<str:id>',
-        'Re-balance Tree' : '/rebalance/<str:graph>/<str:game_id>',
+        'Re-balance Tree' : '/rebalance/<str:adjacency_list>/<str:game_id>',
         'Action'          : '/action/<str:card>/<str:game_id>'
     }
     return Response(api_urls)
@@ -53,7 +53,7 @@ def board(request, game_id):
 
 
 @api_view(['GET'])
-def rebalance(request, graph, game_id):
+def rebalance(request, adjacency_list, game_id):
 
     # Load the game board from database
     status = utils.load_board_db(game_id)
@@ -71,20 +71,26 @@ def rebalance(request, graph, game_id):
         return Response({'invalid_action': check['reason']})
 
     # Do the rebalance action with Nick's AVL lib here
-    # correct_graph = avl.rebalance(graph)
-    # correct_graph['nodes'] == graph
-    graph =  {'nodes': 'node4(node2(node3)(node1))(node6(node5))',
-              'node_points': {'node1': 1, 'node2': 2, 'node3': 3, 'node4': 4, 'node5': 5, 'node6': 6},
-              'gold_node': 'node5',
-              'root_node': 'node3',
-              'balanced': True}
+    if board['curr_data_structure'] == 'AVL':
+        graph = avl.avlRebalance(board['graph'])
     board['graph'] = graph
+
+    # If not correct lose points
+    if board['graph'] != adjacency_list:
+        board['player_points']['turn'] -= config.LOSS[str(board['difficulty'])]
+
+    # Change turn
+    next_player_index = (board['player_ids'].index(board['turn']) + 1) % len(board['player_ids'])
+    board['turn'] = board['player_ids'][next_player_index]
 
     # Update board
     status = utils.update_board_db(board)
     if status['error']:
         return Response({'error': status['reason']})
     board = status['game_board']
+
+    # remove nicks ?? uid
+    del status['game_board']['graph']['uid']
 
     return Response(board)
 
@@ -103,11 +109,19 @@ def action(request, card, game_id):
     if check['cheat']:
         return Response({'invalid_action': check['reason']})
 
+    # Give the points
+    if config.GAIN_TIMES[board['curr_data_structure']] in card:
+        point = board['graph']['node_points'][card.split()[1]]
+        board['player_points'][board['turn']] += point
+
     # Do the card action with Nick's AVL lib here
     if board['curr_data_structure'] == 'AVL':
         graph = avl.avlAction(card, board['graph'])
+    else:
+        graph = avl.avlAction(card, board['graph'])
 
     board['graph'] = graph
+
 
     # Remove the played card
     board['cards'][board['turn']].remove(card)
@@ -122,5 +136,8 @@ def action(request, card, game_id):
     if status['error']:
         return Response({'error': status['reason']})
     board = status['game_board']
+
+    # remove nicks ?? uid
+    del status['game_board']['graph']['uid']
 
     return Response(board)
