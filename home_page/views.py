@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
+from django.views.generic import TemplateView
 
 def home(request):
-    return HttpResponse("<h1> The Data Structures Game </h1>")
+    return render(request, 'index.html')
 
