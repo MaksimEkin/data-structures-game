@@ -89,8 +89,6 @@ class AVLHandler(object):
 					if k_int not in insertion_dict:
 						insertion_dict[k_int] = keys[k]
 		
-		# ~ for nid in insertion_dict:
-			# ~ print(f'nid: {nid}, entry: {insertion_dict[nid]}')
 		for nid in sorted(insertion_dict, key=alphanum_key):
 			self.addNode(tryint(insertion_dict[nid]), tryint(nid)) 
 

@@ -26,13 +26,12 @@ class AVLTree(object):
 		key  -- key value being added
 		nid  -- node id
 		"""  
-		
 		if not root:  				# base case
 			return TreeNode(key, nid)
 		elif key < root.key:  		# go left
-			root.left = self.insert_node(root.left, key, nid)
+			root.left = self.insert_node(root.left, key, nid, balance)
 		elif key > root.key:  		# go right
-			root.right = self.insert_node(root.right, key, nid)	
+			root.right = self.insert_node(root.right, key, nid, balance)	
 		else:						# no duplicates
 			return root
 		root.height = 1 + max(self.getHeight(root.left), # update height
@@ -55,10 +54,10 @@ class AVLTree(object):
 			return root
 			
 		elif key < root.key:	# go left
-			root.left = self.delete_node(root.left, key)
+			root.left = self.delete_node(root.left, key, balance)
 			
 		elif key > root.key:	# go right
-			root.right = self.delete_node(root.right, key)
+			root.right = self.delete_node(root.right, key, balance)
 		else:
 			if root.left is None:
 				temp = root.right
@@ -70,8 +69,7 @@ class AVLTree(object):
 				return temp
 			temp = self.getMinNode(root.right)
 			root.key = temp.key
-			root.right = self.delete_node(root.right,
-										  temp.key)
+			root.right = self.delete_node(root.right, temp.key, balance)
 		if root is None:
 			return root
 			
@@ -96,12 +94,12 @@ class AVLTree(object):
 		
 		if root and root.nid != nid:
 			if root.left and not root.right:	# go left only
-				root.left = self.delete_node_id(root.left, nid)
+				root.left = self.delete_node_id(root.left, nid, balance)
 			elif not root.left and root.right:	# go left only
-				root.right = self.delete_node_id(root.right, nid)
+				root.right = self.delete_node_id(root.right, nid, balance)
 			elif root.left and root.right:		# do both
-				root.left = self.delete_node_id(root.left, nid)
-				root.right = self.delete_node_id(root.right, nid)
+				root.left = self.delete_node_id(root.left, nid, balance)
+				root.right = self.delete_node_id(root.right, nid, balance)
 			else:								# do neither
 				return root	
 			
@@ -119,8 +117,8 @@ class AVLTree(object):
 				return temp
 			temp = self.getMinNode(root.right)
 			root.key = temp.key
-			root.right = self.delete_node(root.right,
-										  temp.key)
+			root.nid = temp.nid
+			root.right = self.delete_node_id(root.right, temp.nid, balance)
 		if root is None:
 			return root
 			
