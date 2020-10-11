@@ -48,7 +48,7 @@ LOSS = {
 # When to gain points
 # ========================================================================
 GAIN_TIMES  = {
-    'AVL' : 'Delete',
+    'AVL'  : 'Delete',
     'STACK': 'Pop'
 }
 
