@@ -72,17 +72,24 @@
 		return graph;
 	} // create_graph
 
+
+
 function create_adjacency(graph){
 	var adjacency_list_returnable = {};
 	var x;
 	var y;
-	var node;
-	for (x = 0; x < graph.nodes.length; x++){
-		node = graph.nodes[x];
-		for(y=0; y < graph.edges.length; y++ ){
+	var node_val;
 
+	for (x = 0; x < graph.nodes.length; x++){
+		node_val = graph.nodes[x].id;
+		for(y=0; y < graph.edges.length; y++ ){
+			if (graph.edges[y].source == node_val){
+				adjacency_list_returnable.node_val = node_val;
+				//adjacency_list_returnable.node
+
+			}
 		} // for
-		adjacency_list_returnable = { node };
+		//adjacency_list_returnable = { node };
 	} // for
 
 	return adjacency_list_returnable;
