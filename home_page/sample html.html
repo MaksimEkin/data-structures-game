@@ -12,16 +12,20 @@
 </html>
 
 <script type="text/javascript">
+	//var fetch_return = fetch(https://data-structures-game.herokuapp.com/game_board/api/board/f3ec8628-0b6e-11eb-a40f-fa794f32c380)
+	//var graph = fetch_return["graph"];
+	//var adjacency_list = graph["adjacency_list"];
 	var adjacency_list = {'node4': ['node1', 'node0'],
-	                'node1': ['node2', 'node5'],
-	                'node2': ['node3'],
-	                'node5': ['node6'],
-	                'node6': ['node3'],
-	                'node0': ['node3'],
-	                'node3': ['node3']};
+				                'node1': ['node2', 'node5'],
+				                'node2': ['node3'],
+				                'node5': ['node6'],
+				                'node6': ['node3'],
+				                'node0': ['node3'],
+				                'node3': ['node3']};
 
 	var node_points = {'node2': 3, 'node6': 28, 'node5': 31, 'node1': 14, 'node3': 94, 'node0': 81, 'node4': 35};
 	var graph = create_graph(adjacency_list, node_points );
+	var adjacency_list_returned = create_adjacency(graph);
 
 	function create_graph(adjacency_list, node_points ){
 		const edges = [];
@@ -40,8 +44,8 @@
 			node = { id: adjacency_keys[i],
 	                 title: node_points[adjacency_keys[i]],
 	                 type: "SPECIAL_TYPE",
-	                 x: 258,
-	                 y: 331
+	                 x: 10+20*i,
+	                 y: 10+10*i
 			};
 			nodes.push(node);
 
@@ -68,5 +72,18 @@
 		return graph;
 	} // create_graph
 
+function create_adjacency(graph){
+	var adjacency_list_returnable = {};
+	var x;
+	var y;
+	var node;
+	for (x = 0; x < graph.nodes.length; x++){
+		node = graph.nodes[x];
+
+		adjacency_list_returnable = { node };
+	} // for
+
+	return adjacency_list_returnable;
+} // create_adjacency
 
 </script>
