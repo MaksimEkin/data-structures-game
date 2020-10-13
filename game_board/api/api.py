@@ -3,6 +3,11 @@ from rest_framework.response import Response
 
 from game_board.api import utils
 from game_board.avl import avl_handler as avl
+
+from rest_framework.throttling import AnonRateThrottle
+from rest_framework.throttling import UserRateThrottle
+from rest_framework.decorators import throttle_classes
+
 from .. import config
 
 import json
@@ -21,6 +26,8 @@ def api_overview(request):
 
 
 @api_view(['GET'])
+@throttle_classes([AnonRateThrottle])
+@throttle_classes([UserRateThrottle])
 def start_game(request, difficulty, player_ids, data_structures):
 
     if difficulty not in config.DIFFICULTY_LEVELS:
@@ -41,6 +48,7 @@ def start_game(request, difficulty, player_ids, data_structures):
 
 @api_view(['GET'])
 def board(request, game_id):
+    throttle_scope = ''
 
     status = utils.load_board_db(game_id)
     if status['error']:
@@ -103,10 +111,11 @@ def rebalance(request, game_id):
     status = utils.update_board_db(board)
     if status['error']:
         return Response({'error': status['reason']})
-    board = status['game_board']
 
     # remove nicks ?? uid
     del status['game_board']['graph']['uid']
+
+    board = status['game_board']
 
     return Response(board)
 
@@ -126,7 +135,7 @@ def action(request, card, game_id):
         return Response({'invalid_action': check['reason']})
 
     # Give the points
-    if config.GAIN_TIMES[board['curr_data_structure']] in card:
+    if card in config.GAIN_TIMES[board['curr_data_structure']]:
         point = board['graph']['node_points'][card.split()[1]]
         board['player_points'][board['turn']] += point
 
@@ -150,9 +159,10 @@ def action(request, card, game_id):
     status = utils.update_board_db(board)
     if status['error']:
         return Response({'error': status['reason']})
-    board = status['game_board']
 
     # remove nicks ?? uid
     del status['game_board']['graph']['uid']
+
+    board = status['game_board']
 
     return Response(board)
