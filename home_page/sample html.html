@@ -17,7 +17,7 @@
 	//var adjacency_list = graph["adjacency_list"];
 	var adjacency_list = {'node4': ['node1', 'node0'],
 				                'node1': ['node2', 'node5'],
-				                'node2': ['node3'],
+				                'node2': [],
 				                'node5': ['node6'],
 				                'node6': ['node3'],
 				                'node0': ['node3'],
@@ -79,17 +79,23 @@ function create_adjacency(graph){
 	var x;
 	var y;
 	var node_val;
+	var count = 0;
 
 	for (x = 0; x < graph.nodes.length; x++){
 		node_val = graph.nodes[x].id;
-		for(y=0; y < graph.edges.length; y++ ){
+		count = 0;
+		for(y = 0; y < graph.edges.length; y++ ){
 			if (graph.edges[y].source == node_val){
-				adjacency_list_returnable.node_val = node_val;
-				//adjacency_list_returnable.node
-
-			}
+				count += 1;
+				if (typeof(adjacency_list_returnable[node_val])!= "undefined"){
+					adjacency_list_returnable[node_val].push(graph.edges[y].target);
+				} else {
+					adjacency_list_returnable[node_val] = [graph.edges[y].target];
+				} // else
+			} // if
+			if (count == 2){x = graph.edges.length;}
 		} // for
-		//adjacency_list_returnable = { node };
+		if (count == 0) adjacency_list_returnable[node_val] = [];
 	} // for
 
 	return adjacency_list_returnable;
