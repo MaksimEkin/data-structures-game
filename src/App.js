@@ -1,16 +1,38 @@
-import React from 'react';
-import logo from './logo.svg';
+//import React from 'react';
+import React, { Component } from "react";
+import GameBoard from './Components/GameBoard'
 import Home from './Components/Home'
 import Header from './Components/Header';
-
-function App() {
+import {Route, Link, Switch} from "react-router-dom";
+import { BrowserRouter as Router } from 'react-router-dom'
+import Navigation from './Components/Navigation'
+ 
+function App(){
   return (
-    <div className="App">
-      <header className="App-header">
-  {/* <img src={logo} className="App-logo" alt="logo" */}
-            <Header />
-      </header>
-    </div>
+    <div>      
+    <Router>
+    <Header />
+      <ul>
+        <li>
+          <Link className="text-blue-500 py-3 border-t bordre-b block" to="/" >
+            Home
+          </Link>
+        </li>
+        <li>
+          <Link className="text-blue-500 py-3 border-t bordre-b block" to="/game_board" >
+            Start Game</Link>
+        </li>
+      </ul>
+      <Switch>
+        <Route exact path="/">
+          <Home/>
+        </Route>
+        <Route exact path="/game_board">
+          <GameBoard/>
+        </Route>
+      </Switch>
+    </Router>      
+    </div>      
   );
 }
 
