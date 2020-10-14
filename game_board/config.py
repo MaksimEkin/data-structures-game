@@ -1,5 +1,7 @@
 # ========================================================================
 # General
+#   DIFFICULTY_LEVELS: Game difficulty.
+#   CARDS_PER_PLAYER : How many cards each player gets.
 # ========================================================================
 DIFFICULTY_LEVELS = ['Hard', 'Medium', 'Easy']
 CARDS_PER_PLAYER = 3
@@ -7,6 +9,12 @@ CARDS_PER_PLAYER = 3
 
 # ========================================================================
 # Available cards (actions) for each data structure.
+#   CARDS : Each key is a data structure, and its value is a
+#           list of actions (cards).
+#
+#           Keywords:
+#           <#> is point specific action, replaced with intiger
+#           <node#> node specific action
 # ========================================================================
 CARDS = {
     'AVL'  : ['Insert #', 'Delete node#'],
@@ -16,6 +24,9 @@ CARDS = {
 
 # ========================================================================
 # Node points for game difficulty.
+#   POINTS : Each key is a difficulty from DIFFICULTY_LEVELS, and
+#            its value is a dictionary look-up for minimum and
+#            maximum points.
 # ========================================================================
 POINTS = {
     DIFFICULTY_LEVELS[0] : {'min':1, 'max':100},
@@ -26,6 +37,8 @@ POINTS = {
 
 # ========================================================================
 # Number of nodes given the difficulty
+#   HEIGHT : Each key is a difficulty from DIFFICULTY_LEVELS, and
+#            its value is the height of the tree.
 # ========================================================================
 HEIGHT = {
     DIFFICULTY_LEVELS[0] : 6,
@@ -36,6 +49,8 @@ HEIGHT = {
 
 # ========================================================================
 # Loss Points
+#   LOSS : Each key is a difficulty from DIFFICULTY_LEVELS, and
+#            its value is the number of points to lose for invalid action
 # ========================================================================
 LOSS = {
     DIFFICULTY_LEVELS[0] : 25,
@@ -46,9 +61,11 @@ LOSS = {
 
 # ========================================================================
 # When to gain points
+#   GAIN_TIMES : Each key is a data structure and its value is list of card
+#                types that gains points to the player.
 # ========================================================================
 GAIN_TIMES  = {
-    'AVL'  : 'Delete',
-    'STACK': 'Pop'
+    'AVL'  : ['Delete'],
+    'STACK': ['Pop']
 }
 
