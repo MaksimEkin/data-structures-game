@@ -13,20 +13,20 @@
 
 <script type="text/javascript">
 	var adjacency_list = {'node4': ['node1', 'node0'],
-	                'node1': ['node2', 'node5'],
-	                'node2': ['node3'],
-	                'node5': ['node6'],
-	                'node6': ['node3'],
-	                'node0': ['node3'],
-	                'node3': ['node3']};
+				                'node1': ['node2', 'node5'],
+				                'node2': [],
+				                'node5': ['node6'],
+				                'node6': ['node3'],
+				                'node0': ['node3'],
+				                'node3': ['node3']};
 
 	var node_points = {'node2': 3, 'node6': 28, 'node5': 31, 'node1': 14, 'node3': 94, 'node0': 81, 'node4': 35};
 	var graph = create_graph(adjacency_list, node_points );
+	var adjacency_list_returned = create_adjacency(graph);
 
 	function create_graph(adjacency_list, node_points ){
 		const edges = [];
 		const nodes = [];
-		var text = "";
 		var node;
 		var edge;
 		var i;
@@ -34,39 +34,56 @@
 		var adjacency_keys = Object.keys(adjacency_list)
 		var node_point_keys = Object.keys(node_points)
 		for (i = 0; i < adjacency_keys.length; i++) {
-			//text += " hi " + "<br>";
 
-			text += adjacency_keys[i] + " = ";
 			node = { id: adjacency_keys[i],
 	                 title: node_points[adjacency_keys[i]],
 	                 type: "SPECIAL_TYPE",
-	                 x: 258,
-	                 y: 331
+	                 x: 10+20*i,
+	                 y: 10+10*i
 			};
 			nodes.push(node);
 
-			//text += adjacency_list[adjacency_keys[i]];
-			text += "adjacency_keys[i]: "+ adjacency_keys[i];
-			text += " + adjacency_list[adjacency_keys[i]]]:"+adjacency_list[adjacency_keys[i]];
 			for (j = 0; j < adjacency_list[adjacency_keys[i]].length;j++){
-				text += " + node_points[adjacency_list[adjacency_keys[i]][j]]:"+node_points[adjacency_list[adjacency_keys[i]][j]];
-
 				edge = {handleText: "",
 					source: adjacency_keys[i],
 					target: adjacency_list[adjacency_keys[i]][j],
 					type: "SPECIAL_EDGE_TYPE"
 				};
 				edges.push(edge);
-
 			} //for
-
-			text+= "<br>";
-
 		}	// for i
-		document.getElementsByClassName("testing")[0].innerHTML = text;
 		var graph = {"edges": edges,"nodes":nodes};
 		return graph;
 	} // create_graph
 
+function create_adjacency(graph){
+	var adjacency_list_returnable = {};
+	var x;
+	var y;
+	var node_val;
+	var count = 0;
+
+	for (x = 0; x < graph.nodes.length; x++){
+		node_val = graph.nodes[x].id;
+		count = 0;
+		for(y = 0; y < graph.edges.length; y++ ){
+			if (graph.edges[y].source == node_val){
+				count += 1;
+				if (typeof(adjacency_list_returnable[node_val]) != "undefined"){
+					// Adds second Child to array
+					adjacency_list_returnable[node_val].push(graph.edges[y].target);
+				} else {
+					// First Child found, creates the array
+					adjacency_list_returnable[node_val] = [graph.edges[y].target];
+				} // else
+			} // if
+			if (count == 2){y = graph.edges.length;}
+		} // for
+		// Node has no Children
+		if (count == 0) adjacency_list_returnable[node_val] = [];
+	} // for
+
+	return adjacency_list_returnable;
+} // create_adjacency
 
 </script>
