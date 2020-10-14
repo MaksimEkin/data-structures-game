@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import ReactDOM from "react-dom";
+
 import {
   GraphView // required
 } from "react-digraph";
@@ -139,11 +140,33 @@ class GameBoard extends Component {
   constructor(props) {
     super(props);
     this.customNodeRef = React.createRef();
+
     this.state = {
       graph: sample,
-      selected: {}
+      selected: {},
+
+      loading: true,
+      board: null,
+      gameID: null,
+      playerCardChoice: null,
+      playerBalanceAttempt: null
+
     };
   }
+  // TODO:  ADD COMMENTS HERE
+  async componentDidMount() {
+       // TODO: FIX THE URLS, GET VARIABLES FROM USER: DIFFICULTY, PLAYERS(1-4), DATA STRUCTURE
+       let createGameURL = "http://127.0.0.1:8000/game_board/api/start_game/Easy/Maksim,Nick/AVL";
+       let getGameURL = "http://127.0.0.1:8000/game_board/api/board/";
+
+       let response = await fetch(createGameURL);
+       let game_id = await response.json();
+       this.setState({ gameID: game_id['game_id']});
+
+       response = await fetch(getGameURL + game_id['game_id']);
+       let board_ = await response.json();
+       this.setState({ board: board_, loading: false});
+    }
 
   renderNode = (nodeRef, data, id, selected, hovered) => {
     return (
@@ -430,15 +453,67 @@ class GameBoard extends Component {
 
   /* Define custom graph editing methods here */
 
+  // TODO: FUNCTION
+  // arg: card chosen
+  // call action api which returns new board
+  // sets the new board
+  playCard = event => {
+    let url = "http://127.0.0.1:8000/game_board/api/action/" + this.state.board['cards'][this.state.board['turn']][0] + '/'
+    url = url + this.state.board['game_id']
+    console.log(url)
+
+    this.setState({ loading: true});
+
+    // Here acting like i know what card is being played
+    // TODO: LEARN HOW TO DO API CALL HERE LOL
+    let response = fetch(url);
+    let newBoard = response.json();
+    this.setState({ board: newBoard, loading: false});
+
+    console.log(newBoard)
+  }
+
+  // TODO: FUNCTION
+  // arg: adjacency list of user's balance attempt from graph
+  // call balance api
+  // sets the new board
+
 
   render() {
     const nodes = this.state.graph.nodes;
     const edges = this.state.graph.edges;
     const selected = this.state.selected;
 
+    let card_1 = null;
+    let card_2 = null;
+    let card_3 = null;
+
+    if (!this.state.loading) {
+      console.log(this.state.gameID);
+      console.log(this.state.board);
+
+      // current cards that the palyer whose turn has
+      console.log(this.state.board['cards'][this.state.board['turn']][0]);
+      console.log(this.state.board['cards'][this.state.board['turn']][1]);
+      console.log(this.state.board['cards'][this.state.board['turn']][2]);
+
+      // graph
+      console.log(this.state.board['graph']);
+
+      // here staticly getting the cards so change
+      card_1 = this.state.board['cards'][this.state.board['turn']][0]
+      card_2 = this.state.board['cards'][this.state.board['turn']][1]
+      card_3 = this.state.board['cards'][this.state.board['turn']][2]
+      // plus it would have to be updateding as we play
+    }
+
     return (
 
       <div style={{ height: "50rem" }}>
+
+        <button id="startButton" class={"startButton"} onClick={this.playCard}>{card_1}</button>
+        <button id="startButton" className={"startButton"} onClick={this.playCard}>{card_2}</button>
+        <button id="startButton" className={"startButton"} onClick={this.playCard}>{card_3}</button>
 
         <div id = "graph" style={{ height: "50rem"}}>
           <GraphView
