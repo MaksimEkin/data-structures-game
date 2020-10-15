@@ -71,6 +71,8 @@ def main():
 		print("Uh oh, looks likes theres an issue, go check it out")
 		
 	
+	print('Finished!')
+	
 if __name__ == '__main__':
 	
 	main()
