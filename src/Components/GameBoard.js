@@ -48,8 +48,8 @@ class GameBoard extends Component {
   // TODO:  ADD COMMENTS HERE
   async componentDidMount() {
        // TODO: FIX THE URLS, GET VARIABLES FROM USER: DIFFICULTY, PLAYERS(1-4), DATA STRUCTURE
-       let createGameURL = "http://127.0.0.1:8000/game_board/api/start_game/Medium/Maksim,Nick/AVL";
-       let getGameURL = "http://127.0.0.1:8000/game_board/api/board/";
+       let createGameURL = "https://data-structures-game.herokuapp.com/game_board/api/start_game/Medium/Maksim,Nick/AVL";
+       let getGameURL = "https://data-structures-game.herokuapp.com/game_board/api/board/";
 
        let response = await fetch(createGameURL);
        let game_id = await response.json();
@@ -355,7 +355,7 @@ class GameBoard extends Component {
   // sets the new board
 
   playCard = async () => {
-    let url = "http://127.0.0.1:8000/game_board/api/action/" + this.state.board['cards'][this.state.board['turn']][0] + '/'
+    let url = "https://data-structures-game.herokuapp.com/game_board/api/action/" + this.state.board['cards'][this.state.board['turn']][0] + '/'
     url = url + this.state.board['game_id']
     console.log(url)
 
