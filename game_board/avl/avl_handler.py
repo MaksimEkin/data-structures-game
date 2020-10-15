@@ -1,8 +1,8 @@
 """ Handles AVL tree state """
 
 import re
-from avl import TreeNode
-from avl import AVLTree
+from .avl import TreeNode
+from .avl import AVLTree
 from random import seed
 from random import randint
 from random import choice
@@ -73,9 +73,9 @@ class AVLHandler(object):
 			return
 			
 		self.tree = AVLTree()
-		self.addNewNode(randint(0, self.point_cap))	
+		self.addNewNode(randint(1, self.point_cap))	
 		while(self.root.height < self.expected_height):
-			self.addNewNode(randint(0, self.point_cap))	
+			self.addNewNode(randint(1, self.point_cap))	
 		
 		allUIDs = list(range(self.uid))  # randomly choose golden node
 		allUIDs.remove(self.root.nid)
