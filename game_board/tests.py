@@ -1,5 +1,6 @@
 """
 Run: python manage.py test
+Refrence: https://www.django-rest-framework.org/api-guide/testing/
 """
 
 from django.test import TestCase
@@ -125,6 +126,10 @@ class RunTests(TestCase):
         # remove the created game
         sleep(0.2)
         db.remove_game(created_game.data['game_id'])
+
+    def test_simple_game_play(self):
+        """Tests game play by simulating a simple game"""
+        pass
 
 # ========================================================================
 # START TESTS
