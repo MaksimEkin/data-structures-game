@@ -144,7 +144,7 @@ class GameBoard extends Component {
     this.state = {
       graph: sample,
       selected: {},
-
+      card: {},
       loading: true,
       board: null,
       gameID: null,
@@ -156,8 +156,14 @@ class GameBoard extends Component {
   // TODO:  ADD COMMENTS HERE
   async componentDidMount() {
        // TODO: FIX THE URLS, GET VARIABLES FROM USER: DIFFICULTY, PLAYERS(1-4), DATA STRUCTURE
-       let createGameURL = "http://127.0.0.1:8000/game_board/api/start_game/Easy/Maksim,Nick/AVL";
-       let getGameURL = "http://127.0.0.1:8000/game_board/api/board/";
+       let userArr= ["kulsoom","naomi","ryan","nick","maksim"]
+       let users = userArr.join(",")
+       console.log(users)
+       let level = "easy"
+       let ds = "avl"
+       let gameId = "3ec8628-0b6e-11eb-a40f-fa794f32c380"
+       let createGameURL = "http://127.0.0.1:8000/game_board/api/start_game/"+{level}+"/"+{users}+"/"+{ds};
+       let getGameURL = "http://127.0.0.1:8000/game_board/api/board/"+{gameId}; //add gameId to end of this url
 
        let response = await fetch(createGameURL);
        let game_id = await response.json();
@@ -165,7 +171,7 @@ class GameBoard extends Component {
 
        response = await fetch(getGameURL + game_id['game_id']);
        let board_ = await response.json();
-       this.setState({ board: board_, loading: false});
+       this.setState({ board: board_, loading: false, card:{}});
     }
 
   renderNode = (nodeRef, data, id, selected, hovered) => {
@@ -457,8 +463,9 @@ class GameBoard extends Component {
   // arg: card chosen
   // call action api which returns new board
   // sets the new board
+  //this.state.board['cards'][this.state.board['turn']][0] + '/'
   playCard = event => {
-    let url = "http://127.0.0.1:8000/game_board/api/action/" + this.state.board['cards'][this.state.board['turn']][0] + '/'
+    let url = "http://127.0.0.1:8000/game_board/api/action/"+this.state.board['cards']+this.state.board['turn'][0]+ '/';
     url = url + this.state.board['game_id']
     console.log(url)
 
@@ -484,10 +491,14 @@ class GameBoard extends Component {
     const edges = this.state.graph.edges;
     const selected = this.state.selected;
 
-    let card_1 = null;
+    let card_1 = [
+      "Insert 18",
+      "Insert 23",
+      "Insert 17"
+  ];
     let card_2 = null;
     let card_3 = null;
-
+    
     if (!this.state.loading) {
       console.log(this.state.gameID);
       console.log(this.state.board);
