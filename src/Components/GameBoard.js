@@ -41,15 +41,16 @@ class GameBoard extends Component {
       board: null,
       gameID: null,
       playerCardChoice: null,
-      playerBalanceAttempt: null
+      playerBalanceAttempt: null,
+      cardPlayed: true
 
     };
   }
   // TODO:  ADD COMMENTS HERE
   async componentDidMount() {
        // TODO: FIX THE URLS, GET VARIABLES FROM USER: DIFFICULTY, PLAYERS(1-4), DATA STRUCTURE
-       let createGameURL = "https://data-structures-game.herokuapp.com/game_board/api/start_game/Medium/Maksim,Nick/AVL";
-       let getGameURL = "https://data-structures-game.herokuapp.com/game_board/api/board/";
+       let createGameURL = "http://127.0.0.1:8000/game_board/api/start_game/Medium/Maksim,Nick/AVL";
+       let getGameURL = "http://127.0.0.1:8000/game_board/api/board/";
 
        let response = await fetch(createGameURL);
        let game_id = await response.json();
@@ -354,25 +355,29 @@ class GameBoard extends Component {
   // call action api which returns new board
   // sets the new board
 
-  playCard = async () => {
-    let url = "https://data-structures-game.herokuapp.com/game_board/api/action/" + this.state.board['cards'][this.state.board['turn']][0] + '/'
-    url = url + this.state.board['game_id']
-    console.log(url)
+  playCard = async (card_num = -1) => {
 
-    this.setState({ loading: true});
+    if (!this.state.card_played) {
+      let url = "http://127.0.0.1:8000/game_board/api/action/" + this.state.board['cards'][this.state.board['turn']][card_num] + '/'
+      url = url + this.state.board['game_id']
+      console.log(url)
 
-    // Here acting like i know what card is being played
-    // TODO: LEARN HOW TO DO API CALL HERE LOL
-    let response = await fetch(url);
-    let newBoard = await response.json();
-    this.setState({ board: newBoard, loading: false});
+      this.setState({loading: true});
 
-    let made_graph = create_graph(this.state.board['graph'])
-    console.log(made_graph);
-    this.setState({ graph: made_graph});
+      // Here acting like i know what card is being played
+      // TODO: LEARN HOW TO DO API CALL HERE LOL
+      let response = await fetch(url);
+      let newBoard = await response.json();
+      this.setState({board: newBoard, loading: false, card_played: true});
+
+      let made_graph = create_graph(this.state.board['graph'])
+      console.log(made_graph);
+      this.setState({graph: made_graph});
 
 
-    console.log(newBoard)
+      console.log(newBoard);
+    }
+
   }
 
   // TODO: FUNCTION
@@ -415,15 +420,15 @@ class GameBoard extends Component {
           <div className="bg-gray-200 flex items-center bg-gray-200 h-10">
 
             <div className="flex-1 text-gray-700 text-center bg-gray-400 px-4 py-2 m-2">
-              <button onClick={this.playCard}>{card_1}</button>
+              <button onClick={this.playCard(0)}>{card_1}</button>
             </div>
 
             <div className="flex-1 text-gray-700 text-center bg-gray-400 px-4 py-2 m-2">
-              <button onClick={this.playCard}>{card_2}</button>
+              <button onClick={this.playCard(1)}>{card_2}</button>
             </div>
 
             <div className="flex-1 text-gray-700 text-center bg-gray-400 px-4 py-2 m-2">
-              <button onClick={this.playCard}>{card_3}</button>
+              <button onClick={this.playCard(2)}>{card_3}</button>
             </div>
           </div>
 

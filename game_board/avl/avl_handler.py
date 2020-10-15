@@ -1,8 +1,8 @@
 """ Handles AVL tree state """
 
 import re
-from avl import TreeNode
-from avl import AVLTree
+from .avl import TreeNode
+from .avl import AVLTree
 from random import seed
 from random import randint
 from random import choice
