@@ -1,11 +1,12 @@
 """ Handles AVL tree state """
 
 import re
-from .avl import TreeNode
-from .avl import AVLTree
+from avl import TreeNode
+from avl import AVLTree
 from random import seed
 from random import randint
-seed(42)  # fixed seed for debugging
+from random import choice
+#seed(42)  # fixed seed for debugging
 
 
 def tryint(s):
@@ -32,6 +33,11 @@ class AVLHandler(object):
 	@classmethod
 	def from_scratch(cls, expected_height, point_cap):	
 		
+		if expected_height <= 1:
+			raise Exception(f"Argument 'expected_height' given invalid value: {expected_height} Must be >1")
+		if point_cap <= 2:
+			raise Exception(f"Argument 'point_cap' given invalid value: {point_cap} Must be >2")
+		
 		handler = cls()
 		handler.uid = 0
 		handler.golden_id = None  # id of golden node
@@ -44,6 +50,14 @@ class AVLHandler(object):
 	
 	@classmethod
 	def from_graph(cls, graph):
+		
+		# verify graph has correct keys
+		expected_keys = ['adjacency_list', 'node_points', 'gold_node', 
+						'root_node', 'balanced', 'uid']
+		for key in expected_keys:
+			if key not in graph:
+				raise Exception(f'Expected key in graph not found: {key}')
+		
 		
 		handler = cls()
 		handler.uid = tryint(graph['uid'])
@@ -63,10 +77,10 @@ class AVLHandler(object):
 		while(self.root.height < self.expected_height):
 			self.addNewNode(randint(0, self.point_cap))	
 		
-		self.golden_id = randint(0, self.uid - 1) # randomly choose golden node
-		if(self.root.nid == self.golden_id):
-			self.golden_id = self.root.left.nid
-			
+		allUIDs = list(range(self.uid))  # randomly choose golden node
+		allUIDs.remove(self.root.nid)
+		self.golden_id = choice(allUIDs)
+
 			
 	def __parse_graph(self, graph):
 		""" deseralize tree from existing tree graph """
@@ -91,14 +105,6 @@ class AVLHandler(object):
 		
 		for nid in sorted(insertion_dict, key=alphanum_key):
 			self.addNode(tryint(insertion_dict[nid]), tryint(nid)) 
-
-	
-	# ~ def __parse_graph_helper(self, entry): 
-		# ~ """ turn inner node dict into a key and insertion dict """
-		
-		# ~ nid = entry['nid'][4:]  # strip 'node' from id
-		# ~ out = {'key': entry['key'], 'val': entry['val']}
-		# ~ return nid, out
 		
 	
 	def addNewNode(self, key, b=True):
@@ -112,6 +118,7 @@ class AVLHandler(object):
 		""" add node to tree by value """
 		self.root = self.tree.insert_node(self.root, key, nid, balance=b)
 		self.balanced = self.tree.isBalanced(self.root)
+		
 		
 	def delNode(self, key, b=True):
 		""" remove node from tree by value """
@@ -144,6 +151,12 @@ class AVLHandler(object):
 		else:
 			self.tree.printKeys(self.root, "", True)
 		
+	def debug_wrapper(self):
+		self.debug_print(use_id=False)
+		print('\n\nNow with ids. . .')
+		self.debug_print(use_id=True)
+		print(f'Golden Node:\t{self.golden_id}')
+		print(f'Balanced:\t{self.balanced}')
 		
 		
 ##### API Callable Functions #####
@@ -152,9 +165,7 @@ def avlNew(height, point_cap, debug=False):
 	
 	handler = AVLHandler.from_scratch(height, point_cap)
 	if debug:
-		handler.debug_print(use_id=False)
-		print('\n\nNow with ids. . .')
-		handler.debug_print(use_id=True)
+		handler.debug_wrapper()
 	return handler.get_gamestate()
 
 
@@ -177,18 +188,14 @@ def avlAction(command, graph, debug=False):
 		raise Exception('Invalid command passed to AVL Handler')
 	
 	if debug:
-		handler.debug_print(use_id=False)
-		print('\n\nNow with ids. . .')
-		handler.debug_print(use_id=True)
+		handler.debug_wrapper()
 	return handler.get_gamestate()
 	
 	
 def avlRebalance(graph, debug=False):
 	handler = AVLHandler.from_graph(graph)
 	if debug:
-		handler.debug_print(use_id=False)
-		print('\n\nNow with ids. . .')
-		handler.debug_print(use_id=True)
+		handler.debug_wrapper()
 	return handler.get_gamestate()
 	""" rebalance graph and return """
 	

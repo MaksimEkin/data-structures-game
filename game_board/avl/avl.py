@@ -30,10 +30,9 @@ class AVLTree(object):
 			return TreeNode(key, nid)
 		elif key < root.key:  		# go left
 			root.left = self.insert_node(root.left, key, nid, balance)
-		elif key > root.key:  		# go right
+		else:						# go right
 			root.right = self.insert_node(root.right, key, nid, balance)	
-		else:						# no duplicates
-			return root
+			
 		root.height = 1 + max(self.getHeight(root.left), # update height
 							  self.getHeight(root.right))
 	
