@@ -1,8 +1,10 @@
 import React, { Component } from "react";
 import ReactDOM from "react-dom";
+import {create_adjacency, create_graph} from './CreateGraphAdj.js';
 
 import {
-  GraphView // required
+  GraphView, // required
+  LayoutEngineType,
 } from "react-digraph";
 
 import {
@@ -19,123 +21,12 @@ import {
 
 import "./styles.css";
 
-var gameStarted = false
-
 const sample = {
-  edges: [
-    {
-      source: "start1",
-      target: "a1",
-      type: SPECIAL_EDGE_TYPE
-    },
-    {
-      handleText: "5",
-      source: "a1",
-      target: "a2",
-      type: SPECIAL_EDGE_TYPE
-    },
-    {
-      handleText: "54",
-      source: "a2",
-      target: "a4",
-      type: EMPTY_EDGE_TYPE
-    },
-    {
-      handleText: "54",
-      source: "a1",
-      target: "a3",
-      type: EMPTY_EDGE_TYPE
-    },
-    {
-      handleText: "54",
-      source: "a3",
-      target: "a4",
-      type: EMPTY_EDGE_TYPE
-    },
-    {
-      handleText: "54",
-      source: "a1",
-      target: "a5",
-      type: EMPTY_EDGE_TYPE
-    },
-    {
-      handleText: "54",
-      source: "a4",
-      target: "a1",
-      type: EMPTY_EDGE_TYPE
-    },
-    {
-      handleText: "54",
-      source: "a1",
-      target: "a6",
-      type: EMPTY_EDGE_TYPE
-    },
-    {
-      handleText: "24",
-      source: "a1",
-      target: "a7",
-      type: EMPTY_EDGE_TYPE
-    }
-  ],
-  nodes: [
-    {
-      id: "start1",
-      title: "Start (0)",
-      type: SPECIAL_TYPE
-
-    },
-    {
-      id: "a1",
-      title: "Node A (1)",
-      type: CUSTOM_EMPTY_TYPE,
-      x: 258.3976135253906,
-      y: 331.9783248901367
-    },
-    {
-      id: "a2",
-      title: "Node B (2)",
-      type: CUSTOM_EMPTY_TYPE,
-      x: 593.9393920898438,
-      y: 260.6060791015625
-    },
-    {
-      id: "a3",
-      title: "Node C (3)",
-      type: CUSTOM_EMPTY_TYPE,
-      x: 237.5757598876953,
-      y: 61.81818389892578
-    },
-    {
-      id: "a4",
-      title: "Node D (4)",
-      type: CUSTOM_EMPTY_TYPE,
-      x: 600.5757598876953,
-      y: 600.81818389892578
-    },
-    {
-      id: "a5",
-      title: "Node E (5)",
-      type: CUSTOM_EMPTY_TYPE,
-      x: 50.5757598876953,
-      y: 500.81818389892578
-    },
-    {
-      id: "a6",
-      title: "Node E (6)",
-      type: CUSTOM_EMPTY_TYPE,
-      x: 300,
-      y: 600
-    },
-    {
-      id: "a7",
-      title: "Node F (7)",
-      type: CUSTOM_EMPTY_TYPE,
-      x: 0,
-      y: 300
-    }
-  ]
+  edges: [{}],
+  nodes: [{ id: "start1", title: "Start (0)", type: SPECIAL_TYPE },]
 };
- 
+
+
 class GameBoard extends Component {
   constructor(props) {
     super(props);
@@ -144,7 +35,8 @@ class GameBoard extends Component {
     this.state = {
       graph: sample,
       selected: {},
-      card: {},
+      layoutEngineType: 'VerticalTree',
+
       loading: true,
       board: null,
       gameID: null,
@@ -156,14 +48,8 @@ class GameBoard extends Component {
   // TODO:  ADD COMMENTS HERE
   async componentDidMount() {
        // TODO: FIX THE URLS, GET VARIABLES FROM USER: DIFFICULTY, PLAYERS(1-4), DATA STRUCTURE
-       let userArr= ["kulsoom","naomi","ryan","nick","maksim"]
-       let users = userArr.join(",")
-       console.log(users)
-       let level = "easy"
-       let ds = "avl"
-       let gameId = "3ec8628-0b6e-11eb-a40f-fa794f32c380"
-       let createGameURL = "http://127.0.0.1:8000/game_board/api/start_game/"+{level}+"/"+{users}+"/"+{ds};
-       let getGameURL = "http://127.0.0.1:8000/game_board/api/board/"+{gameId}; //add gameId to end of this url
+       let createGameURL = "http://127.0.0.1:8000/game_board/api/start_game/Medium/Maksim,Nick/AVL";
+       let getGameURL = "http://127.0.0.1:8000/game_board/api/board/";
 
        let response = await fetch(createGameURL);
        let game_id = await response.json();
@@ -171,7 +57,11 @@ class GameBoard extends Component {
 
        response = await fetch(getGameURL + game_id['game_id']);
        let board_ = await response.json();
-       this.setState({ board: board_, loading: false, card:{}});
+       this.setState({ board: board_, loading: false});
+
+       let made_graph = create_graph(this.state.board['graph'])
+       console.log(made_graph);
+       this.setState({ graph: made_graph});
     }
 
   renderNode = (nodeRef, data, id, selected, hovered) => {
@@ -463,9 +353,9 @@ class GameBoard extends Component {
   // arg: card chosen
   // call action api which returns new board
   // sets the new board
-  //this.state.board['cards'][this.state.board['turn']][0] + '/'
-  playCard = event => {
-    let url = "http://127.0.0.1:8000/game_board/api/action/"+this.state.board['cards']+this.state.board['turn'][0]+ '/';
+
+  playCard = async () => {
+    let url = "http://127.0.0.1:8000/game_board/api/action/" + this.state.board['cards'][this.state.board['turn']][0] + '/'
     url = url + this.state.board['game_id']
     console.log(url)
 
@@ -473,9 +363,14 @@ class GameBoard extends Component {
 
     // Here acting like i know what card is being played
     // TODO: LEARN HOW TO DO API CALL HERE LOL
-    let response = fetch(url);
-    let newBoard = response.json();
+    let response = await fetch(url);
+    let newBoard = await response.json();
     this.setState({ board: newBoard, loading: false});
+
+    let made_graph = create_graph(this.state.board['graph'])
+    console.log(made_graph);
+    this.setState({ graph: made_graph});
+
 
     console.log(newBoard)
   }
@@ -491,14 +386,10 @@ class GameBoard extends Component {
     const edges = this.state.graph.edges;
     const selected = this.state.selected;
 
-    let card_1 = [
-      "Insert 18",
-      "Insert 23",
-      "Insert 17"
-  ];
+    let card_1 = null;
     let card_2 = null;
     let card_3 = null;
-    
+
     if (!this.state.loading) {
       console.log(this.state.gameID);
       console.log(this.state.board);
@@ -520,13 +411,24 @@ class GameBoard extends Component {
 
     return (
 
-      <div style={{ height: "50rem" }}>
+        <div style={{height: "10rem"}}>
+          <div className="bg-gray-200 flex items-center bg-gray-200 h-10">
 
-        <button id="startButton" class={"startButton"} onClick={this.playCard}>{card_1}</button>
-        <button id="startButton" className={"startButton"} onClick={this.playCard}>{card_2}</button>
-        <button id="startButton" className={"startButton"} onClick={this.playCard}>{card_3}</button>
+            <div className="flex-1 text-gray-700 text-center bg-gray-400 px-4 py-2 m-2">
+              <button onClick={this.playCard}>{card_1}</button>
+            </div>
 
-        <div id = "graph" style={{ height: "50rem"}}>
+            <div className="flex-1 text-gray-700 text-center bg-gray-400 px-4 py-2 m-2">
+              <button onClick={this.playCard}>{card_2}</button>
+            </div>
+
+            <div className="flex-1 text-gray-700 text-center bg-gray-400 px-4 py-2 m-2">
+              <button onClick={this.playCard}>{card_3}</button>
+            </div>
+          </div>
+
+
+        <div id = "graph" style={{ height: "60rem"}}>
           <GraphView
           showGraphControls={true}
           gridSize="100rem"
@@ -549,6 +451,8 @@ class GameBoard extends Component {
           onSwapEdge={this.onSwapEdge}
           onDeleteEdge={this.onDeleteEdge}
           readOnly={false}
+          dark={true}
+          layoutEngineType={this.state.layoutEngineType}
           //renderNode={this.renderNode}
         />
         </div>
