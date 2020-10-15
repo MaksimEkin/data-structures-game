@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import ReactDOM from "react-dom";
 import {create_adjacency, create_graph} from './CreateGraphAdj.js';
+import '../tailwind.css';
 
 import {
   GraphView, // required
@@ -40,9 +41,9 @@ class GameBoard extends Component {
       loading: true,
       board: null,
       gameID: null,
+      turn: null,
       playerCardChoice: null,
-      playerBalanceAttempt: null,
-      cardPlayed: true
+      playerBalanceAttempt: null
 
     };
   }
@@ -54,11 +55,10 @@ class GameBoard extends Component {
 
        let response = await fetch(createGameURL);
        let game_id = await response.json();
-       this.setState({ gameID: game_id['game_id']});
 
        response = await fetch(getGameURL + game_id['game_id']);
        let board_ = await response.json();
-       this.setState({ board: board_, loading: false});
+       this.setState({ board: board_, loading: false, turn: board_['turn'] });
 
        let made_graph = create_graph(this.state.board['graph'])
        console.log(made_graph);
@@ -355,29 +355,25 @@ class GameBoard extends Component {
   // call action api which returns new board
   // sets the new board
 
-  playCard = async (card_num = -1) => {
+  playCard = async () => {
+    let url = "http://127.0.0.1:8000/game_board/api/action/" + this.state.board['cards'][this.state.turn][0] + '/'
+    url = url + this.state.board['game_id']
+    console.log(url)
 
-    if (!this.state.card_played) {
-      let url = "http://127.0.0.1:8000/game_board/api/action/" + this.state.board['cards'][this.state.board['turn']][card_num] + '/'
-      url = url + this.state.board['game_id']
-      console.log(url)
+    this.setState({ loading: true});
 
-      this.setState({loading: true});
+    // Here acting like i know what card is being played
+    // TODO: LEARN HOW TO DO API CALL HERE LOL
+    let response = await fetch(url);
+    let newBoard = await response.json();
+    this.setState({ board: newBoard, loading: false, turn: newBoard['turn']});
 
-      // Here acting like i know what card is being played
-      // TODO: LEARN HOW TO DO API CALL HERE LOL
-      let response = await fetch(url);
-      let newBoard = await response.json();
-      this.setState({board: newBoard, loading: false, card_played: true});
-
-      let made_graph = create_graph(this.state.board['graph'])
-      console.log(made_graph);
-      this.setState({graph: made_graph});
+    let made_graph = create_graph(this.state.board['graph'])
+    console.log(made_graph);
+    this.setState({ graph: made_graph});
 
 
-      console.log(newBoard);
-    }
-
+    console.log(newBoard)
   }
 
   // TODO: FUNCTION
@@ -417,19 +413,22 @@ class GameBoard extends Component {
     return (
 
         <div style={{height: "10rem"}}>
+          <div className="text-center text-6xl font-bold"> It's {this.state.turn }'s turn! </div>
+
           <div className="bg-gray-200 flex items-center bg-gray-200 h-10">
 
             <div className="flex-1 text-gray-700 text-center bg-gray-400 px-4 py-2 m-2">
-              <button onClick={this.playCard(0)}>{card_1}</button>
+              <button onClick={this.playCard}>{card_1}</button>
             </div>
 
             <div className="flex-1 text-gray-700 text-center bg-gray-400 px-4 py-2 m-2">
-              <button onClick={this.playCard(1)}>{card_2}</button>
+              <button onClick={this.playCard}>{card_2}</button>
             </div>
 
             <div className="flex-1 text-gray-700 text-center bg-gray-400 px-4 py-2 m-2">
-              <button onClick={this.playCard(2)}>{card_3}</button>
+              <button onClick={this.playCard}>{card_3}</button>
             </div>
+
           </div>
 
 
@@ -469,5 +468,5 @@ class GameBoard extends Component {
 
 const rootElement = document.getElementById("root");
 ReactDOM.render(<GameBoard />, rootElement);
- 
+
 export default GameBoard;
