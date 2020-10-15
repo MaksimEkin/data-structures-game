@@ -198,6 +198,7 @@ def distribute_cards(player_ids, nodes, data_structure, difficulty, gold_node):
     # Remove the golden node from node options so it doesn't get deleted
     nodes.remove(gold_node)
 
+
     # generate the deck of cards
     cards = list()
     for ii in range(len(player_ids) * config.CARDS_PER_PLAYER):
