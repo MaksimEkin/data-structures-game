@@ -16,14 +16,20 @@ import {
   SPECIAL_CHILD_SUBTYPE,
   SPECIAL_EDGE_TYPE,
   SPECIAL_TYPE,
-  SKINNY_TYPE
+  SKINNY_TYPE,
+    GOLD_NODE
 } from "./config";
 
 import "./styles.css";
 
+//Fix XSS security issues when developing locally
+const local = "http://127.0.0.1:8000/";
+const remote = "https://data-structures-game.herokuapp.com/";
+const url = local;
+
 const sample = {
   edges: [{}],
-  nodes: [{ id: "start1", title: "Start (0)", type: SPECIAL_TYPE },]
+  nodes: [{ id: "start1", title: "Start (0)", type: GOLD_NODE },]
 };
 
 
@@ -48,8 +54,8 @@ class GameBoard extends Component {
   // TODO:  ADD COMMENTS HERE
   async componentDidMount() {
        // TODO: FIX THE URLS, GET VARIABLES FROM USER: DIFFICULTY, PLAYERS(1-4), DATA STRUCTURE
-       let createGameURL = "https://data-structures-game.herokuapp.com/game_board/api/start_game/Medium/Maksim,Nick/AVL";
-       let getGameURL = "https://data-structures-game.herokuapp.com/game_board/api/board/";
+       let createGameURL = url+"game_board/api/start_game/Medium/Maksim,Nick/AVL";
+       let getGameURL = url+"game_board/api/board/";
 
        let response = await fetch(createGameURL);
        let game_id = await response.json();
@@ -355,7 +361,7 @@ class GameBoard extends Component {
   // sets the new board
 
   playCard = async () => {
-    let url = "https://data-structures-game.herokuapp.com/game_board/api/action/" + this.state.board['cards'][this.state.board['turn']][0] + '/'
+    let url = url+"game_board/api/action/" + this.state.board['cards'][this.state.board['turn']][0] + '/'
     url = url + this.state.board['game_id']
     console.log(url)
 
@@ -464,5 +470,5 @@ class GameBoard extends Component {
 
 const rootElement = document.getElementById("root");
 ReactDOM.render(<GameBoard />, rootElement);
- 
+
 export default GameBoard;

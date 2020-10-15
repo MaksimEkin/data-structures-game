@@ -30,17 +30,25 @@ export const SKINNY_TYPE = "skinny";
 export const SPECIAL_CHILD_SUBTYPE = "specialChild";
 export const EMPTY_EDGE_TYPE = "emptyEdge";
 export const SPECIAL_EDGE_TYPE = "specialEdge";
+export const GOLD_NODE = "goldnode";
 
 export const nodeTypes = [
   EMPTY_TYPE,
   CUSTOM_EMPTY_TYPE,
   POLY_TYPE,
   SPECIAL_TYPE,
-  SKINNY_TYPE
+  SKINNY_TYPE,
+  GOLD_NODE
 ];
 export const edgeTypes = [EMPTY_EDGE_TYPE, SPECIAL_EDGE_TYPE];
 
 export const nodeSubTypes = [SPECIAL_CHILD_SUBTYPE];
+
+const Goldnode = (
+  <symbol viewBox="0 0 200 200" id="goldnode" width="154" height="154">
+    <circle cx="100" cy="100" r="50" fill="rgba(255, 165, 0)"/>
+  </symbol>
+);
 
 const EmptyNodeShape = (
   <symbol viewBox="0 0 154 154" width="154" height="154" id="emptyNode">
@@ -141,12 +149,12 @@ export default {
     customEmpty: {
       shape: CustomEmptyShape,
       shapeId: "#customEmpty",
-      typeText: "None"
+      typeText: "Node"
     },
     special: {
       shape: SpecialShape,
       shapeId: "#special",
-      typeText: "Special"
+      typeText: "Root"
     },
     skinny: {
       shape: SkinnyShape,
@@ -157,6 +165,11 @@ export default {
       shape: PolyShape,
       shapeId: "#poly",
       typeText: "Poly"
-    }
+    },
+    goldnode: {
+      shape: Goldnode,
+      shapeId: "#goldnode",
+      typeText: "Gold"
+    },
   }
 };
