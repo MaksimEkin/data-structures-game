@@ -25,7 +25,7 @@ import "./styles.css";
 //Fix XSS security issues when developing locally
 const local = "http://127.0.0.1:8000/";
 const remote = "https://data-structures-game.herokuapp.com/";
-const url = local;
+const url = remote;
 
 const sample = {
   edges: [{}],
