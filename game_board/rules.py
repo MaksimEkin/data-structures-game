@@ -14,14 +14,14 @@ def general(game_board, card=-1):
 # ========================================================================
 # Addional game rules when the DS is AVL
 # ========================================================================
-def AVL(game_board, rebalance=-1):
+def AVL(game_board, rebalance):
 
     # Check if the graph is in rebalance state
-    if rebalance != -1 and (game_board['graph']['balanced'] == True):
+    if rebalance != False and (game_board['graph']['balanced'] == True):
         return {'cheat': True, 'reason': str('Tree is already balanced!')}
 
     # Check if user is attempting to do an action while tree is not balanced
-    if rebalance == -1 and (game_board['graph']['balanced'] == False):
+    if rebalance == False and (game_board['graph']['balanced'] == False):
         return {'cheat': True, 'reason': str('You must balance the tree first!')}
 
     # No cheat detected
