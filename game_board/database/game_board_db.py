@@ -17,7 +17,7 @@ def create_game(board):
     On Success:
         str: unique identification for the game
     On Fail:
-        str: friendly response to infrom of an error
+        str: friendly response to inform of an error
     """
     gameid = board["game_id"]
     user_list = board["player_ids"]
@@ -69,7 +69,7 @@ def read_game(game_id: str):
     On Success:
         dictionary: an active game document
     On Fail:
-        str: friendly response to infrom of an error
+        str: friendly response to inform of an error
     """
     DATABASE_URL1 = os.environ.get('DATABASE_URL1')
     client = MongoClient(DATABASE_URL1)
@@ -90,7 +90,7 @@ def remove_game(game_id: str):
     On Success:
         int: number of deleted game documents
     On Fail:
-        str: friendly response to infrom of an error
+        str: friendly response to inform of an error
     """
     value_returned = client.InitialDB.Active_Games.delete_one({"game_id": game_id}).acknowledged
     if value_returned == False:

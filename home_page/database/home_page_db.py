@@ -9,7 +9,7 @@ client = MongoClient(DATABASE_URL1)
 def get_rankings():
     """
     Allows all user profiles to be passed back to the API.
-    Passes them back in order from highest to lowest based on the numebr of points they have
+    Passes them back in order from highest to lowest based on the number of points they have
     Refrains from passing data that will not be displayed in rankings
 
     Parameters:

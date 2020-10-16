@@ -7,7 +7,8 @@ import {
   SPECIAL_CHILD_SUBTYPE,
   SPECIAL_EDGE_TYPE,
   SPECIAL_TYPE,
-  SKINNY_TYPE
+  SKINNY_TYPE,
+	GOLD_NODE
 } from "./config";
 
 function create_graph(graph){
@@ -15,7 +16,7 @@ function create_graph(graph){
 	var adjacency_list = graph['adjacency_list'];
 	var node_points = graph['node_points'];
 	var root_node = graph['root_node'];
-	var golden_node = graph['golden_node'];
+	var gold_node = graph['gold_node'];
 	const edges = [];
 	const nodes = [];
 	var node;
@@ -28,9 +29,11 @@ function create_graph(graph){
 
 	// Make the nodes
 	for (i = 0; i < adjacency_keys.length; i++) {
-		var type = CUSTOM_EMPTY_TYPE
+		var type = CUSTOM_EMPTY_TYPE;
 		if  (adjacency_keys[i] == root_node) {
 			type = SPECIAL_TYPE;
+		} else if (adjacency_keys[i] == gold_node) {
+		  type = GOLD_NODE;
 		}
 
 		node = { id: adjacency_keys[i],
