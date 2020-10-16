@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import ReactDOM from "react-dom";
+import { Button, Grid, Typography, Card, CardHeader, CardActions, CardActionArea, CardContent, Chip } from '@material-ui/core';
 import {create_adjacency, create_graph} from './CreateGraphAdj.js';
+import GameInfo from './Modal/GameInfo.js'
 
 import {
   GraphView, // required
@@ -42,20 +44,24 @@ class GameBoard extends Component {
       graph: sample,
       selected: {},
       layoutEngineType: 'VerticalTree',
-
+      addModalClose:false,
+      addModalShow:false,
       loading: true,
       board: null,
       gameID: null,
       playerCardChoice: null,
-      playerBalanceAttempt: null
-
+      playerBalanceAttempt: null,
+      difficulty:null,
+      players:null,
+      data_structure:null
     };
   }
   // TODO:  ADD COMMENTS HERE
   async componentDidMount() {
        // TODO: FIX THE URLS, GET VARIABLES FROM USER: DIFFICULTY, PLAYERS(1-4), DATA STRUCTURE
-       let createGameURL = url+"game_board/api/start_game/Medium/Maksim,Nick/AVL";
-       let getGameURL = url+"game_board/api/board/";
+      ///**** INSERT MODAL HERE AND RETURN ITS INFO TO PASS TO CREATEGAMEURL */
+       let createGameURL = "https://data-structures-game.herokuapp.com/game_board/api/start_game/Medium/Maksim,Nick/AVL";
+       let getGameURL = "https://data-structures-game.herokuapp.com/game_board/api/board/";
 
        let response = await fetch(createGameURL);
        let game_id = await response.json();
@@ -69,6 +75,8 @@ class GameBoard extends Component {
        console.log(made_graph);
        this.setState({ graph: made_graph});
     }
+    /*showGameSettingsModal(obj){
+    } */
 
   renderNode = (nodeRef, data, id, selected, hovered) => {
     return (
@@ -416,7 +424,16 @@ class GameBoard extends Component {
     }
 
     return (
-
+      <div>
+      <Button>
+        <GameInfo
+        level = {this.state.difficulty}
+        playerList={this.state.players}
+        gameDS={this.state.data_structure}
+        />
+      
+        </Button>
+        
         <div style={{height: "10rem"}}>
           <div className="bg-gray-200 flex items-center bg-gray-200 h-10">
 
@@ -464,11 +481,11 @@ class GameBoard extends Component {
         </div>
 
       </div>
+      </div>
     );
   }
 }
-
+export default GameBoard;
 const rootElement = document.getElementById("root");
 ReactDOM.render(<GameBoard />, rootElement);
-
-export default GameBoard;
+ 
