@@ -1,7 +1,9 @@
 # ========================================================================
 # General
-#   DIFFICULTY_LEVELS: Game difficulty.
+#   DIFFICULTY_LEVELS: Game difficulty. Establishes the number of nodes in
+#                      the game or the height of the tree. See HEIGHT.
 #   CARDS_PER_PLAYER : How many cards each player gets.
+#                      Number of action choices each player have.
 # ========================================================================
 DIFFICULTY_LEVELS = ['Hard', 'Medium', 'Easy']
 CARDS_PER_PLAYER = 3
