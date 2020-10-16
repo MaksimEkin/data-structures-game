@@ -39,6 +39,7 @@ class GameBoard extends Component {
   constructor(props) {
     super(props);
     this.customNodeRef = React.createRef();
+    this.myRef = React.createRef();
 
     this.state = {
       graph: sample,
@@ -359,7 +360,8 @@ class GameBoard extends Component {
       this.GraphView.panToNode(event.target.value, true);
     }
   };
-
+  printValues()
+  {console.log(this.myRef)}
   /* Define custom graph editing methods here */
 
   // TODO: FUNCTION
@@ -395,6 +397,8 @@ class GameBoard extends Component {
 
 
   render() {
+    
+    this.printValues()
     const nodes = this.state.graph.nodes;
     const edges = this.state.graph.edges;
     const selected = this.state.selected;
@@ -421,9 +425,11 @@ class GameBoard extends Component {
       card_3 = this.state.board['cards'][this.state.board['turn']][2]
       // plus it would have to be updateding as we play
     }
-
+    
     return (
       <div>
+        <GameInfo id="gameInfo" ref={this.myRef} />
+        <div> {this.state.difficulty}</div>
       {/*<Button>
         <GameInfo
         level = {this.state.difficulty}
