@@ -18,14 +18,20 @@ import {
   SPECIAL_CHILD_SUBTYPE,
   SPECIAL_EDGE_TYPE,
   SPECIAL_TYPE,
-  SKINNY_TYPE
+  SKINNY_TYPE,
+    GOLD_NODE
 } from "./config";
 
 import "./styles.css";
 
+//Fix XSS security issues when developing locally
+const local = "http://127.0.0.1:8000/";
+const remote = "https://data-structures-game.herokuapp.com/";
+const url = remote;
+
 const sample = {
   edges: [{}],
-  nodes: [{ id: "start1", title: "Start (0)", type: SPECIAL_TYPE },]
+  nodes: [{ id: "start1", title: "Start (0)", type: GOLD_NODE },]
 };
 
 
@@ -53,9 +59,8 @@ class GameBoard extends Component {
   // TODO:  ADD COMMENTS HERE
   async componentDidMount() {
        // TODO: FIX THE URLS, GET VARIABLES FROM USER: DIFFICULTY, PLAYERS(1-4), DATA STRUCTURE
-      ///**** INSERT MODAL HERE AND RETURN ITS INFO TO PASS TO CREATEGAMEURL */
-       let createGameURL = "https://data-structures-game.herokuapp.com/game_board/api/start_game/Medium/Maksim,Nick/AVL";
-       let getGameURL = "https://data-structures-game.herokuapp.com/game_board/api/board/";
+       let createGameURL = url+"game_board/api/start_game/Medium/Maksim,Nick/AVL";
+       let getGameURL = url+"game_board/api/board/";
 
        let response = await fetch(createGameURL);
        let game_id = await response.json();
@@ -363,15 +368,15 @@ class GameBoard extends Component {
   // sets the new board
 
   playCard = async () => {
-    let url = "https://data-structures-game.herokuapp.com/game_board/api/action/" + this.state.board['cards'][this.state.board['turn']][0] + '/'
-    url = url + this.state.board['game_id']
-    console.log(url)
+    let fetch_url = url+"game_board/api/action/" + this.state.board['cards'][this.state.board['turn']][0] + '/'
+    fetch_url = fetch_url + this.state.board['game_id']
+    console.log(fetch_url)
 
     this.setState({ loading: true});
 
     // Here acting like i know what card is being played
     // TODO: LEARN HOW TO DO API CALL HERE LOL
-    let response = await fetch(url);
+    let response = await fetch(fetch_url);
     let newBoard = await response.json();
     this.setState({ board: newBoard, loading: false});
 
@@ -419,14 +424,14 @@ class GameBoard extends Component {
 
     return (
       <div>
-      <Button>
+      {/*<Button>
         <GameInfo
         level = {this.state.difficulty}
         playerList={this.state.players}
         gameDS={this.state.data_structure}
         />
       
-        </Button>
+        </Button> */}
         
         <div style={{height: "10rem"}}>
           <div className="bg-gray-200 flex items-center bg-gray-200 h-10">
@@ -482,4 +487,5 @@ class GameBoard extends Component {
 export default GameBoard;
 const rootElement = document.getElementById("root");
 ReactDOM.render(<GameBoard />, rootElement);
- 
+
+

@@ -13,6 +13,10 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 from pathlib import Path
 import os
 
+# Causing server not to render locally
+#SECURE_CONTENT_TYPE_NOSNIFF = False
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -141,7 +145,7 @@ REST_FRAMEWORK = {
         'rest_framework.throttling.UserRateThrottle',
     ],
     'DEFAULT_THROTTLE_RATES': {
-        'anon': '100000000/hour',
-        'user': '99999991/minute',
+        'anon': '1000/hour',
+        'user': '1000/minute',
     }
 }

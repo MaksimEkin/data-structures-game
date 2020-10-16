@@ -1,6 +1,6 @@
 import React, { useState } from 'react'; 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {Grid, TextField} from '@material-ui/core';
+import {Button, Grid, TextField} from '@material-ui/core';
 import { render } from '@testing-library/react';
 class GameInfo extends React.Component {
     constructor(props) {
@@ -41,6 +41,11 @@ render(){
                     style={{ marginBottom: '1em' }} 
                 />            
             </Grid>
+            <Button>
+
+
+                
+            </Button>
          </Grid>
                 
     );
