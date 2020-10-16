@@ -1,5 +1,5 @@
 """
-Run: python manage.py test
+Run: python manage.py test game_board.api.tests_api
 Refrence: https://www.django-rest-framework.org/api-guide/testing/
 """
 
