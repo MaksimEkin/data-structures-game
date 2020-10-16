@@ -361,15 +361,15 @@ class GameBoard extends Component {
   // sets the new board
 
   playCard = async () => {
-    let url = url+"game_board/api/action/" + this.state.board['cards'][this.state.board['turn']][0] + '/'
-    url = url + this.state.board['game_id']
-    console.log(url)
+    let fetch_url = url+"game_board/api/action/" + this.state.board['cards'][this.state.board['turn']][0] + '/'
+    fetch_url = fetch_url + this.state.board['game_id']
+    console.log(fetch_url)
 
     this.setState({ loading: true});
 
     // Here acting like i know what card is being played
     // TODO: LEARN HOW TO DO API CALL HERE LOL
-    let response = await fetch(url);
+    let response = await fetch(fetch_url);
     let newBoard = await response.json();
     this.setState({ board: newBoard, loading: false});
 
