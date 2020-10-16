@@ -92,8 +92,8 @@ def remove_game(game_id: str):
     On Fail:
         str: friendly response to inform of an error
     """
-    value_returned = client.InitialDB.Active_Games.delete_one({"game_id": game_id}).acknowledged
-    if value_returned == False:
+    value_returned = client.InitialDB.Active_Games.delete_one({"game_id": game_id}).deleted_count
+    if value_returned == 0:
         return 'nah bro idk about it'
     return value_returned
 
