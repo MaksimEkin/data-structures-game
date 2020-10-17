@@ -28,8 +28,8 @@ import "./styles.css";
 const local = "http://127.0.0.1:8000/";
 const reactLocal = "http://localhost:3000/"
 const remote = "https://data-structures-game.herokuapp.com/";
-const url = local;
-//const url = remote;
+//const url = local;
+const url = remote;
 //const url = reactLocal;
 const sample = {
   edges: [{}],
