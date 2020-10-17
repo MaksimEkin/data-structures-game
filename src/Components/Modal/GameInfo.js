@@ -1,6 +1,6 @@
-import React, { useState } from 'react'; 
+import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {Grid, TextField} from '@material-ui/core';
+import {Button, Grid, TextField} from '@material-ui/core';
 import { render } from '@testing-library/react';
 import Cookies from 'universal-cookie';
 
@@ -27,7 +27,7 @@ class GameInfo extends React.Component {
     };
 
 
-   
+
 render(){
 
     return(
@@ -46,20 +46,20 @@ render(){
                     <option value="Stack">Stack</option>
                  </select>
 
-                <TextField 
+                <TextField
                     required
                     fullWidth
-                    name='playerList' 
+                    name='playerList'
                     label='players'
-                    value={this.state.playerList} 
-                    onChange={this.handleInput} 
-                    style={{ marginBottom: '1em' }} 
+                    value={this.state.playerList}
+                    onChange={this.handleInput}
+                    style={{ marginBottom: '1em' }}
                 />
 
             </Grid>
             </Grid>
              </form>
-                
+
     );
 }
 }

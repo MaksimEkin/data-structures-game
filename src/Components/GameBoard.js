@@ -398,10 +398,13 @@ class GameBoard extends Component {
 
     console.log(newBoard)
   }
+
   // TODO: FUNCTION
   // arg: adjacency list of user's balance attempt from graph
   // call balance api
   // sets the new board
+
+
   render() {
 
     const nodes = this.state.graph.nodes;
@@ -424,14 +427,14 @@ class GameBoard extends Component {
     return (
       <div>
         <div> {this.state.difficulty}</div>
-      <Button>
+      {/*<Button>
         <GameInfo
         level = {this.state.difficulty}
         playerList={this.state.players}
         gameDS={this.state.data_structure}
         />
       
-        </Button>
+        </Button> */}
         
         <div style={{height: "10rem"}}>
           <div className="bg-gray-200 flex items-center bg-gray-200 h-10">
@@ -487,4 +490,5 @@ class GameBoard extends Component {
 export default GameBoard;
 const rootElement = document.getElementById("root");
 ReactDOM.render(<GameBoard />, rootElement);
- 
+
+
