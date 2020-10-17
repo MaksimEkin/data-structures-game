@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import ReactDOM from "react-dom";
 import { Button, Grid, Typography, Card, CardHeader, CardActions, CardActionArea, CardContent, Chip } from '@material-ui/core';
 import {create_adjacency, create_graph} from './CreateGraphAdj.js';
-import GameInfo from './Modal/GameInfo.js'
+import Cookies from 'universal-cookie';
 
 import {
   GraphView, // required
@@ -27,7 +27,7 @@ import "./styles.css";
 //Fix XSS security issues when developing locally
 const local = "http://127.0.0.1:8000/";
 const remote = "https://data-structures-game.herokuapp.com/";
-const url = remote;
+const url = local;
 
 const sample = {
   edges: [{}],
@@ -59,8 +59,18 @@ class GameBoard extends Component {
   }
   // TODO:  ADD COMMENTS HERE
   async componentDidMount() {
+        const cookies = new Cookies();
+
+        let difficulty = cookies.get('level');
+        let players = cookies.get('playerList');
+        let ds = cookies.get('gameDS');
+
+        console.log(cookies.get('level'));
+        console.log(cookies.get('playerList'));
+        console.log(cookies.get('gameDS'));
+
        // TODO: FIX THE URLS, GET VARIABLES FROM USER: DIFFICULTY, PLAYERS(1-4), DATA STRUCTURE
-       let createGameURL = url+"game_board/api/start_game/Medium/Maksim,Nick/AVL";
+       let createGameURL = url+"game_board/api/start_game/" + difficulty + "/" + players + "/" + ds
        let getGameURL = url+"game_board/api/board/";
 
        let response = await fetch(createGameURL);
@@ -360,8 +370,7 @@ class GameBoard extends Component {
       this.GraphView.panToNode(event.target.value, true);
     }
   };
-  printValues()
-  {console.log(this.myRef)}
+
   /* Define custom graph editing methods here */
 
   // TODO: FUNCTION
@@ -389,16 +398,12 @@ class GameBoard extends Component {
 
     console.log(newBoard)
   }
-
   // TODO: FUNCTION
   // arg: adjacency list of user's balance attempt from graph
   // call balance api
   // sets the new board
-
-
   render() {
-    
-    this.printValues()
+
     const nodes = this.state.graph.nodes;
     const edges = this.state.graph.edges;
     const selected = this.state.selected;
@@ -408,16 +413,6 @@ class GameBoard extends Component {
     let card_3 = null;
 
     if (!this.state.loading) {
-      console.log(this.state.gameID);
-      console.log(this.state.board);
-
-      // current cards that the palyer whose turn has
-      console.log(this.state.board['cards'][this.state.board['turn']][0]);
-      console.log(this.state.board['cards'][this.state.board['turn']][1]);
-      console.log(this.state.board['cards'][this.state.board['turn']][2]);
-
-      // graph
-      console.log(this.state.board['graph']);
 
       // here staticly getting the cards so change
       card_1 = this.state.board['cards'][this.state.board['turn']][0]
@@ -428,7 +423,6 @@ class GameBoard extends Component {
     
     return (
       <div>
-        <GameInfo id="gameInfo" ref={this.myRef} />
         <div> {this.state.difficulty}</div>
       {/*<Button>
         <GameInfo
