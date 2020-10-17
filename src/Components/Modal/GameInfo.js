@@ -7,8 +7,8 @@ class GameInfo extends React.Component {
         super(props);
         this.customNodeRef = React.createRef();
         //let hyparlink = props.hyparlink || new Hyparlink();
-        this.state = {level:null, playerList:null, gameDS:null, game_id:null};
-        this.handleInput = this.handleInput.bind(this)
+        this.state = {difficulty:null, players:null, data_structure:null, game_id:null};
+        this.handleInput = this.handleInput.bind(this); //bind to the input when target value changes
     }   
     handleInput = ({ target }) => {
         this.setState({ [target.name]: target.value });
@@ -16,9 +16,9 @@ class GameInfo extends React.Component {
     };
    getURLfxn =()=>
     {
-        let levelU= this.state.level
-        let playerListU = this.state.playerList
-        let gameDSU = this.state.gameDS
+        let levelU= this.state.difficulty
+        let playerListU = this.state.players
+        let gameDSU = this.state.data_structure
         
         let start_game_url="/game_board/api/start_game/"+ {levelU}+"/"+{playerListU}+"/"+{gameDSU}
         console.log(start_game_url)
@@ -40,7 +40,7 @@ render(){
                     fullWidth
                     name='level'
                     label='Difficulty Level' 
-                    value={this.state.level} 
+                    value={this.state.difficulty} 
                     onChange={this.handleInput} 
                     style={{ marginBottom: '1em' }} 
                 />
@@ -49,7 +49,7 @@ render(){
                     fullWidth
                     name='playerList' 
                     label='players'
-                    value={this.state.playerList} 
+                    value={this.state.players} 
                     onChange={this.handleInput} 
                     style={{ marginBottom: '1em' }} 
                 />
@@ -58,7 +58,7 @@ render(){
                     multiline 
                     name='gameDS' 
                     label='DSgame'
-                    value={this.state.gameDS} 
+                    value={this.state.data_structure} 
                     onChange={this.handleInput} 
                     style={{ marginBottom: '1em' }} 
                 />            
