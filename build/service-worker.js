@@ -15,10 +15,14 @@ importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox
 
 importScripts(
 <<<<<<< HEAD
+<<<<<<< HEAD
   "/precache-manifest.b86333acdc4dbf29ef982ec0448de37b.js"
 =======
   "/precache-manifest.04c8cb8d1f4c75cd442c69dcfcb3e5fa.js"
 >>>>>>> needed to stash changes
+=======
+  "/precache-manifest.b9882d9ff8134bb9f6fce99d081e3061.js"
+>>>>>>> added cookies to pass get request url variables
 );
 
 self.addEventListener('message', (event) => {

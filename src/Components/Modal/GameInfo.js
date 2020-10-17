@@ -2,70 +2,63 @@ import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {Grid, TextField} from '@material-ui/core';
 import { render } from '@testing-library/react';
+import Cookies from 'universal-cookie';
+
+
 class GameInfo extends React.Component {
     constructor(props) {
         super(props);
         this.customNodeRef = React.createRef();
         //let hyparlink = props.hyparlink || new Hyparlink();
-        this.state = {difficulty:null, players:null, data_structure:null, game_id:null};
-        this.handleInput = this.handleInput.bind(this); //bind to the input when target value changes
-    }   
-    handleInput = ({ target }) => {
-        this.setState({ [target.name]: target.value });
-        console.log(this.state)
-    };
-   getURLfxn =()=>
-    {
-        let levelU= this.state.difficulty
-        let playerListU = this.state.players
-        let gameDSU = this.state.data_structure
-        
-        let start_game_url="/game_board/api/start_game/"+ {levelU}+"/"+{playerListU}+"/"+{gameDSU}
-        console.log(start_game_url)
-        fetch({start_game_url})
-        .then(response => response.json())
-        .then(data => this.setState({ game_id: data.total }));
-        console.log(this.state.game_id)
-
-        
+        this.state = {level:null, playerList:null, gameDS:'AVL'};
+        this.handleInput = this.handleInput.bind(this);
+        this.submitDSG = this.handleInput.bind(this)
     }
+
+
+    handleInput = (e) => {
+        this.setState({ [e.target.name]: e.target.value });
+        console.log(this.state)
+
+        const cookies = new Cookies();
+        cookies.set('level', this.state.level, { path: '/' });
+        cookies.set('playerList', this.state.playerList, { path: '/' });
+        cookies.set('gameDS', this.state.gameDS, { path: '/' });
+    };
+
+
    
 render(){
-    this.getURLfxn()
+
     return(
+        <form>
         <Grid container spacing={1} style={{ marginBottom: '5em' }}>
             <Grid item sm={6} md={6} lg={6}>
-                <TextField 
-                    required 
-                    fullWidth
-                    name='level'
-                    label='Difficulty Level' 
-                    value={this.state.difficulty} 
-                    onChange={this.handleInput} 
-                    style={{ marginBottom: '1em' }} 
-                />
+
+                <select value={this.state.level} onInput={this.handleInput} name='level' label='Difficulty Level' style={{ marginBottom: '1em' }}  >
+                    <option value="Easy">Easy</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Hard">Hard</option>
+                 </select>
+
+                <select value={this.state.gameDS} onInput={this.handleInput} name='gameDS' label='DSgame' style={{ marginBottom: '1em' }}  >
+                    <option value="AVL">AVL</option>
+                    <option value="Stack">Stack</option>
+                 </select>
+
                 <TextField 
                     required
                     fullWidth
                     name='playerList' 
                     label='players'
-                    value={this.state.players} 
+                    value={this.state.playerList} 
                     onChange={this.handleInput} 
                     style={{ marginBottom: '1em' }} 
                 />
-                <TextField 
-                    fullWidth 
-                    multiline 
-                    name='gameDS' 
-                    label='DSgame'
-                    value={this.state.data_structure} 
-                    onChange={this.handleInput} 
-                    style={{ marginBottom: '1em' }} 
-                />            
-            </Grid>
-            
 
             </Grid>
+            </Grid>
+             </form>
                 
     );
 }
