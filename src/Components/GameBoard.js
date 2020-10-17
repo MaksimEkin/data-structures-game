@@ -398,13 +398,10 @@ class GameBoard extends Component {
 
     console.log(newBoard)
   }
-
   // TODO: FUNCTION
   // arg: adjacency list of user's balance attempt from graph
   // call balance api
   // sets the new board
-
-
   render() {
 
     const nodes = this.state.graph.nodes;
