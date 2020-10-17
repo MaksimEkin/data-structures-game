@@ -76,7 +76,7 @@ class DBRead(TestCase):
     def tearDown(self):
         mongo.remove_game(self.board["game_id"])
 
-class DBupdate(TestCase):
+class DBUpdate(TestCase):
     def setUp(self):
         self.board = {"game_id": "60afce36-085a-11eb-b6ab-acde48001122","graph": {"nodes": "node4(node2(node3)(node1))(node6(node5))","node_points": {"node1": 1,"node2": 2,"node3": 3,"node4": 4,"node5": 5,"node6": 6},"gold_node": "node5","balanced": True},"player_ids": ["id2","id3","id4","id5"],"player_names": ["naomi","kulsoom","nick","ryan"],"player_points": {"id2": 2,"id3": 2,"id4": 3,"id5": 10},"turn": "id2","cards": {"id2": ["card1","card2","card3"],"id3": ["card1","card2","card3"],"id4":["card1","card2","card3"],"id5": ["card1","card2","card3"]},"gold_node": False,"difficulty": "Medium","num_players": 4,"online": True,"curr_data_structure": "AVL","selected_data_structures": ["AVL","Stack"],"timed_game": False,"seconds_until_next_ds": 60,"time_created": "07/10/2020 00:05:47","end_game": False}
 
@@ -104,7 +104,7 @@ class DBupdate(TestCase):
     def tearDown(self):
         mongo.remove_game(self.board2["game_id"])
 
-class DBdelete(TestCase):
+class DBDelete(TestCase):
     def setUp(self):
         self.board = {"game_id": "60afce36-085a-11eb-b6ab-acde48001122","graph": {"nodes": "node4(node2(node3)(node1))(node6(node5))","node_points": {"node1": 1,"node2": 2,"node3": 3,"node4": 4,"node5": 5,"node6": 6},"gold_node": "node5","balanced": True},"player_ids": ["id2","id3","id4","id5"],"player_names": ["naomi","kulsoom","nick","ryan"],"player_points": {"id2": 2,"id3": 2,"id4": 3,"id5": 10},"turn": "id2","cards": {"id2": ["card1","card2","card3"],"id3": ["card1","card2","card3"],"id4":["card1","card2","card3"],"id5": ["card1","card2","card3"]},"gold_node": False,"difficulty": "Medium","num_players": 4,"online": True,"curr_data_structure": "AVL","selected_data_structures": ["AVL","Stack"],"timed_game": False,"seconds_until_next_ds": 60,"time_created": "07/10/2020 00:05:47","end_game": False}
 
@@ -128,7 +128,24 @@ class DBdelete(TestCase):
         print(f"{BColors.OKGREEN}\t[+]\tPass gameboard database delete nonexistant.{BColors.ENDC}")
 
 
+class DBList(TestCase):
+    def setUp(self):
+        self.board = {"game_id": "60afce36-085a-11eb-b6ab-acde48001122","graph": {"nodes": "node4(node2(node3)(node1))(node6(node5))","node_points": {"node1": 1,"node2": 2,"node3": 3,"node4": 4,"node5": 5,"node6": 6},"gold_node": "node5","balanced": True},"player_ids": ["id2","id3","id4","id5"],"player_names": ["naomi","kulsoom","nick","ryan"],"player_points": {"id2": 2,"id3": 2,"id4": 3,"id5": 10},"turn": "id2","cards": {"id2": ["card1","card2","card3"],"id3": ["card1","card2","card3"],"id4":["card1","card2","card3"],"id5": ["card1","card2","card3"]},"gold_node": False,"difficulty": "Medium","num_players": 4,"online": True,"curr_data_structure": "AVL","selected_data_structures": ["AVL","Stack"],"timed_game": False,"seconds_until_next_ds": 60,"time_created": "07/10/2020 00:05:47","end_game": False}
 
-# LIST ALL GAMES IDS
-#for game in list_games():
-#    print(game['game_id'])
+        self.fail_phrase = 'nah bro idk about it'
+
+        mongo.create_game( self.board )
+
+    def test_list_correct(self):
+        """ The document was added to the list and appears in the returned list """
+        found = False
+        game_cursor = mongo.list_games()
+        for gameid in game_cursor:
+            if self.board["game_id"] == gameid["game_id"]:
+                found = True
+
+        self.assertEqual( found, True, msg=f'{BColors.FAIL}\t[-]\tAdded game was not in the listed games!{BColors.ENDC}')
+        print(f"{BColors.OKGREEN}\t[+]\tPass gameboard database list.{BColors.ENDC}")
+
+    def tearDown(self):
+        mongo.remove_game(self.board["game_id"])
