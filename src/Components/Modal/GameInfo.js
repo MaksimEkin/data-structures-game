@@ -1,4 +1,4 @@
-import React, { useState } from 'react'; 
+import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {Button, Grid, TextField} from '@material-ui/core';
 import { render } from '@testing-library/react';
@@ -10,7 +10,7 @@ class GameInfo extends React.Component {
         super(props);
         this.customNodeRef = React.createRef();
         //let hyparlink = props.hyparlink || new Hyparlink();
-        this.state = {level:null, playerList:null, gameDS:'AVL'};
+        this.state = {level:'Hard', playerList:'ID1', gameDS:'AVL'};
         this.handleInput = this.handleInput.bind(this);
         this.submitDSG = this.handleInput.bind(this)
     }
@@ -27,7 +27,7 @@ class GameInfo extends React.Component {
     };
 
 
-   
+
 render(){
 
     return(
@@ -43,23 +43,23 @@ render(){
 
                 <select value={this.state.gameDS} onInput={this.handleInput} name='gameDS' label='DSgame' style={{ marginBottom: '1em' }}  >
                     <option value="AVL">AVL</option>
-                    <option value="Stack">Stack</option>
+                    
                  </select>
 
-                <TextField 
+                <TextField
                     required
                     fullWidth
-                    name='playerList' 
+                    name='playerList'
                     label='players'
-                    value={this.state.playerList} 
-                    onChange={this.handleInput} 
-                    style={{ marginBottom: '1em' }} 
+                    value={this.state.playerList}
+                    onChange={this.handleInput}
+                    style={{ marginBottom: '1em' }}
                 />
 
             </Grid>
             </Grid>
              </form>
-                
+
     );
 }
 }
