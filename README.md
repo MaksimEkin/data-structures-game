@@ -32,7 +32,7 @@ The Data Structures Game is a competitive online game. The goal of this game is 
 - ```npm install```
 8. Front-end makes API requests to Heroku. When the project is run locally, this results in cross origin calls from localhost to Heroku domain.
 Cross-origins calls are blocked due to a header that is in place to protect against XSS attacks. To run the code locally, you will need to change the API call url.
-- Open src/Components/GameBoard.js tp edit/
+- Open src/Components/GameBoard.js to edit/
 - Change ```const url = remote;``` with ```const url = local;```. [Code](https://github.com/MaksimEkin/data-structures-game/blob/develop/src/Components/GameBoard.js#L28).
 9. Build the front-end:
 - ```npm run build```
