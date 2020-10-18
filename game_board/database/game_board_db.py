@@ -19,13 +19,13 @@ def create_game(board):
     On Fail:
         str: friendly response to inform of an error
     """
-    gameid = board["game_id"]
+    game_id = board["game_id"]
     user_list = board["player_ids"]
 
     Game_collection = client.InitialDB.Active_Games
     Lobby_collection = client.InitialDB.Lobby
 
-    returned_data = Game_collection.find_one({"game_id": gameid})
+    returned_data = Game_collection.find_one({"game_id": game_id})
     if returned_data is None:
 
         #Remove the players from the lobby
@@ -34,7 +34,7 @@ def create_game(board):
             #What happens when the player is being added to the game but not in the Lobby?
 
         Game_collection.insert_one(board)
-        return gameid
+        return game_id
     else:
         return 'nah bro idk about it'
 
@@ -71,8 +71,6 @@ def read_game(game_id: str):
     On Fail:
         str: friendly response to inform of an error
     """
-    DATABASE_URL1 = os.environ.get('DATABASE_URL1')
-    client = MongoClient(DATABASE_URL1)
 
     value_returned = client.InitialDB.Active_Games.find_one({"game_id": game_id})
     if value_returned == None:
@@ -92,8 +90,8 @@ def remove_game(game_id: str):
     On Fail:
         str: friendly response to inform of an error
     """
-    value_returned = client.InitialDB.Active_Games.delete_one({"game_id": game_id}).acknowledged
-    if value_returned == False:
+    value_returned = client.InitialDB.Active_Games.delete_one({"game_id": game_id}).deleted_count
+    if value_returned == 0:
         return 'nah bro idk about it'
     return value_returned
 
