@@ -79,14 +79,14 @@ if __name__ == '__main__':
     create_game(board)
 
     # UPDATE A GAME
-    update_board("60afce36-085a-11eb-b6ab-acde48001122", board)
+    print(update_game("60afce36-085a-11eb-b6ab-acde48001122", board))
 
     # READ A GAME
     read_game("60afce36-085a-11eb-b6ab-acde48001122")
 
     # DELETE A GAME
     print(remove_game("60afce36-085a-11eb-b6ab-acde48001122"))
-    
+
     # LIST ALL GAMES IDS
     for game in list_games():
         print(game['game_id'])
