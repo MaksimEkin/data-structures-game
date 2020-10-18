@@ -28,7 +28,7 @@ import "./styles.css";
 //this allows us to test separately locally and on Heroku by changing just one line
 const local = "http://127.0.0.1:8000/";
 const remote = "https://data-structures-game.herokuapp.com/";
-const url = remote;
+const url = local;
 
 const sample = {
   edges: [{}],
@@ -53,6 +53,7 @@ class GameBoard extends Component {
       //store state of board
       board: null,
       gameID: null,
+      turn: null,
 
       //which card did user choose to play (of their assigned card)
       //playerCardChoice: null,
@@ -412,7 +413,7 @@ class GameBoard extends Component {
     // TODO: LEARN HOW TO DO API CALL HERE LOL
     let response = await fetch(fetch_url);
     let newBoard = await response.json();
-    this.setState({ board: newBoard, loading: false});
+    this.setState({ board: newBoard, loading: false, turn: newBoard['turn']});
 
     let made_graph = create_graph(this.state.board['graph'])
     console.log(made_graph);
@@ -452,6 +453,8 @@ class GameBoard extends Component {
     return (
 
         <div style={{height: "10rem"}}>
+          <div className="text-center text-6xl font-bold"> It's {this.state.turn }'s turn! </div>
+
           <div className="bg-gray-200 flex items-center bg-gray-200 h-10">
 
             <div className="flex-1 text-gray-700 text-center bg-gray-400 px-4 py-2 m-2">
