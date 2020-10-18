@@ -43,8 +43,7 @@ class DBCreate(TestCase):
         created_game = mongo.create_game( self.board )
         created_game = mongo.create_game( self.board )
 
-        self.assertEqual( created_game, self.fail_phrase
-, msg=f'{BColors.FAIL}\t[-]\tGame was not created in the Database!{BColors.ENDC}')
+        self.assertEqual( created_game, self.fail_phrase, msg=f'{BColors.FAIL}\t[-]\tGame was not created in the Database!{BColors.ENDC}')
         print(f"{BColors.OKGREEN}\t[+]\tPass gameboard database save duplicate.{BColors.ENDC}")
 
     def tearDown(self):
@@ -69,8 +68,7 @@ class DBRead(TestCase):
         """ The document should not be read from the database """
         read_game = mongo.read_game( "This name should really not exist in the database, and if it does, YEESH!" )
 
-        self.assertEqual( read_game, self.fail_phrase
-, msg=f'{BColors.FAIL}\t[-]\tIncorrect return for non-existant game!{BColors.ENDC}')
+        self.assertEqual( read_game, self.fail_phrase, msg=f'{BColors.FAIL}\t[-]\tIncorrect return for non-existant game!{BColors.ENDC}')
         print(f"{BColors.OKGREEN}\t[+]\tPass gameboard database read nonexistant.{BColors.ENDC}")
 
     def tearDown(self):
@@ -97,8 +95,7 @@ class DBUpdate(TestCase):
         """ The document should not be updated from the database """
         updated_game = mongo.update_game( "This name should really not exist in the database, and if it does, YEESH!", self.board )
 
-        self.assertEqual( updated_game, self.fail_phrase
-, msg=f'{BColors.FAIL}\t[-]\tIncorrect return for non-existant game!{BColors.ENDC}')
+        self.assertEqual( updated_game, self.fail_phrase, msg=f'{BColors.FAIL}\t[-]\tIncorrect return for non-existant game!{BColors.ENDC}')
         print(f"{BColors.OKGREEN}\t[+]\tPass gameboard database update nonexistant.{BColors.ENDC}")
 
     def tearDown(self):
@@ -123,8 +120,7 @@ class DBDelete(TestCase):
         """ The document should not be deleted from the database """
         deleted_game = mongo.remove_game( "This name should really not exist in the database, and if it does, it desrves to be deleted" )
 
-        self.assertEqual( deleted_game, self.fail_phrase
-, msg=f'{BColors.FAIL}\t[-]\tIncorrect return for non-existant game!{BColors.ENDC}')
+        self.assertEqual( deleted_game, self.fail_phrase, msg=f'{BColors.FAIL}\t[-]\tIncorrect return for non-existant game!{BColors.ENDC}')
         print(f"{BColors.OKGREEN}\t[+]\tPass gameboard database delete nonexistant.{BColors.ENDC}")
 
 
