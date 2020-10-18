@@ -1,11 +1,12 @@
 import React, { Component } from 'react'
-import Header from './Header'
 import "./styles.css";
 import Particles from 'react-particles-js';
 import { Button, Grid, Typography, Card, CardHeader, CardActions, CardActionArea, CardContent, Chip } from '@material-ui/core';
 import GameInfo from './Modal/GameInfo.js'
-//function Home(){
+//this function is called from App.js to start the interface of the game
+//calls the GameInfo modal to get the new game's information
 class Home extends Component{
+  //constructor to set the intial state value's
   constructor(props) {
     super(props);
     this.state = {
@@ -14,9 +15,8 @@ class Home extends Component{
       data_structure:null
     };
   }
-
-
-
+  //display the background particle
+  //and the modal as a button and pass the state values in there
   render(){
     return(
     <div>

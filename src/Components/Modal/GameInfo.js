@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {Button, Grid, TextField} from '@material-ui/core';
-import { render } from '@testing-library/react';
 import Cookies from 'universal-cookie';
 
-
+//set the construct by sharing/setting the constructor states between
+// Home and GameInfo & bind the state value's to the input change that happens
 class GameInfo extends React.Component {
     constructor(props) {
         super(props);
@@ -15,7 +14,8 @@ class GameInfo extends React.Component {
         this.submitDSG = this.handleInput.bind(this)
     }
 
-
+    //this handls the change in input and is later binded to state values
+    //cookies then are set to the changed values
     handleInput = (e) => {
         this.setState({ [e.target.name]: e.target.value });
         console.log(this.state)
@@ -31,6 +31,9 @@ class GameInfo extends React.Component {
 render(){
 
     return(
+        //grid stores the different options that are set in the modal form
+        // each value input changes handleInput and is rebinded to the state value
+        //that is changed and resets the cookies
         <form>
         <Grid container spacing={1} style={{ marginBottom: '5em' }}>
             <Grid item sm={6} md={6} lg={6}>
