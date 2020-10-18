@@ -27,7 +27,7 @@ function create_graph(graph){
 	var adjacency_keys = Object.keys(adjacency_list)
 	var node_point_keys = Object.keys(node_points)
 
-	// Make the nodes
+	// Assign shape depending on the type of node
 	for (i = 0; i < adjacency_keys.length; i++) {
 		var type = CUSTOM_EMPTY_TYPE;
 		if  (adjacency_keys[i] == root_node) {
@@ -36,19 +36,23 @@ function create_graph(graph){
 		  type = GOLD_NODE;
 		}
 
+    // Create the node with appropriate type and label
 		node = { id: adjacency_keys[i],
 				 title: node_points[adjacency_keys[i]] + " POINTS " + adjacency_keys[i],
 				 type: type
 		};
+
 		nodes.push(node);
 
-		// Make the edges
+		// Find what edges exist, and their types
 		for (j = 0; j < adjacency_list[adjacency_keys[i]].length;j++){
       type = SPECIAL_EDGE_TYPE;
       /*
       // Need to figure out edge coloring to add this
       if  (adjacency_keys[i] == gold_node || adjacency_list[adjacency_keys[i]][j] == gold_node) {type = SPECIAL_EDGE_TYPE;}
       */
+
+      // Create a single edge
 			edge = {handleText: "",
 				source: adjacency_keys[i],
 				target: adjacency_list[adjacency_keys[i]][j],
@@ -58,6 +62,8 @@ function create_graph(graph){
 		} //for j
 		console.log(j);
 	}	// for i
+
+  // Add nodes and edges to the readable format for digraph
 	var graph = {"edges": edges,"nodes":nodes};
 	return graph;
 } // create_graph
@@ -69,12 +75,17 @@ var y;
 var node_val;
 var count = 0;
 
+ // iterate all nodes
 for (x = 0; x < graph.nodes.length; x++){
 	node_val = graph.nodes[x].id;
 	count = 0;
+
+  // Check the edges of the nodes
 	for(y = 0; y < graph.edges.length; y++ ){
 		if (graph.edges[y].source == node_val){
 			count += 1;
+
+      // Test if any children have been previously found
 			if (typeof(adjacency_list_returnable[node_val]) != "undefined"){
 				// Adds second Child to array
 				adjacency_list_returnable[node_val].push(graph.edges[y].target);
