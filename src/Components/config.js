@@ -45,31 +45,78 @@ export const edgeTypes = [EMPTY_EDGE_TYPE, SPECIAL_EDGE_TYPE];
 export const nodeSubTypes = [SPECIAL_CHILD_SUBTYPE];
 
 const Goldnode = (
+  // Gold Node
   <symbol viewBox="0 0 200 200" id="goldnode" width="154" height="154">
-    <circle cx="100" cy="100" r="50" fill="rgba(255, 165, 0)"/>
-  </symbol>
-);
-
-const EmptyNodeShape = (
-  <symbol viewBox="0 0 154 154" width="154" height="154" id="emptyNode">
-    <circle cx="77" cy="77" r="76" />
+    <circle
+    cx="100"
+    cy="100"
+    r="50"
+    stroke="rgba(255, 220, 183)"
+    stroke-width="10"
+    fill="rgba(255, 165, 0)"
+    />
   </symbol>
 );
 
 const CustomEmptyShape = (
-  <symbol viewBox="0 0 200 200" id="customEmpty">
-    <circle cx="100" cy="100" r="50" />
-    <g>
-      <foreignObject width="100%" height="100%">
-        <div xmlns="http://www.w3.org/1999/xhtml">test</div>
-      </foreignObject>
-    </g>
+  // Regular Nodes
+  <symbol viewBox="0 0 200 200"  width="154" height="154" id="customEmpty">
+    <circle
+    cx="100"
+    cy="100"
+    r="50"
+    stroke="rgba(100, 100, 100)"
+    stroke-width="5"
+    fill="rgba(0, 204, 204)"
+    />
+  </symbol>
+  );
+
+const SpecialShape = (
+  // Root Node
+  <symbol viewBox="-27 0 154 154" id="special" width="154" height="154">
+    <rect
+    transform="translate(50) rotate(45)"
+    width="109"
+    height="109"
+    fill="rgba(117, 255, 112)"
+    stroke="black"
+    stroke-width="3"
+    />
+  </symbol>
+  );
+
+const SpecialEdgeShape = (
+  //gold edges
+  <symbol viewBox="0 0 50 50" id="specialEdge">
+    <rect
+    transform="rotate(45)"
+    x="27.5"
+    y="-7.5"
+    width="15"
+    height="15"
+    fill="rgba(153, 102, 0)"
+    />
   </symbol>
 );
 
-const SpecialShape = (
-  <symbol viewBox="-27 0 154 154" id="special" width="154" height="154">
-    <rect transform="translate(50) rotate(45)" width="109" height="109" />
+const EmptyEdgeShape = (
+  // regular node edges
+  <symbol viewBox="0 0 50 50" id="specialEdge">
+  <rect
+  transform="rotate(45)"
+  x="27.5"
+  y="-7.5"
+  width="15"
+  height="15"
+  fill="rgba(0, 0, 0)"
+  />
+  </symbol>
+  );
+
+const EmptyNodeShape = (
+  <symbol viewBox="0 0 154 154" width="154" height="154" id="emptyNode">
+    <circle cx="77" cy="77" r="76" />
   </symbol>
 );
 
@@ -103,24 +150,6 @@ const SpecialChildShape = (
   </symbol>
 );
 
-const EmptyEdgeShape = (
-  <symbol viewBox="0 0 50 50" id="emptyEdge">
-    <circle cx="25" cy="25" r="8" fill="currentColor" />
-  </symbol>
-);
-
-const SpecialEdgeShape = (
-  <symbol viewBox="0 0 50 50" id="specialEdge">
-    <rect
-      transform="rotate(45)"
-      x="27.5"
-      y="-7.5"
-      width="15"
-      height="15"
-      fill="currentColor"
-    />
-  </symbol>
-);
 
 export default {
   EdgeTypes: {
