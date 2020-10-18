@@ -1,7 +1,9 @@
 import React, { Component } from "react";
 import ReactDOM from "react-dom";
 import {create_adjacency, create_graph} from './CreateGraphAdj.js';
+import Cookies from 'universal-cookie';
 
+//imports required for displaying the AVL tree (graph)
 import {
   GraphView, // required
   LayoutEngineType,
@@ -17,59 +19,74 @@ import {
   SPECIAL_EDGE_TYPE,
   SPECIAL_TYPE,
   SKINNY_TYPE,
-  GOLD_NODE
+    GOLD_NODE
 } from "./config";
 
 import "./styles.css";
 
 //Fix XSS security issues when developing locally
+//this allows us to test separately locally and on Heroku by changing just one line
 const local = "http://127.0.0.1:8000/";
 const remote = "https://data-structures-game.herokuapp.com/";
-const url = remote;
+const url = local;
 
 const sample = {
   edges: [{}],
   nodes: [{ id: "start1", title: "Start (0)", type: GOLD_NODE },]
 };
 
-
+//Gameboard Component
 class GameBoard extends Component {
   constructor(props) {
     super(props);
     this.customNodeRef = React.createRef();
 
+    //state of the board
     this.state = {
       graph: sample,
       selected: {},
       layoutEngineType: 'VerticalTree',
 
+      //loading defines whether the API calls have returned JSON yet or not
       loading: true,
+
+      //store state of board
       board: null,
       gameID: null,
-      playerCardChoice: null,
+      turn: null,
+
+      //which card did user choose to play (of their assigned card)
+      //playerCardChoice: null,
+
+      //store player's attempt to rebalance board, so can check if correct
       playerBalanceAttempt: null
 
     };
   }
   // TODO:  ADD COMMENTS HERE
+  //function executes when GameBoard component executes
   async componentDidMount() {
        // TODO: FIX THE URLS, GET VARIABLES FROM USER: DIFFICULTY, PLAYERS(1-4), DATA STRUCTURE
        let createGameURL = url+"game_board/api/start_game/Medium/Maksim,Nick/AVL";
        let getGameURL = url+"game_board/api/board/";
 
+       //start a game and fetch the returned board, store game_id for later use
        let response = await fetch(createGameURL);
        let game_id = await response.json();
        this.setState({ gameID: game_id['game_id']});
 
+       //store the returned board in the component state
        response = await fetch(getGameURL + game_id['game_id']);
        let board_ = await response.json();
        this.setState({ board: board_, loading: false});
 
+       //make graph from board
        let made_graph = create_graph(this.state.board['graph'])
        console.log(made_graph);
        this.setState({ graph: made_graph});
     }
 
+  //display each node of the tree, using react digraph library
   renderNode = (nodeRef, data, id, selected, hovered) => {
     return (
       <g x="0" y="0" className={`shape`}>
@@ -104,6 +121,7 @@ class GameBoard extends Component {
     );
   };
 
+  //may need later
   // onSelectEdge = (node, event) => {
   //   //console.log("test select edge");
   // };
@@ -114,6 +132,7 @@ class GameBoard extends Component {
   //   this.setState({});
   // };
 
+  //returns index of a specified node
   getNodeIndex(searchNode) {
     return this.state.graph.nodes.findIndex(node => {
       return node[NODE_KEY] === searchNode[NODE_KEY];
@@ -139,6 +158,7 @@ class GameBoard extends Component {
     return this.state.graph.nodes[i];
   }
 
+  //board always has start node
   addStartNode = e => {
     const graph = this.state.graph;
 
@@ -159,6 +179,7 @@ class GameBoard extends Component {
     });
   };
 
+  //delete header node
   deleteStartNode = () => {
     const graph = this.state.graph;
 
@@ -274,7 +295,6 @@ class GameBoard extends Component {
     }
   };
 
-
   // Called when an edge is reattached to a different target.
   onSwapEdge = (sourceViewNode, targetViewNode, viewEdge) => {
     const graph = this.state.graph;
@@ -293,7 +313,6 @@ class GameBoard extends Component {
     });
   };
 
-
   // Called when an edge is deleted
   onDeleteEdge = (viewEdge, edges) => {
     const graph = this.state.graph;
@@ -305,8 +324,8 @@ class GameBoard extends Component {
     });
   };
 
+  // Not implemented yet
   onUndo = () => {
-    // Not implemented
     console.warn("Undo is not currently implemented in the example.");
     // Normally any add, remove, or update would record the action in an array.
     // In order to undo it one would simply call the inverse of the action performed. For instance, if someone
@@ -314,6 +333,7 @@ class GameBoard extends Component {
     // into the edges array at position i.
   };
 
+  //functions for copying and pasting nodes from tree
   onCopySelected = () => {
     if (this.state.selected.source) {
       console.warn("Cannot copy selected edges, try selecting a node instead.");
@@ -362,8 +382,28 @@ class GameBoard extends Component {
   // call action api which returns new board
   // sets the new board
 
-  playCard = async () => {
-    let fetch_url = url+"game_board/api/action/" + this.state.board['cards'][this.state.board['turn']][0] + '/'
+  //for playing first card (one displayed on far left)
+
+
+
+
+  // TODO: FUNCTION
+  // arg: adjacency list of user's balance attempt from graph
+  // call balance api
+  // sets the new board
+  // sets the new board
+  playCard = (card) => {
+    const cookies = new Cookies();
+    cookies.set('selectedCard', card, { path: '/' });
+    this.apiCall()
+  }
+
+  apiCall = async () => {
+    const cookies = new Cookies();
+    let selectedCard = cookies.get('selectedCard');
+    console.log(selectedCard);
+
+    let fetch_url = url+"game_board/api/action/" + selectedCard + '/'
     fetch_url = fetch_url + this.state.board['game_id']
     console.log(fetch_url)
 
@@ -373,7 +413,7 @@ class GameBoard extends Component {
     // TODO: LEARN HOW TO DO API CALL HERE LOL
     let response = await fetch(fetch_url);
     let newBoard = await response.json();
-    this.setState({ board: newBoard, loading: false});
+    this.setState({ board: newBoard, loading: false, turn: newBoard['turn']});
 
     let made_graph = create_graph(this.state.board['graph'])
     console.log(made_graph);
@@ -383,55 +423,50 @@ class GameBoard extends Component {
     console.log(newBoard)
   }
 
-  // TODO: FUNCTION
-  // arg: adjacency list of user's balance attempt from graph
-  // call balance api
-  // sets the new board
-
-
   render() {
+
+    //statically store this.state
     const nodes = this.state.graph.nodes;
     const edges = this.state.graph.edges;
     const selected = this.state.selected;
 
+    //variables to store cards
     let card_1 = null;
     let card_2 = null;
     let card_3 = null;
 
+    //if loading is completed, statically store cards
     if (!this.state.loading) {
-      console.log(this.state.gameID);
-      console.log(this.state.board);
 
       // current cards that the palyer whose turn has
-      console.log(this.state.board['cards'][this.state.board['turn']][0]);
+      /*console.log(this.state.board['cards'][this.state.board['turn']][0]);
       console.log(this.state.board['cards'][this.state.board['turn']][1]);
-      console.log(this.state.board['cards'][this.state.board['turn']][2]);
+      console.log(this.state.board['cards'][this.state.board['turn']][2]);*/
 
-      // graph
-      console.log(this.state.board['graph']);
-
-      // here staticly getting the cards so change
+      // here staticly getting the cards so change, plus it would have to be updateding as we play
       card_1 = this.state.board['cards'][this.state.board['turn']][0]
       card_2 = this.state.board['cards'][this.state.board['turn']][1]
       card_3 = this.state.board['cards'][this.state.board['turn']][2]
-      // plus it would have to be updateding as we play
     }
 
+    //html returned to display page. When each card is played, the appropriate function is called, which in turn makes an API call
     return (
 
         <div style={{height: "10rem"}}>
+          <div className="text-center text-6xl font-bold"> It's {this.state.turn }'s turn! </div>
+
           <div className="bg-gray-200 flex items-center bg-gray-200 h-10">
 
             <div className="flex-1 text-gray-700 text-center bg-gray-400 px-4 py-2 m-2">
-              <button onClick={this.playCard}>{card_1}</button>
+              <button onClick={() => this.playCard(card_1)}>{card_1}</button>
             </div>
 
             <div className="flex-1 text-gray-700 text-center bg-gray-400 px-4 py-2 m-2">
-              <button onClick={this.playCard}>{card_2}</button>
+              <button onClick={() => this.playCard(card_2)}>{card_2}</button>
             </div>
 
             <div className="flex-1 text-gray-700 text-center bg-gray-400 px-4 py-2 m-2">
-              <button onClick={this.playCard}>{card_3}</button>
+              <button onClick={() => this.playCard(card_3)}>{card_3}</button>
             </div>
           </div>
 
@@ -440,7 +475,7 @@ class GameBoard extends Component {
           <GraphView
           showGraphControls={true}
           gridSize="100rem"
-          gridDotSize={2}
+          gridDotSize={1}
           renderNodeText={false}
           ref="GraphView"
           nodeKey={NODE_KEY}
