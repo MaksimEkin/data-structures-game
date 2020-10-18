@@ -1,9 +1,11 @@
 import React, { Component } from "react";
 import ReactDOM from "react-dom";
+import { Button, Grid, Typography, Card, CardHeader, CardActions, CardActionArea, CardContent, Chip } from '@material-ui/core';
 import {create_adjacency, create_graph} from './CreateGraphAdj.js';
 import Cookies from 'universal-cookie';
 
-//imports required for displaying the AVL tree (graph)
+//Uber's digraph react folder
+
 import {
   GraphView, // required
   LayoutEngineType,
@@ -27,9 +29,11 @@ import "./styles.css";
 //Fix XSS security issues when developing locally
 //this allows us to test separately locally and on Heroku by changing just one line
 const local = "http://127.0.0.1:8000/";
+const reactLocal = "http://localhost:3000/"
 const remote = "https://data-structures-game.herokuapp.com/";
-const url = local;
 
+//can also be const url = local; or const url = reactLocal;
+const url = remote;
 const sample = {
   edges: [{}],
   nodes: [{ id: "start1", title: "Start (0)", type: GOLD_NODE },]
@@ -39,7 +43,9 @@ const sample = {
 class GameBoard extends Component {
   constructor(props) {
     super(props);
+    //this is used for accessing variables between components
     this.customNodeRef = React.createRef();
+
 
     //state of the board
     this.state = {
@@ -47,46 +53,58 @@ class GameBoard extends Component {
       selected: {},
       layoutEngineType: 'VerticalTree',
 
-      //loading defines whether the API calls have returned JSON yet or not
+      addModalClose:false,
+      addModalShow:false,
+
       loading: true,
 
       //store state of board
       board: null,
       gameID: null,
-      turn: null,
 
-      //which card did user choose to play (of their assigned card)
-      //playerCardChoice: null,
-
-      //store player's attempt to rebalance board, so can check if correct
-      playerBalanceAttempt: null
-
+      playerCardChoice: null,
+      playerBalanceAttempt: null,
+      difficulty:null,
+      players:null,
+      data_structure:null
     };
   }
-  // TODO:  ADD COMMENTS HERE
-  //function executes when GameBoard component executes
+  // Initialize component objects by setting state and props of the gameboard
+  // Before compoenentDidMount is called the render menthod is called to
+  // access the DOM to make API calls and update the state and re-renders
+  // component did mount to update the values of the state
+
   async componentDidMount() {
-       // TODO: FIX THE URLS, GET VARIABLES FROM USER: DIFFICULTY, PLAYERS(1-4), DATA STRUCTURE
-       let createGameURL = url+"game_board/api/start_game/Medium/Maksim,Nick/AVL";
+        const cookies = new Cookies();
+        //set state varibals to these variables to be used in the url
+        let difficulty = cookies.get('level');
+        let players = cookies.get('playerList');
+        let ds = cookies.get('gameDS');
+
+       //get cookie variables from state and insert into url
+       let createGameURL = url+"game_board/api/start_game/" + difficulty + "/" + players + "/" + ds
        let getGameURL = url+"game_board/api/board/";
 
-       //start a game and fetch the returned board, store game_id for later use
+       //get request to get game id
        let response = await fetch(createGameURL);
        let game_id = await response.json();
+      //save the get request response to state
        this.setState({ gameID: game_id['game_id']});
 
-       //store the returned board in the component state
+       //get request to api and include the dynamic game_id
+
        response = await fetch(getGameURL + game_id['game_id']);
        let board_ = await response.json();
+       //set the state values with respect to the dynamic json response
        this.setState({ board: board_, loading: false});
 
-       //make graph from board
+        //pass the new board state into create_graph function and 
+        //set the made_graph state
        let made_graph = create_graph(this.state.board['graph'])
-       console.log(made_graph);
        this.setState({ graph: made_graph});
     }
 
-  //display each node of the tree, using react digraph library
+    //from imported digraph folder
   renderNode = (nodeRef, data, id, selected, hovered) => {
     return (
       <g x="0" y="0" className={`shape`}>
@@ -121,6 +139,11 @@ class GameBoard extends Component {
     );
   };
 
+
+
+  //from imported digraph folder
+  //uncommented for later use
+
   //may need later
   // onSelectEdge = (node, event) => {
   //   //console.log("test select edge");
@@ -133,12 +156,14 @@ class GameBoard extends Component {
   // };
 
   //returns index of a specified node
+
   getNodeIndex(searchNode) {
     return this.state.graph.nodes.findIndex(node => {
       return node[NODE_KEY] === searchNode[NODE_KEY];
     });
   }
 
+  //from imported digraph folder
   // Helper to find the index of a given edge
   getEdgeIndex(searchEdge) {
     return this.state.graph.edges.findIndex(edge => {
@@ -148,6 +173,7 @@ class GameBoard extends Component {
     });
   }
 
+  //from imported digraph folder
   // Given a nodeKey, return the corresponding node
   getViewNode(nodeKey) {
     const searchNode = {};
@@ -158,7 +184,10 @@ class GameBoard extends Component {
     return this.state.graph.nodes[i];
   }
 
+
+  //from imported digraph folder
   //board always has start node
+
   addStartNode = e => {
     const graph = this.state.graph;
 
@@ -179,6 +208,7 @@ class GameBoard extends Component {
     });
   };
 
+  //from imported digraph folder
   //delete header node
   deleteStartNode = () => {
     const graph = this.state.graph;
@@ -192,6 +222,7 @@ class GameBoard extends Component {
     });
   };
 
+    //from imported digraph folder
   handleChange = event => {
     this.setState(
       {
@@ -201,10 +232,8 @@ class GameBoard extends Component {
     );
   };
 
-  /*
-   * Handlers/Interaction
-   */
-
+  //from imported digraph folder
+  //Handlers/Interaction
   // Called by 'drag' handler, etc..
   // to sync updates from D3 with the graph
   onUpdateNode = viewNode => {
@@ -215,6 +244,7 @@ class GameBoard extends Component {
     this.setState({ graph });
   };
 
+    //from imported digraph folder
   // Node 'mouseUp' handler
   onSelectNode = (viewNode, event) => {
     const { id = "" } = event.target;
@@ -222,19 +252,23 @@ class GameBoard extends Component {
       document.getElementById(event.target.id).click();
     }
 
+    //from imported digraph folder
     // Deselect events will send Null viewNode
     this.setState({ selected: viewNode });
   };
 
+    //from imported digraph folder
   // Edge 'mouseUp' handler
   onSelectEdge = viewEdge => {
     this.setState({ selected: viewEdge });
   };
 
+    //from imported digraph folder
   // Updates the graph with a new node
   onCreateNode = (x, y) => {
     const graph = this.state.graph;
 
+    //from imported digraph folder
     // This is just an example - any sort of logic
     // could be used here to determine node type
     // There is also support for subtypes. (see 'sample' above)
@@ -253,6 +287,7 @@ class GameBoard extends Component {
     this.setState({ graph });
   };
 
+    //from imported digraph folder
   // Deletes a node from the graph
   onDeleteNode = (viewNode, nodeId, nodeArr) => {
     const graph = this.state.graph;
@@ -269,6 +304,7 @@ class GameBoard extends Component {
     this.setState({ graph, selected: null });
   };
 
+    //from imported digraph folder
   // Creates a new node between two edges
   onCreateEdge = (sourceViewNode, targetViewNode) => {
     const graph = this.state.graph;
@@ -285,6 +321,7 @@ class GameBoard extends Component {
       type
     };
 
+    //from imported digraph folder
     // Only add the edge when the source node is not the same as the target
     if (viewEdge.source !== viewEdge.target) {
       graph.edges = [...graph.edges, viewEdge];
@@ -324,7 +361,7 @@ class GameBoard extends Component {
     });
   };
 
-  // Not implemented yet
+    //from imported digraph folder
   onUndo = () => {
     console.warn("Undo is not currently implemented in the example.");
     // Normally any add, remove, or update would record the action in an array.
@@ -333,6 +370,8 @@ class GameBoard extends Component {
     // into the edges array at position i.
   };
 
+
+    //from imported digraph folder
   //functions for copying and pasting nodes from tree
   onCopySelected = () => {
     if (this.state.selected.source) {
@@ -348,7 +387,8 @@ class GameBoard extends Component {
       copiedNode: { ...this.state.selected, x, y }
     });
   };
-
+ 
+    //from imported digraph folder 
   onPasteSelected = () => {
     if (!this.state.copiedNode) {
       console.warn(
@@ -363,12 +403,14 @@ class GameBoard extends Component {
     this.forceUpdate();
   };
 
+    //from imported digraph folder
   handleChangeLayoutEngineType = event => {
     this.setState({
       layoutEngineType: event.target.value
     });
   };
 
+    //from imported digraph folder
   onSelectPanNode = event => {
     if (this.GraphView) {
       this.GraphView.panToNode(event.target.value, true);
@@ -377,21 +419,11 @@ class GameBoard extends Component {
 
   /* Define custom graph editing methods here */
 
-  // TODO: FUNCTION
   // arg: card chosen
   // call action api which returns new board
   // sets the new board
 
   //for playing first card (one displayed on far left)
-
-
-
-
-  // TODO: FUNCTION
-  // arg: adjacency list of user's balance attempt from graph
-  // call balance api
-  // sets the new board
-  // sets the new board
   playCard = (card) => {
     const cookies = new Cookies();
     cookies.set('selectedCard', card, { path: '/' });
@@ -402,15 +434,13 @@ class GameBoard extends Component {
     const cookies = new Cookies();
     let selectedCard = cookies.get('selectedCard');
     console.log(selectedCard);
-
     let fetch_url = url+"game_board/api/action/" + selectedCard + '/'
+
     fetch_url = fetch_url + this.state.board['game_id']
     console.log(fetch_url)
 
     this.setState({ loading: true});
 
-    // Here acting like i know what card is being played
-    // TODO: LEARN HOW TO DO API CALL HERE LOL
     let response = await fetch(fetch_url);
     let newBoard = await response.json();
     this.setState({ board: newBoard, loading: false, turn: newBoard['turn']});
@@ -423,9 +453,15 @@ class GameBoard extends Component {
     console.log(newBoard)
   }
 
+
+  //in react life cycle, code that is rendered occurs after constructor initialization
+  //and component mounting and then reflects the change in state/prop values
+  //then it checks if the change needs to be re-rendered
+
   render() {
 
     //statically store this.state
+
     const nodes = this.state.graph.nodes;
     const edges = this.state.graph.edges;
     const selected = this.state.selected;
@@ -438,10 +474,8 @@ class GameBoard extends Component {
     //if loading is completed, statically store cards
     if (!this.state.loading) {
 
-      // current cards that the palyer whose turn has
-      /*console.log(this.state.board['cards'][this.state.board['turn']][0]);
-      console.log(this.state.board['cards'][this.state.board['turn']][1]);
-      console.log(this.state.board['cards'][this.state.board['turn']][2]);*/
+
+      // get the value of api json return index 0,1,2
 
       // here staticly getting the cards so change, plus it would have to be updateding as we play
       card_1 = this.state.board['cards'][this.state.board['turn']][0]
@@ -450,8 +484,12 @@ class GameBoard extends Component {
     }
 
     //html returned to display page. When each card is played, the appropriate function is called, which in turn makes an API call
-    return (
 
+    return (
+      //format code to display the 3 cards in flex boxes
+      <div>
+        <div> {this.state.difficulty}</div>
+        
         <div style={{height: "10rem"}}>
           <div className="text-center text-6xl font-bold"> It's {this.state.turn }'s turn! </div>
 
@@ -470,7 +508,7 @@ class GameBoard extends Component {
             </div>
           </div>
 
-
+        {/*from react digraph library to format graph */}
         <div id = "graph" style={{ height: "60rem"}}>
           <GraphView
           showGraphControls={true}
@@ -496,16 +534,16 @@ class GameBoard extends Component {
           readOnly={false}
           dark={true}
           layoutEngineType={this.state.layoutEngineType}
-          //renderNode={this.renderNode}
         />
         </div>
 
       </div>
+      </div>
     );
   }
 }
-
+export default GameBoard;
 const rootElement = document.getElementById("root");
 ReactDOM.render(<GameBoard />, rootElement);
 
-export default GameBoard;
+

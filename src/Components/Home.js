@@ -1,9 +1,23 @@
-import React from 'react'
-import Header from './Header'
+import React, { Component } from 'react'
 import "./styles.css";
 import Particles from 'react-particles-js';
-
-function Home(){
+import { Button, Grid, Typography, Card, CardHeader, CardActions, CardActionArea, CardContent, Chip } from '@material-ui/core';
+import GameInfo from './Modal/GameInfo.js'
+//this function is called from App.js to start the interface of the game
+//calls the GameInfo modal to get the new game's information
+class Home extends Component{
+  //constructor to set the intial state value's
+  constructor(props) {
+    super(props);
+    this.state = {
+      difficulty:null,
+      players:null,
+      data_structure:null
+    };
+  }
+  //display the background particle
+  //and the modal as a button and pass the state values in there
+  render(){
     return(
     <div>
 
@@ -27,7 +41,15 @@ function Home(){
           />
 
         <h1 className="font-bold text-2xl"> Home</h1>
+        <Button>
+        <GameInfo
+        level = {this.state.difficulty}
+        playerList={this.state.players}
+        gameDS={this.state.data_structure}
+        />
+    </Button>
     </div>
     )
+}
 }
 export default Home
