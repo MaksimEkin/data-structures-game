@@ -17,7 +17,7 @@ import {
   SPECIAL_EDGE_TYPE,
   SPECIAL_TYPE,
   SKINNY_TYPE,
-    GOLD_NODE
+  GOLD_NODE
 } from "./config";
 
 import "./styles.css";
@@ -25,7 +25,7 @@ import "./styles.css";
 //Fix XSS security issues when developing locally
 const local = "http://127.0.0.1:8000/";
 const remote = "https://data-structures-game.herokuapp.com/";
-const url = remote;
+const url = local;
 
 const sample = {
   edges: [{}],
@@ -274,6 +274,7 @@ class GameBoard extends Component {
     }
   };
 
+
   // Called when an edge is reattached to a different target.
   onSwapEdge = (sourceViewNode, targetViewNode, viewEdge) => {
     const graph = this.state.graph;
@@ -291,6 +292,7 @@ class GameBoard extends Component {
       selected: edge
     });
   };
+
 
   // Called when an edge is deleted
   onDeleteEdge = (viewEdge, edges) => {
@@ -438,7 +440,7 @@ class GameBoard extends Component {
           <GraphView
           showGraphControls={true}
           gridSize="100rem"
-          gridDotSize={1}
+          gridDotSize={2}
           renderNodeText={false}
           ref="GraphView"
           nodeKey={NODE_KEY}

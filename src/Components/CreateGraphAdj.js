@@ -44,11 +44,15 @@ function create_graph(graph){
 
 		// Make the edges
 		for (j = 0; j < adjacency_list[adjacency_keys[i]].length;j++){
-
+      type = SPECIAL_EDGE_TYPE;
+      /*
+      // Need to figure out edge coloring to add this
+      if  (adjacency_keys[i] == gold_node || adjacency_list[adjacency_keys[i]][j] == gold_node) {type = SPECIAL_EDGE_TYPE;}
+      */
 			edge = {handleText: "",
 				source: adjacency_keys[i],
 				target: adjacency_list[adjacency_keys[i]][j],
-				type: SPECIAL_EDGE_TYPE
+				type: type
 			};
 			edges.push(edge);
 		} //for j
