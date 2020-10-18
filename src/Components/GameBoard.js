@@ -33,7 +33,7 @@ const reactLocal = "http://localhost:3000/"
 const remote = "https://data-structures-game.herokuapp.com/";
 
 //can also be const url = local; or const url = reactLocal;
-const url = local;
+const url = remote;
 const sample = {
   edges: [{}],
   nodes: [{ id: "start1", title: "Start (0)", type: GOLD_NODE },]
