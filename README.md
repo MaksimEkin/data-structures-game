@@ -33,7 +33,7 @@ The Data Structures Game is a competitive online game. The goal of this game is 
 8. Front-end makes API requests to Heroku. When the project is run locally, this results in cross origin calls from localhost to Heroku domain.
 Cross-origins calls are blocked due to a header that is in place to protect against XSS attacks. To run the code locally, you will need to change the API call url.
 - Open src/Components/GameBoard.js to edit/
-- Change ```const url = remote;``` with ```const url = local;```. [Code](https://github.com/MaksimEkin/data-structures-game/blob/develop/src/Components/GameBoard.js#L28).
+- Change ```const url = remote;``` with ```const url = local;```. [Code](https://github.com/MaksimEkin/data-structures-game/blob/master/src/Components/GameBoard.js#L28).
 9. Build the front-end:
 - ```npm run build```
 10. Run from the root directory of the project:
@@ -44,13 +44,13 @@ Cross-origins calls are blocked due to a header that is in place to protect agai
 ## Developer Test Suites
 
 - **Game Board API**
-    - Located at [game_board/api/tests_api.py](https://github.com/MaksimEkin/data-structures-game/tree/develop/game_board/api/tests_api.py)
+    - Located at [game_board/api/tests_api.py](https://github.com/MaksimEkin/data-structures-game/tree/master/game_board/api/tests_api.py)
     - Run from the root directory of the project with ```python manage.py test game_board.api.tests_api```
 - **Game Board Database**
-    - Located at [game_board/database/test_db.py](https://github.com/MaksimEkin/data-structures-game/tree/develop/game_board/database/test_db.py)
+    - Located at [game_board/database/test_db.py](https://github.com/MaksimEkin/data-structures-game/tree/master/game_board/database/test_db.py)
     - Run from the root directory of the project with ```python manage.py test game_board.database.test_db```
 - **AVL Data Structure**
-    - Located at [game_board/avl/test_avl.py](https://github.com/MaksimEkin/data-structures-game/blob/develop/game_board/avl/test_avl.py)
+    - Located at [game_board/avl/test_avl.py](https://github.com/MaksimEkin/data-structures-game/blob/master/game_board/avl/test_avl.py)
     - Run from the root directory of the project with ```python manage.py test game_board.avl.test_avl```
     
 [See Wiki for details.](https://github.com/MaksimEkin/data-structures-game/wiki)
