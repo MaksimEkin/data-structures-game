@@ -1,8 +1,8 @@
 """
-python manage.py test user_profile.database.test_db
+python manage.py test profile_page.database.test_db
 """
 
-from user_profile.database import user_profile_db as mongo
+from profile_page.database import profile_page_db as mongo
 from django.test import TestCase
 
 class BColors:
