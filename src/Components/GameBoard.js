@@ -3,7 +3,9 @@ import ReactDOM from "react-dom";
 import { Button, Grid, Typography, Card, CardHeader, CardActions, CardActionArea, CardContent, Chip } from '@material-ui/core';
 import {create_adjacency, create_graph} from './CreateGraphAdj.js';
 import Cookies from 'universal-cookie';
+
 //Uber's digraph react folder
+
 import {
   GraphView, // required
   LayoutEngineType,
@@ -19,12 +21,13 @@ import {
   SPECIAL_EDGE_TYPE,
   SPECIAL_TYPE,
   SKINNY_TYPE,
-  GOLD_NODE
+    GOLD_NODE
 } from "./config";
 
 import "./styles.css";
 
 //Fix XSS security issues when developing locally
+//this allows us to test separately locally and on Heroku by changing just one line
 const local = "http://127.0.0.1:8000/";
 const reactLocal = "http://localhost:3000/"
 const remote = "https://data-structures-game.herokuapp.com/";
@@ -36,22 +39,29 @@ const sample = {
   nodes: [{ id: "start1", title: "Start (0)", type: GOLD_NODE },]
 };
 
+//Gameboard Component
 class GameBoard extends Component {
   constructor(props) {
     super(props);
     //this is used for accessing variables between components
     this.customNodeRef = React.createRef();
-    this.myRef = React.createRef();
-    //many of these states are for react digraph display
+
+
+    //state of the board
     this.state = {
       graph: sample,
       selected: {},
       layoutEngineType: 'VerticalTree',
+
       addModalClose:false,
       addModalShow:false,
+
       loading: true,
+
+      //store state of board
       board: null,
       gameID: null,
+
       playerCardChoice: null,
       playerBalanceAttempt: null,
       difficulty:null,
@@ -63,6 +73,7 @@ class GameBoard extends Component {
   // Before compoenentDidMount is called the render menthod is called to
   // access the DOM to make API calls and update the state and re-renders
   // component did mount to update the values of the state
+
   async componentDidMount() {
         const cookies = new Cookies();
         //set state varibals to these variables to be used in the url
@@ -73,21 +84,26 @@ class GameBoard extends Component {
        //get cookie variables from state and insert into url
        let createGameURL = url+"game_board/api/start_game/" + difficulty + "/" + players + "/" + ds
        let getGameURL = url+"game_board/api/board/";
+
        //get request to get game id
        let response = await fetch(createGameURL);
        let game_id = await response.json();
       //save the get request response to state
        this.setState({ gameID: game_id['game_id']});
+
        //get request to api and include the dynamic game_id
+
        response = await fetch(getGameURL + game_id['game_id']);
        let board_ = await response.json();
        //set the state values with respect to the dynamic json response
        this.setState({ board: board_, loading: false});
+
         //pass the new board state into create_graph function and 
         //set the made_graph state
        let made_graph = create_graph(this.state.board['graph'])
        this.setState({ graph: made_graph});
     }
+
     //from imported digraph folder
   renderNode = (nodeRef, data, id, selected, hovered) => {
     return (
@@ -124,7 +140,23 @@ class GameBoard extends Component {
   };
 
 
+
   //from imported digraph folder
+  //uncommented for later use
+
+  //may need later
+  // onSelectEdge = (node, event) => {
+  //   //console.log("test select edge");
+  // };
+
+  // onUpdateNode = () => true;
+
+  // onDeleteNode = (...args) => {
+  //   this.setState({});
+  // };
+
+  //returns index of a specified node
+
   getNodeIndex(searchNode) {
     return this.state.graph.nodes.findIndex(node => {
       return node[NODE_KEY] === searchNode[NODE_KEY];
@@ -152,7 +184,10 @@ class GameBoard extends Component {
     return this.state.graph.nodes[i];
   }
 
+
   //from imported digraph folder
+  //board always has start node
+
   addStartNode = e => {
     const graph = this.state.graph;
 
@@ -174,6 +209,7 @@ class GameBoard extends Component {
   };
 
   //from imported digraph folder
+  //delete header node
   deleteStartNode = () => {
     const graph = this.state.graph;
 
@@ -296,7 +332,6 @@ class GameBoard extends Component {
     }
   };
 
-
   // Called when an edge is reattached to a different target.
   onSwapEdge = (sourceViewNode, targetViewNode, viewEdge) => {
     const graph = this.state.graph;
@@ -328,7 +363,6 @@ class GameBoard extends Component {
 
     //from imported digraph folder
   onUndo = () => {
-    // Not implemented
     console.warn("Undo is not currently implemented in the example.");
     // Normally any add, remove, or update would record the action in an array.
     // In order to undo it one would simply call the inverse of the action performed. For instance, if someone
@@ -336,7 +370,9 @@ class GameBoard extends Component {
     // into the edges array at position i.
   };
 
+
     //from imported digraph folder
+  //functions for copying and pasting nodes from tree
   onCopySelected = () => {
     if (this.state.selected.source) {
       console.warn("Cannot copy selected edges, try selecting a node instead.");
@@ -380,9 +416,26 @@ class GameBoard extends Component {
       this.GraphView.panToNode(event.target.value, true);
     }
   };
-  //get cards for the current turn user to get their playing cards
-  playCard = async () => {
-    let fetch_url = url+"game_board/api/action/" + this.state.board['cards'][this.state.board['turn']][0] + '/'
+
+  /* Define custom graph editing methods here */
+
+  // arg: card chosen
+  // call action api which returns new board
+  // sets the new board
+
+  //for playing first card (one displayed on far left)
+  playCard = (card) => {
+    const cookies = new Cookies();
+    cookies.set('selectedCard', card, { path: '/' });
+    this.apiCall()
+  }
+
+  apiCall = async () => {
+    const cookies = new Cookies();
+    let selectedCard = cookies.get('selectedCard');
+    console.log(selectedCard);
+    let fetch_url = url+"game_board/api/action/" + selectedCard + '/'
+
     fetch_url = fetch_url + this.state.board['game_id']
     console.log(fetch_url)
 
@@ -390,7 +443,7 @@ class GameBoard extends Component {
 
     let response = await fetch(fetch_url);
     let newBoard = await response.json();
-    this.setState({ board: newBoard, loading: false});
+    this.setState({ board: newBoard, loading: false, turn: newBoard['turn']});
 
     let made_graph = create_graph(this.state.board['graph'])
     console.log(made_graph);
@@ -400,46 +453,58 @@ class GameBoard extends Component {
     console.log(newBoard)
   }
 
+
   //in react life cycle, code that is rendered occurs after constructor initialization
   //and component mounting and then reflects the change in state/prop values
   //then it checks if the change needs to be re-rendered
+
   render() {
-  
+
+    //statically store this.state
+
     const nodes = this.state.graph.nodes;
     const edges = this.state.graph.edges;
     const selected = this.state.selected;
 
+    //variables to store cards
     let card_1 = null;
     let card_2 = null;
     let card_3 = null;
 
+    //if loading is completed, statically store cards
     if (!this.state.loading) {
 
+
       // get the value of api json return index 0,1,2
+
+      // here staticly getting the cards so change, plus it would have to be updateding as we play
       card_1 = this.state.board['cards'][this.state.board['turn']][0]
       card_2 = this.state.board['cards'][this.state.board['turn']][1]
       card_3 = this.state.board['cards'][this.state.board['turn']][2]
-      
     }
-    
+
+    //html returned to display page. When each card is played, the appropriate function is called, which in turn makes an API call
+
     return (
       //format code to display the 3 cards in flex boxes
       <div>
         <div> {this.state.difficulty}</div>
         
         <div style={{height: "10rem"}}>
+          <div className="text-center text-6xl font-bold"> It's {this.state.turn }'s turn! </div>
+
           <div className="bg-gray-200 flex items-center bg-gray-200 h-10">
 
             <div className="flex-1 text-gray-700 text-center bg-gray-400 px-4 py-2 m-2">
-              <button onClick={this.playCard}>{card_1}</button>
+              <button onClick={() => this.playCard(card_1)}>{card_1}</button>
             </div>
 
             <div className="flex-1 text-gray-700 text-center bg-gray-400 px-4 py-2 m-2">
-              <button onClick={this.playCard}>{card_2}</button>
+              <button onClick={() => this.playCard(card_2)}>{card_2}</button>
             </div>
 
             <div className="flex-1 text-gray-700 text-center bg-gray-400 px-4 py-2 m-2">
-              <button onClick={this.playCard}>{card_3}</button>
+              <button onClick={() => this.playCard(card_3)}>{card_3}</button>
             </div>
           </div>
 
@@ -448,7 +513,7 @@ class GameBoard extends Component {
           <GraphView
           showGraphControls={true}
           gridSize="100rem"
-          gridDotSize={2}
+          gridDotSize={1}
           renderNodeText={false}
           ref="GraphView"
           nodeKey={NODE_KEY}
