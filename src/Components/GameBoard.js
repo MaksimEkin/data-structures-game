@@ -61,7 +61,7 @@ class GameBoard extends Component {
       //store state of board
       board: null,
       gameID: null,
-
+      turn: null,
       playerCardChoice: null,
       playerBalanceAttempt: null,
       difficulty:null,
@@ -96,7 +96,7 @@ class GameBoard extends Component {
        response = await fetch(getGameURL + game_id['game_id']);
        let board_ = await response.json();
        //set the state values with respect to the dynamic json response
-       this.setState({ board: board_, loading: false});
+       this.setState({ board: board_, loading: false, turn: board_['turn']});
 
         //pass the new board state into create_graph function and 
         //set the made_graph state
