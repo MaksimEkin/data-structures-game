@@ -52,5 +52,6 @@ Cross-origins calls are blocked due to a header that is in place to protect agai
 - **AVL Data Structure**
     - Located at [game_board/avl/test_avl.py](https://github.com/MaksimEkin/data-structures-game/blob/develop/game_board/avl/test_avl.py)
     - Run by executing test_avl.py in the avl directory
+    
 [See Wiki for details.](https://github.com/MaksimEkin/data-structures-game/wiki)
 
