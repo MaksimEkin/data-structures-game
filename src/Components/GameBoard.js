@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import ReactDOM from "react-dom";
 import {create_adjacency, create_graph} from './CreateGraphAdj.js';
+import Cookies from 'universal-cookie';
 
 //imports required for displaying the AVL tree (graph)
 import {
@@ -381,70 +382,45 @@ class GameBoard extends Component {
   // sets the new board
 
   //for playing first card (one displayed on far left)
-  playCard1 = async () => {
 
-    //api call url to play the card that returns an updated board
-    let fetch_url = url + "game_board/api/action/" + this.state.board['cards'][this.state.board['turn']][0] + '/'
-    fetch_url = fetch_url + this.state.board['game_id']
 
-    this.setState({ loading: true});
-
-    //api call for new board
-    let response = await fetch(fetch_url);
-    let newBoard = await response.json();
-    this.setState({ board: newBoard, loading: false});
-
-    //update graph
-    let made_graph = create_graph(this.state.board['graph'])
-    this.setState({ graph: made_graph});
-  }
-
-  //playing middle card
-  playCard2 = async () => {
-
-    //api call url to play the card that returns an updated board
-    let url = url + "/game_board/api/action/" + this.state.board['cards'][this.state.turn][1] + '/'
-    url = url + this.state.board['game_id']
-    console.log(url)
-
-    this.setState({ loading: true});
-
-    //api call for new board
-    let response = await fetch(url);
-    let newBoard = await response.json();
-    this.setState({ board: newBoard, loading: false, turn: newBoard['turn']});
-
-    //update graph
-    let made_graph = create_graph(this.state.board['graph'])
-    this.setState({ graph: made_graph});
-  }
-
-  //playing card 3 (far right card)
-  playCard3 = async () => {
-
-    //api url
-    let url = url + "/game_board/api/action/" + this.state.board['cards'][this.state.turn][2] + '/'
-    url = url + this.state.board['game_id']
-    console.log(url)
-
-    this.setState({ loading: true});
-
-    //api call, update board
-    let response = await fetch(url);
-    let newBoard = await response.json();
-    this.setState({ board: newBoard, loading: false, turn: newBoard['turn']});
-
-    //update graph
-    let made_graph = create_graph(this.state.board['graph'])
-    this.setState({ graph: made_graph});
-  }
 
 
   // TODO: FUNCTION
   // arg: adjacency list of user's balance attempt from graph
   // call balance api
   // sets the new board
+  // sets the new board
+  playCard = (card) => {
+    const cookies = new Cookies();
+    cookies.set('selectedCard', card, { path: '/' });
+    this.apiCall()
+  }
 
+  apiCall = async () => {
+    const cookies = new Cookies();
+    let selectedCard = cookies.get('selectedCard');
+    console.log(selectedCard);
+
+    let fetch_url = url+"game_board/api/action/" + selectedCard + '/'
+    fetch_url = fetch_url + this.state.board['game_id']
+    console.log(fetch_url)
+
+    this.setState({ loading: true});
+
+    // Here acting like i know what card is being played
+    // TODO: LEARN HOW TO DO API CALL HERE LOL
+    let response = await fetch(fetch_url);
+    let newBoard = await response.json();
+    this.setState({ board: newBoard, loading: false});
+
+    let made_graph = create_graph(this.state.board['graph'])
+    console.log(made_graph);
+    this.setState({ graph: made_graph});
+
+
+    console.log(newBoard)
+  }
 
   render() {
 
@@ -479,15 +455,15 @@ class GameBoard extends Component {
           <div className="bg-gray-200 flex items-center bg-gray-200 h-10">
 
             <div className="flex-1 text-gray-700 text-center bg-gray-400 px-4 py-2 m-2">
-              <button onClick={this.playCard1}>{card_1}</button>
+              <button onClick={() => this.playCard(card_1)}>{card_1}</button>
             </div>
 
             <div className="flex-1 text-gray-700 text-center bg-gray-400 px-4 py-2 m-2">
-              <button onClick={this.playCard2}>{card_2}</button>
+              <button onClick={() => this.playCard(card_2)}>{card_2}</button>
             </div>
 
             <div className="flex-1 text-gray-700 text-center bg-gray-400 px-4 py-2 m-2">
-              <button onClick={this.playCard3}>{card_3}</button>
+              <button onClick={() => this.playCard(card_3)}>{card_3}</button>
             </div>
           </div>
 
