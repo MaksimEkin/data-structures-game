@@ -73,9 +73,9 @@ class AVLHandler(object):
 			return
 			
 		self.tree = AVLTree()
-		self.addNewNode(randint(1, self.point_cap))	
+		self.addNewNode(randint(1, self.point_cap))
 		while(self.root.height < self.expected_height):
-			self.addNewNode(randint(1, self.point_cap))	
+			self.addNewNode(randint(1, self.point_cap))
 		
 		allUIDs = list(range(self.uid))  # randomly choose golden node
 		allUIDs.remove(self.root.nid)
