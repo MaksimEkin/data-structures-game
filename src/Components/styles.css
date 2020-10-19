@@ -1,0 +1,43 @@
+#particles canvas{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
+
+.App {
+  font-family: sans-serif;
+  text-align: center;
+  height: 50rem;
+}
+
+.startButton{
+  display: flex;
+  justify-content: center;
+  width: 30%;
+  margin: auto;
+  background-color: #555555;
+  color: white;
+  font-size: 15px;
+  padding: 15px 32px;
+  font-weight: bold;
+}
+
+#particles canvas{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
+
+.startButton{
+  display: flex;
+  justify-content: center;
+  width: 10%;
+  margin: auto;
+  background-color: #555555;
+  color: white;
+  font-size: 15px;
+  padding: 15px 32px;
+  font-weight: bold;
+}
