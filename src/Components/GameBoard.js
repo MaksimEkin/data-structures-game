@@ -33,10 +33,10 @@ const reactLocal = "http://localhost:3000/"
 const remote = "https://data-structures-game.herokuapp.com/";
 
 //can also be const url = local; or const url = reactLocal;
-const url = remote;
+const url = local;
 const sample = {
   edges: [{}],
-  nodes: [{ id: "start1", title: "Start (0)", type: GOLD_NODE },]
+  nodes: [{ id: "start1", title: "Start (0)", type: GOLD_NODE,  node_id:"", points:0 },]
 };
 
 //Gameboard Component
@@ -278,6 +278,8 @@ class GameBoard extends Component {
     const viewNode = {
       id: Date.now(),
       title: "",
+      node_id:"",
+      points:0,
       type,
       x,
       y
@@ -433,11 +435,9 @@ class GameBoard extends Component {
   apiCall = async () => {
     const cookies = new Cookies();
     let selectedCard = cookies.get('selectedCard');
-    console.log(selectedCard);
     let fetch_url = url+"game_board/api/action/" + selectedCard + '/'
 
     fetch_url = fetch_url + this.state.board['game_id']
-    console.log(fetch_url)
 
     this.setState({ loading: true});
 
@@ -446,12 +446,23 @@ class GameBoard extends Component {
     this.setState({ board: newBoard, loading: false, turn: newBoard['turn']});
 
     let made_graph = create_graph(this.state.board['graph'])
-    console.log(made_graph);
     this.setState({ graph: made_graph});
 
-
-    console.log(newBoard)
   }
+
+  // Create custom content for the nodes
+  renderNodeText = (data) => {
+    console.log(data);
+    return (
+      <foreignObject x="0" y="0" width="50" height="50">
+        <div className="node">
+          <p className="points">{data.points}</p>
+          <p className="node_id">{data.node_id}</p>
+        </div>
+      </foreignObject>
+    );
+  };
+
 
 
   //in react life cycle, code that is rendered occurs after constructor initialization
@@ -514,7 +525,7 @@ class GameBoard extends Component {
           showGraphControls={true}
           gridSize="100rem"
           gridDotSize={1}
-          renderNodeText={false}
+          renderNodeText={this.renderNodeText}
           ref="GraphView"
           nodeKey={NODE_KEY}
           nodes={nodes}
