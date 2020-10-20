@@ -4,6 +4,7 @@ import { Button, Grid, Typography, Card, CardHeader, CardActions, CardActionArea
 import {create_adjacency, create_graph} from './CreateGraphAdj.js';
 import Cookies from 'universal-cookie';
 
+
 //Uber's digraph react folder
 
 import {
@@ -33,7 +34,7 @@ const reactLocal = "http://localhost:3000/"
 const remote = "https://data-structures-game.herokuapp.com/";
 
 //can also be const url = local; or const url = reactLocal;
-const url = local;
+const url = remote;
 const sample = {
   edges: [{}],
   nodes: [{ id: "start1", title: "Start (0)", type: GOLD_NODE,  node_id:"", points:0 },]
@@ -450,19 +451,18 @@ class GameBoard extends Component {
 
   }
 
-  // Create custom content for the nodes
+  // Create custom text content for the nodes: Node point and Node ID
   renderNodeText = (data) => {
     console.log(data);
     return (
-      <foreignObject x="0" y="0" width="50" height="50">
-        <div className="node">
-          <p className="points">{data.points}</p>
-          <p className="node_id">{data.node_id}</p>
+      <foreignObject x='-20' y='-30' width='200' height='50'>
+        <div className="graph_node">
+          <p>{data.points}</p>
+          <p>{data.node_id}</p>
         </div>
       </foreignObject>
     );
   };
-
 
 
   //in react life cycle, code that is rendered occurs after constructor initialization
@@ -497,10 +497,11 @@ class GameBoard extends Component {
     //html returned to display page. When each card is played, the appropriate function is called, which in turn makes an API call
 
     return (
+
       //format code to display the 3 cards in flex boxes
       <div>
         <div> {this.state.difficulty}</div>
-        
+
         <div style={{height: "10rem"}}>
           <div className="text-center text-6xl font-bold"> It's {this.state.turn }'s turn! </div>
 
