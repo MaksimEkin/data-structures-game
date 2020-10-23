@@ -1,10 +1,10 @@
 from pymongo import MongoClient, DESCENDING
-import pprint
 import os
 
 # Gets database & it's authorization from the environment
 DATABASE_URL1 = os.environ.get('DATABASE_URL1')
 client = MongoClient(DATABASE_URL1)
+RECORD_LIMIT = 50
 
 def get_rankings():
     """
@@ -18,4 +18,4 @@ def get_rankings():
     Returns:
         cursor: to iterate  all user profile documents
     """
-    return client.InitialDB.User_profile.find({},{'password hash': 0, 'save games': 0, 'badges': 0, 'friends': 0, 'current story level': 0,}).sort('points', DESCENDING)
+    return client.InitialDB.User_Profile.find({},{'_id':0,'user_id': 1, 'user_name':1, 'points':1}).limit(RECORD_LIMIT).sort('points', DESCENDING)
