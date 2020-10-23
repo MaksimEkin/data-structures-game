@@ -34,7 +34,8 @@ const reactLocal = "http://localhost:3000/"
 const remote = "https://data-structures-game.herokuapp.com/";
 
 //can also be const url = local; or const url = reactLocal;
-const url = remote;
+const url = local;
+
 const sample = {
   edges: [{}],
   nodes: [{ id: "start1", title: "Start (0)", type: GOLD_NODE,  node_id:"", points:0 },]
@@ -91,6 +92,7 @@ class GameBoard extends Component {
        let game_id = await response.json();
       //save the get request response to state
        this.setState({ gameID: game_id['game_id']});
+       cookies.set('game_id', game_id['game_id'], { path: '/' });
 
        //get request to api and include the dynamic game_id
 
@@ -457,8 +459,8 @@ class GameBoard extends Component {
     return (
       <foreignObject x='-20' y='-30' width='200' height='50'>
         <div className="graph_node">
-          <p>{data.points}</p>
-          <p>{data.node_id}</p>
+          <p className="node_points_text">{data.points}</p>
+          <p className="node_id_text">{data.node_id}</p>
         </div>
       </foreignObject>
     );
