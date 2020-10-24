@@ -49,7 +49,7 @@ def register(request):
     REQUIRED_FIELDS = ['user_name', 'password1', 'password2', 'email']
 
     # Check if the post request contain the required fields
-    if REQUIRED_FIELDS != list(request.data.keys()):
+    if set(REQUIRED_FIELDS) != set(list(request.data.keys())):
         return Response({'error': str('Missing required fields!')}, status=status.HTTP_400_BAD_REQUEST)
 
     # POST Request content
@@ -85,7 +85,7 @@ def login(request):
     REQUIRED_FIELDS = ['user_id', 'password']
 
     # Check if the post request contain the required fields
-    if REQUIRED_FIELDS != list(request.data.keys()):
+    if set(REQUIRED_FIELDS) != set(list(request.data.keys())):
         return Response({'error': str('Missing required fields!')}, status=status.HTTP_400_BAD_REQUEST)
 
     # POST Request content
@@ -114,7 +114,7 @@ def logout(request):
     REQUIRED_FIELDS = ['user_id', 'token']
 
     # Check if the post request contain the required fields
-    if REQUIRED_FIELDS != list(request.data.keys()):
+    if set(REQUIRED_FIELDS) != set(list(request.data.keys())):
         return Response({'error': str('Missing required fields!')}, status=status.HTTP_400_BAD_REQUEST)
 
     # POST Request content
@@ -141,7 +141,7 @@ def save_board(request):
     REQUIRED_FIELDS = ['user_id', 'game_id', 'token']
 
     # Check if the post request contain the required fields
-    if REQUIRED_FIELDS != list(request.data.keys()):
+    if set(REQUIRED_FIELDS) != set(list(request.data.keys())):
         return Response({'error': str('Missing required fields!')}, status=status.HTTP_400_BAD_REQUEST)
 
     # POST Request content
@@ -174,7 +174,7 @@ def delete_board(request):
     REQUIRED_FIELDS = ['user_id', 'game_id', 'token']
 
     # Check if the post request contain the required fields
-    if REQUIRED_FIELDS != list(request.data.keys()):
+    if set(REQUIRED_FIELDS) != set(list(request.data.keys())):
         return Response({'error': str('Missing required fields!')}, status=status.HTTP_400_BAD_REQUEST)
 
     # POST Request content
@@ -200,7 +200,7 @@ def share(request):
     REQUIRED_FIELDS = ['source_user_id', 'dest_user_id', 'game_id', 'token']
 
     # Check if the post request contain the required fields
-    if REQUIRED_FIELDS != list(request.data.keys()):
+    if set(REQUIRED_FIELDS) != set(list(request.data.keys())):
         return Response({'error': str('Missing required fields!')}, status=status.HTTP_400_BAD_REQUEST)
 
     # POST Request content
@@ -254,7 +254,7 @@ def load_board(request):
     REQUIRED_FIELDS = ['user_id', 'game_id', 'token']
 
     # Check if the post request contain the required fields
-    if REQUIRED_FIELDS != list(request.data.keys()):
+    if set(REQUIRED_FIELDS) != set(list(request.data.keys())):
         return Response({'error': str('Missing required fields!')}, status=status.HTTP_400_BAD_REQUEST)
 
     # POST Request content
