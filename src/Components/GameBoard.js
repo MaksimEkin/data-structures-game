@@ -4,6 +4,7 @@ import { Button, Grid, Typography, Card, CardHeader, CardActions, CardActionArea
 import {create_adjacency, create_graph} from './CreateGraphAdj.js';
 import Cookies from 'universal-cookie';
 
+
 //Uber's digraph react folder
 
 import {
@@ -34,9 +35,10 @@ const remote = "https://data-structures-game.herokuapp.com/";
 
 //can also be const url = local; or const url = reactLocal;
 const url = remote;
+
 const sample = {
   edges: [{}],
-  nodes: [{ id: "start1", title: "Start (0)", type: GOLD_NODE },]
+  nodes: [{ id: "start1", title: "Start (0)", type: GOLD_NODE,  node_id:"", points:0 },]
 };
 
 //Gameboard Component
@@ -90,6 +92,7 @@ class GameBoard extends Component {
        let game_id = await response.json();
       //save the get request response to state
        this.setState({ gameID: game_id['game_id']});
+       cookies.set('game_id', game_id['game_id'], { path: '/' });
 
        //get request to api and include the dynamic game_id
 
@@ -278,6 +281,8 @@ class GameBoard extends Component {
     const viewNode = {
       id: Date.now(),
       title: "",
+      node_id:"",
+      points:0,
       type,
       x,
       y
@@ -433,11 +438,9 @@ class GameBoard extends Component {
   apiCall = async () => {
     const cookies = new Cookies();
     let selectedCard = cookies.get('selectedCard');
-    console.log(selectedCard);
     let fetch_url = url+"game_board/api/action/" + selectedCard + '/'
 
     fetch_url = fetch_url + this.state.board['game_id']
-    console.log(fetch_url)
 
     this.setState({ loading: true});
 
@@ -446,12 +449,22 @@ class GameBoard extends Component {
     this.setState({ board: newBoard, loading: false, turn: newBoard['turn']});
 
     let made_graph = create_graph(this.state.board['graph'])
-    console.log(made_graph);
     this.setState({ graph: made_graph});
 
-
-    console.log(newBoard)
   }
+
+  // Create custom text content for the nodes: Node point and Node ID
+  renderNodeText = (data) => {
+    console.log(data);
+    return (
+      <foreignObject x='-20' y='-30' width='200' height='50'>
+        <div className="graph_node">
+          <p className="node_points_text">{data.points}</p>
+          <p className="node_id_text">{data.node_id}</p>
+        </div>
+      </foreignObject>
+    );
+  };
 
 
   //in react life cycle, code that is rendered occurs after constructor initialization
@@ -486,10 +499,11 @@ class GameBoard extends Component {
     //html returned to display page. When each card is played, the appropriate function is called, which in turn makes an API call
 
     return (
+
       //format code to display the 3 cards in flex boxes
       <div>
         <div> {this.state.difficulty}</div>
-        
+
         <div style={{height: "10rem"}}>
           <div className="text-center text-6xl font-bold"> It's {this.state.turn }'s turn! </div>
 
@@ -514,7 +528,7 @@ class GameBoard extends Component {
           showGraphControls={true}
           gridSize="100rem"
           gridDotSize={1}
-          renderNodeText={false}
+          renderNodeText={this.renderNodeText}
           ref="GraphView"
           nodeKey={NODE_KEY}
           nodes={nodes}

@@ -38,7 +38,8 @@ function create_graph(graph){
 
     // Create the node with appropriate type and label
 		node = { id: adjacency_keys[i],
-				 title: node_points[adjacency_keys[i]] + " POINTS " + adjacency_keys[i],
+				 points: node_points[adjacency_keys[i]],
+			     node_id: adjacency_keys[i],
 				 type: type
 		};
 

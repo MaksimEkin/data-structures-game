@@ -1,13 +1,15 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-
-from game_board.api import utils
-from game_board.avl import avl_handler as avl
-
+# Status codes documentation: https://www.django-rest-framework.org/api-guide/status-codes/
+from rest_framework import status
 from rest_framework.throttling import AnonRateThrottle
 from rest_framework.throttling import UserRateThrottle
 from rest_framework.decorators import throttle_classes
 
+from django.http import HttpResponse
+
+from game_board.api import utils
+from game_board.avl import avl_handler as avl
 from .. import config
 
 import json
@@ -22,10 +24,10 @@ def api_overview(request):
     :return: Response, list of API URLs.
     '''
     api_urls = {
-        'Start Game'      : '/start_game/<str:difficulty>/<str:player_ids>/<str:data_structures>',
-        'Game Board'      : '/board/<str:id>',
-        'Re-balance Tree' : '/rebalance/<str:game_id>',
-        'Action'          : '/action/<str:card>/<str:game_id>'
+        'Start Game': '/start_game/<str:difficulty>/<str:player_ids>/<str:data_structures>',
+        'Game Board': '/board/<str:id>',
+        'Re-balance Tree': '/rebalance/<str:game_id>',
+        'Action': '/action/<str:card>/<str:game_id>'
     }
     return Response(api_urls)
 
@@ -47,7 +49,8 @@ def start_game(request, difficulty, player_ids, data_structures):
     # Chosen difficulty does not exist
     if difficulty not in config.DIFFICULTY_LEVELS:
         return Response({'error': 'Difficulty level not found!',
-                         'options': config.DIFFICULTY_LEVELS})
+                         'options': config.DIFFICULTY_LEVELS},
+                        status=status.HTTP_400_BAD_REQUEST)
 
     # Convert the string fields into list. Separate by comma if provided
     player_ids = player_ids.split(',')
@@ -55,12 +58,13 @@ def start_game(request, difficulty, player_ids, data_structures):
 
     # Create new game board JSON (dict), and store it in the database
     new_board = utils.new_board(difficulty, player_ids, data_structures)
-    status = utils.create_board_db(new_board)
+    response_status = utils.create_board_db(new_board)
 
-    if status['error']:
-        return Response({'error': status['reason']})
+    if response_status['error']:
+        return Response({'error': response_status['reason']},
+                        status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    return Response({'game_id': status['game_id']})
+    return Response({'game_id': response_status['game_id']})
 
 
 @api_view(['GET'])
@@ -73,14 +77,15 @@ def board(request, game_id):
     :return game board JSON:
     '''
 
-    status = utils.load_board_db(game_id)
-    if status['error']:
-        return Response({'error': status['reason']})
+    response_status = utils.load_board_db(game_id)
+    if response_status['error']:
+        return Response({'error': response_status['reason']},
+                        status=status.HTTP_400_BAD_REQUEST)
 
     # hide the UID used by data structure backend from user
-    del status['game_board']['graph']['uid']
+    del response_status['game_board']['graph']['uid']
 
-    return Response(status['game_board'])
+    return Response(response_status['game_board'])
 
 
 @api_view(['POST'])
@@ -98,13 +103,15 @@ def rebalance(request, game_id):
     try:
         adjacency_list = post_request['adjacency_list']
     except Exception as e:
-        return Response({'error': str(e)})
+        return Response({'error': str(e)},
+                        status=status.HTTP_400_BAD_REQUEST)
 
     # Load the game board from database
-    status = utils.load_board_db(game_id)
-    if status['error']:
-        return Response({'error': status['reason']})
-    board = status['game_board']
+    response_status = utils.load_board_db(game_id)
+    if response_status['error']:
+        return Response({'error': response_status['reason']},
+                        status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    board = response_status['game_board']
 
     #  Check for invalid action
     if board['curr_data_structure'] != 'AVL':
@@ -112,7 +119,8 @@ def rebalance(request, game_id):
 
     check = utils.cheat_check(game_board=board, rebalance=True)
     if check['cheat']:
-        return Response({'invalid_action': check['reason']})
+        return Response({'invalid_action': check['reason']},
+                        status=status.HTTP_400_BAD_REQUEST)
 
     # Do the re-balance action and get the new state of the graph
     if board['curr_data_structure'] == 'AVL':
@@ -128,11 +136,12 @@ def rebalance(request, game_id):
     board['turn'] = board['player_ids'][next_player_index]
 
     # Update board
-    status = utils.update_board_db(board)
-    if status['error']:
-        return Response({'error': status['reason']})
+    response_status = utils.update_board_db(board)
+    if response_status['error']:
+        return Response({'error': response_status['reason']},
+                        status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    board = status['game_board']
+    board = response_status['game_board']
 
     return Response(board)
 
@@ -149,15 +158,17 @@ def action(request, card, game_id):
     '''
 
     # Load the game board from database
-    status = utils.load_board_db(game_id)
-    if status['error']:
-        return Response({'error': status['reason']})
-    board = status['game_board']
+    response_status = utils.load_board_db(game_id)
+    if response_status['error']:
+        return Response({'error': response_status['reason']},
+                        status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    board = response_status['game_board']
 
     # Check for invalid action
     check = utils.cheat_check(game_board=board, card=card)
     if check['cheat']:
-        return Response({'invalid_action': check['reason']})
+        return Response({'invalid_action': check['reason']},
+                        status=status.HTTP_400_BAD_REQUEST)
 
     # Give the points
     if card in config.GAIN_TIMES[board['curr_data_structure']]:
@@ -179,10 +190,11 @@ def action(request, card, game_id):
     board['cards'][board['turn']].append(utils.pick_a_card(board))
 
     # Update the board on database
-    status = utils.update_board_db(board)
-    if status['error']:
-        return Response({'error': status['reason']})
+    response_status = utils.update_board_db(board)
+    if response_status['error']:
+        return Response({'error': response_status['reason']},
+                        status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    board = status['game_board']
+    board = response_status['game_board']
 
     return Response(board)

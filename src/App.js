@@ -19,7 +19,7 @@ function App(){
           </Link>
         </li>
         <li>
-          <Link className="text-blue-500 py-3 border-t bordre-b block" to="/game_board" >
+          <Link className="text-blue-500 py-3 border-t bordre-b block" to="/game_board" name="start_game">
             Start Game</Link>
         </li>
       </ul>
