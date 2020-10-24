@@ -1,6 +1,12 @@
 """
 # Safari --> Allow Remote Automation
 
+This script is a unit test that uses Selenium to verify
+the content of the nodes in the graph.
+More specifically, it checks the node IDs and their
+corresponding node points with what is expected using
+the Game Board API.
+
 How to run:
     1) Run Django: python manage.py runserver
     2) Run the test: python -m unittest test_node_text.py
@@ -48,9 +54,9 @@ class TestStringMethods(unittest.TestCase):
         self.points = list()
         self.ids = list()
 
+        # Extract each point and node ID from the website as text
         for point in node_points:
             self.points.append(int(point.text))
-
         for id in node_ids:
             self.ids.append(id.text)
 
