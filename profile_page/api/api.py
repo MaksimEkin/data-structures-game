@@ -3,13 +3,15 @@ from rest_framework.response import Response
 # Status codes documentation: https://www.django-rest-framework.org/api-guide/status-codes/
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
-from game_board.database import game_board_db as db
-from game_board.api import utils
+
 import uuid
 import json
 
-# @permission_classes([IsAuthenticated])
-# from rest_framework.authtoken.models import Token
+from game_board.api import utils as game_utils
+from game_board.database import game_board_db as game_db
+
+# from profile_page.database import profile_page_db as db
+from . import mock_db as db
 
 @api_view(['GET'])
 def api_overview(request):
@@ -57,15 +59,17 @@ def register(request):
     if data['password1'] != data['password2']:
         return Response({'error': str('Passwords does not match!')}, status=status.HTTP_400_BAD_REQUEST)
 
-    # TODO: Here ask db if this username or e-mail already exist
-    # db.user_or_email_exist(user_name, email)
+    # Here ask db if this username or e-mail already exist
     # if DB says yes, return error, else proceed
+    if db.user_or_email_exist(data['user_name'], data['email']):
+        return Response({'error': str('User or e-mail already exist!')}, status=status.HTTP_406_NOT_ACCEPTABLE)
 
-    # TODO: Here ask db to create a new user with its token
+    # Here ask db to create a new user with its token
     token = str(uuid.uuid1())
-    # db.create_user(user_name, password1, email, token)
+    if not db.create_user(data['user_name'], data['password1'], data['email'], token):
+        return Response({'error': str('Error when creating the account!')}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    return Response({'status': 'User Successfully Created!', 'token':token})
+    return Response({'status': 'User Successfully Created!', 'token': token})
 
 
 @api_view(['POST'])
@@ -87,13 +91,15 @@ def login(request):
     # POST Request content
     data = request.data
 
-    # TODO: Here ask db if username and password works out
-    # db.login(user_id, password)
+    # Here ask db if username and password works out
     # if db says nope, return error. else proceed.
+    if not db.login(data['user_id'], data['password']):
+        return Response({'error': str('UNAUTHORIZED')}, status=status.HTTP_401_UNAUTHORIZED)
 
-    # TODO: Here let db know of the new token that user owns
+    # Here let db know of the new token that user owns
     token = str(uuid.uuid1())
-    # db.update_token(user_id, token)
+    if not db.update_token(data['user_id'], token):
+        return Response({'error': str('Error when updating logging in!')}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     return Response({'status': 'User Successfully Logged-in!', 'token': token})
 
@@ -114,11 +120,14 @@ def logout(request):
     # POST Request content
     data = request.data
 
-    # TODO: Here check if user_id matches the token with the database
-    # db.check_user(user_id, token)
+    # Here check if user_id matches the token with the database
+    if not db.check_user(data['user_id'], data['token']):
+        return Response({'error': str('UNAUTHORIZED')}, status=status.HTTP_401_UNAUTHORIZED)
 
-    # TODO: Here let db know we are logging out by removing user's token
+    # Here let db know we are logging out by removing user's token
     # db.remove_token(user_id)
+    if not db.remove_token(data['token']):
+        return Response({'error': str('Error when logging out!')}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     return Response({'status': 'User Successfully Logged-out!'})
 
@@ -138,19 +147,20 @@ def save_board(request):
     # POST Request content
     data = request.data
 
-    # TODO: Here check if user_id matches the token with the database
-    # db.check_user(user_id, token)
+    # Here check if user_id matches the token with the database
+    if not db.check_user(data['user_id'], data['token']):
+        return Response({'error': str('UNAUTHORIZED')}, status=status.HTTP_401_UNAUTHORIZED)
 
     # Load the game board from the database
-    response_status = utils.load_board_db(data['game_id'])
+    response_status = game_utils.load_board_db(data['game_id'])
     if response_status['error']:
         return Response({'error': response_status['reason']},
                         status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     board = response_status['game_board']
 
-    # TODO: Here append new game board to user's profile. Note that this board already have an ID.
-    # db.save_game(user_id, board)
-    # possibly return ('No space left to save')
+    # Here append new game board to user's profile. Note that this board already have an ID.
+    if not db.save_game(data['user_id'], board):
+        return Response({'error': str('Error when saving the game!')}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     return Response({'status':'Game is Successfully Saved!'})
 
@@ -170,12 +180,13 @@ def delete_board(request):
     # POST Request content
     data = request.data
 
-    # TODO: Here check if user_id matches the token with the database
-    # db.check_user(user_id, token)
+    # Here check if user_id matches the token with the database
+    if not db.check_user(data['user_id'], data['token']):
+        return Response({'error': str('UNAUTHORIZED')}, status=status.HTTP_401_UNAUTHORIZED)
 
-    # TODO: Here delete the game board from user's saved profile
-    # db.delete_game(user_id, board)
-    # possibly return ('Game not found')
+    # Here delete the game board from user's saved profile
+    if not db.delete_game(data['user_id'], data['game_id']):
+        return Response({'error': str('Error when deleting the game!')}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     return Response({'status': 'Game is Successfully Deleted!'})
 
@@ -195,19 +206,23 @@ def share(request):
     # POST Request content
     data = request.data
 
-    # TODO: Here check if source_user_id matches the token with the database
-    # db.check_user(source_user_id, token)
+    # Here check if user_id matches the token with the database
+    if not db.check_user(data['source_user_id'], data['token']):
+        return Response({'error': str('UNAUTHORIZED')}, status=status.HTTP_401_UNAUTHORIZED)
 
-    # TODO: Here check if dest_user_id is accepting shared content
-    # db.check_user_share_setting(dest_user_id)
+    # Here check if dest_user_id is accepting shared content
+    if not db.check_user_share_setting(data['dest_user_id']):
+        return Response({'error': str('NOT ALLOWED')}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
-    # TODO: Here call db to copy saved game board from source_user_id to dest_user_id
-    # db.share_game_board(source_user_id, dest_user_id, game_id)
+    # Here call db to copy saved game board from source_user_id to dest_user_id
+    # This database call just copies the saved board into dest_user_id's saved game boards
+    if not db.share_game_board(data['source_user_id'], data['dest_user_id'], data['game_id']):
+        return Response({'error': str('Error when sharing the game!')}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
     # Note that this could also be multiple db calls where first you give me a game board and allow me to
     # call db.save_game(dest_user_id, board)
 
     return Response({'status': 'Content is Successfully Shared!'})
-
 
 
 @api_view(['GET'])
@@ -218,15 +233,14 @@ def saved_boards(request, user_id, token):
     :return:
     """
 
-    # TODO: Here check user_id is authenticated with token on db
-    # db.check_user(user_id, token)
+    # Here check if user_id matches the token with the database
+    if not db.check_user(user_id, token):
+        return Response({'error': str('UNAUTHORIZED')}, status=status.HTTP_401_UNAUTHORIZED)
 
-    try:
-        # TODO: Make sure DB returns list of game board IDs here
-        saved_game_board_ids =  json.loads(json_util.dumps(db.list_user_games(user_id)))
-
-    except Exception as e:
-        return Response({'error': str('Error in the Database!')}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    # Get list of game board IDs of user's saved game boards so that
+    # user later can use these ids on other API calls
+    # saved_game_board_ids = json.loads(json_util.dumps(db.list_user_games(user_id)))
+    saved_game_board_ids = db.list_user_games(user_id)
 
     return Response({'saved_games': saved_game_board_ids})
 
@@ -246,20 +260,34 @@ def load_board(request):
     # POST Request content
     data = request.data
 
-    # TODO: Here check if user_id matches the token with the database
-    # db.check_user(user_id, token)
+    # Here check if user_id matches the token with the database
+    if not db.check_user(data['user_id'], data['token']):
+        return Response({'error': str('UNAUTHORIZED')}, status=status.HTTP_401_UNAUTHORIZED)
 
-    # TODO: Load the game from user's saved profile
-    # game_board = db.load_board(user_id, game_id)
+    # Load the game from user's saved profile
+    game_board = db.load_board(data['user_id'], data['game_id'])
 
-    # TODO: here I am just going to move this board to active games using the api we already have.
+    # Here I am just going to move this board to active games using the api we already have.
     # Note that board is still saved on user's profile, but we are just creating a new active game.
     # User can just keep creating new active games from the saved board.
     # So we possibly as of now don't need to update stuff in user's saved board
     # But we can use the update stuff once we have more functionality going.
+    response_status = game_utils.create_board_db(game_board)
 
-    # TODO: here i am just going to return the game board from the active games
+    if response_status['error']:
+        return Response({'error': response_status['reason']},
+                        status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    active_game_id = response_status['game_id']
+
+    # Here i am just going to return the game board itself from the active games
     # From this point front-end can continue using the Game Board API to interact with the game
-    pass
+    response_status = game_utils.load_board_db(active_game_id)
+    if response_status['error']:
+        return Response({'error': response_status['reason']},
+                        status=status.HTTP_400_BAD_REQUEST)
 
+    # hide the UID used by data structure backend from user
+    del response_status['game_board']['graph']['uid']
 
+    return Response(response_status['game_board'])
