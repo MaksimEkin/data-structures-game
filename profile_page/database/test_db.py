@@ -20,32 +20,53 @@ class BColors:
 class DBCreateUserProfile(TestCase):
     def setUp(self):
         self.user = {"user_id":"5f7d1b1d8fd2b816c48c148b","badges":[31,24,83],"current_story_level":9,"email":"ryanb777@umbc.edu","friends":["Kulsoom2","Nick2","Maksim2","Naomi2"],"user_name":"ryan2","password_hash":"well,hello there","points":98274,"rank":"diamond","save_games":["4(2(3)(no))(6(5))","4(2(3)(1))(6(5))","4(2(3)(1))(6(5))"]}
-        self.fail_phrase = 'nah bro idk about it'
-        mongo.remove_user(self.user["user_id"]) #Make sure the game is cleared out
+        self.user2 = {"auth_token":"cool!", "user_id":"second_guy","badges":[31,24,83],"current_story_level":9,"email":"ryan@umbc.edu","friends":["Kulsoom2","Nick2","Maksim2","Naomi2"],"user_name":"ryan2","password_hash":"well,hello there","points":98274,"rank":"diamond","save_games":["4(2(3)(no))(6(5))","4(2(3)(1))(6(5))","4(2(3)(1))(6(5))"]}
+
+    def test_save(self):
+        """ The user document was saved in the database """
+        created_user = mongo.save_user( self.user )
+        self.assertEqual( created_user, True, msg=f'{BColors.FAIL}\t[-]\tUser was not created in the Database!{BColors.ENDC}')
+        print(f"{BColors.OKGREEN}\t[+]\tPass User-Profile database save.{BColors.ENDC}")
+
+    def test_duplicate_save(self):
+        """ The user document is a duplicate and should fail saving in the database """
+        created_user = mongo.save_user( self.user )
+        created_user = mongo.save_user( self.user )
+        self.assertEqual( created_user, False, msg=f'{BColors.FAIL}\t[-]\tGame was not created in the Database!{BColors.ENDC}')
+        print(f"{BColors.OKGREEN}\t[+]\tPass User-Profile database save duplicate.{BColors.ENDC}")
 
     def test_create(self):
         """ The user document was created in the database """
-        created_user = mongo.create_user( self.user )
-
-        self.assertEqual( created_user, self.user["user_id"], msg=f'{BColors.FAIL}\t[-]\tUser was not created in the Database!{BColors.ENDC}')
+        created_user = mongo.create_user( self.user2["user_id"], self.user2["password_hash"], self.user2["email"], self.user2["auth_token"] )
+        self.assertEqual( created_user, True, msg=f'{BColors.FAIL}\t[-]\tUser was not created in the Database!{BColors.ENDC}')
         print(f"{BColors.OKGREEN}\t[+]\tPass User-Profile database save.{BColors.ENDC}")
 
-    def test_duplicatecreate(self):
-        """ The user document is a duplicate and should fail creation in the database """
-        created_user = mongo.create_user( self.user )
-        created_user = mongo.create_user( self.user )
+    def test_create_duplicate_uid(self):
+        """ The user document was not created, duplicate user id the database """
+        created_user = mongo.save_user( self.user )
+        created_user = mongo.create_user( self.user["user_id"], self.user2["password_hash"], self.user2["email"], self.user2["auth_token"] )
+        mongo.remove_user(self.user["user_id"])
+        self.assertEqual( created_user, False, msg=f'{BColors.FAIL}\t[-]\tDuplicate user was created in the Database!{BColors.ENDC}')
+        print(f"{BColors.OKGREEN}\t[+]\tPass User-Profile database create duplicate user id .{BColors.ENDC}")
 
-        self.assertEqual( created_user, self.fail_phrase, msg=f'{BColors.FAIL}\t[-]\tGame was not created in the Database!{BColors.ENDC}')
-        print(f"{BColors.OKGREEN}\t[+]\tPass User-Profile database save duplicate.{BColors.ENDC}")
+    def test_create_duplicate_email(self):
+        """ The user document was not created, duplicate user email in the database """
+        created_user = mongo.save_user( self.user )
+        created_user = mongo.create_user( self.user2["user_id"], self.user2["password_hash"], self.user["email"], self.user2["auth_token"] )
+        mongo.remove_user(self.user["user_id"])
+
+        self.assertEqual( created_user, False, msg=f'{BColors.FAIL}\t[-]\tDuplicate user was created in the Database!{BColors.ENDC}')
+        print(f"{BColors.OKGREEN}\t[+]\tPass User-Profile database create duplicate user email .{BColors.ENDC}")
 
     def tearDown(self):
         mongo.remove_user(self.user["user_id"])
+        mongo.remove_user(self.user2["user_id"])
 
 class DBReadUserProfile(TestCase):
     def setUp(self):
         self.user = {"user_id":"5f7d1b1d8fd2b816c48c148b","badges":[31,24,83],"current_story_level":9,"email":"ryanb777@umbc.edu","friends":["Kulsoom2","Nick2","Maksim2","Naomi2"],"user_name":"ryan2","password_hash":"well,hello there","points":98274,"rank":"diamond","save_games":["4(2(3)(no))(6(5))","4(2(3)(1))(6(5))","4(2(3)(1))(6(5))"]}
-        self.fail_phrase = 'nah bro idk about it'
-        mongo.create_user( self.user )
+        self.fail_phrase = False
+        mongo.save_user( self.user )
 
     def test_read_correct(self):
         """ The user document was read from the database """
@@ -82,8 +103,8 @@ class DBUpdateUserProfile(TestCase):
     def setUp(self):
         self.user = {"user_id":"5f7d1b1d8fd2b816c48c148b","badges":[31,24,83],"current_story_level":9,"email":"ryanb777@umbc.edu","friends":["Kulsoom2","Nick2","Maksim2","Naomi2"],"user_name":"ryan2","password_hash":"well,hello there","points":98274,"rank":"diamond","save_games":["4(2(3)(no))(6(5))","4(2(3)(1))(6(5))","4(2(3)(1))(6(5))"]}
         self.user2 = {"user_id":"5f7d1b1d8fd2b816c48c148b","badges":[989879879831,24,83],"current_story_level":9,"email":"ryanb777@umbc.edu","friends":["Kulsoom2","Nick2","Maksim2","Naomi2"],"user_name":"ryan2","password_hash":"well,hello there","points":98274,"rank":"diamond","save_games":["4(2(3)(no))(6(5))","4(2(3)(1))(6(5))","4(2(3)(1))(6(5))"]}
-        self.fail_phrase = 'nah bro idk about it'
-        mongo.create_user( self.user )
+        self.fail_phrase = False
+        mongo.save_user( self.user )
 
     def test_update_correct(self):
         """ The user document is updated in the database """
@@ -111,14 +132,13 @@ class DBUpdateUserGameAndGraph(TestCase):
         self.new_graph = {"nodes": "DID IT WRETITREE ???5))"}
         self.user = {"user_id":"5f7d1b1d8fd2b816c48c148b","badges":[31,24,83],"current_story_level":9,"email":"ryanb777@umbc.edu","friends":["Kulsoom2","Nick2","Maksim2","Naomi2"],"user_name":"ryan2","password_hash":"well,hello there","points":98274,"rank":"diamond","save_games":[self.board,"4(2(3)(1))(6(5))","4(2(3)(1))(6(5))"]}
 
-        self.fail_phrase = 'nah bro idk about it'
-        mongo.create_user( self.user )
+        self.fail_phrase = False
+        mongo.save_user( self.user )
 
     def test_update_game_correct(self):
         """ The user document is updated in the database """
         original_user = self.user
         updated_game = mongo.update_user_game( self.user["user_id"], self.board["game_id"], self.board2 )
-
         self.assertEqual( updated_game != original_user, True, msg=f'{BColors.FAIL}\t[-]\tUser Id returned from read user does not equal expected!{BColors.ENDC}')
         print(f"{BColors.OKGREEN}\t[+]\tPass User-Profile database update.{BColors.ENDC}")
 
@@ -126,25 +146,8 @@ class DBUpdateUserGameAndGraph(TestCase):
         """ The user document should not be updated from the database """
         original_user = self.user
         updated_user = mongo.update_user_game( self.user["user_id"], "This name should really not exist in the database, and if it does, YEESH!", self.board2)
-
-        self.assertEqual( updated_user, original_user, msg=f'{BColors.FAIL}\t[-]\tIncorrect return for non-existant user!{BColors.ENDC}')
+        self.assertEqual( updated_user, False, msg=f'{BColors.FAIL}\t[-]\tIncorrect return for non-existant user!{BColors.ENDC}')
         print(f"{BColors.OKGREEN}\t[+]\tPass User-Profile database update game nonexistant.{BColors.ENDC}")
-
-    def test_update_graph_correct(self):
-        """ The user document is updated in the database """
-        original = self.user
-        updated = mongo.update_user_game_graph( self.user["user_id"], self.board["game_id"], self.new_graph )
-
-        self.assertEqual( updated != original, True, msg=f'{BColors.FAIL}\t[-]\tUser Id returned from read user does not equal expected!{BColors.ENDC}')
-        print(f"{BColors.OKGREEN}\t[+]\tPass User-Profile database graph update.{BColors.ENDC}")
-
-    def test_update_graph_nonexist(self):
-        """ The user document should not be updated from the database """
-        original_user = self.user
-        updated_graph = mongo.update_user_game_graph( self.user["user_id"], "This name should really not exist in the database, and if it does, YEESH!", self.board2)
-
-        self.assertEqual( updated_graph, original_user, msg=f'{BColors.FAIL}\t[-]\tIncorrect return for non-existant user!{BColors.ENDC}')
-        print(f"{BColors.OKGREEN}\t[+]\tPass User-Profile database update graph nonexistant.{BColors.ENDC}")
 
     def tearDown(self):
         mongo.remove_user(self.user["user_id"])
@@ -153,71 +156,49 @@ class DBUpdateUserGameAndGraph(TestCase):
 class DBDeleteUser(TestCase):
     def setUp(self):
         self.user = {"user_id":"5f7d1b1d8fd2b816c48c148b","badges":[31,24,83],"current_story_level":9,"email":"ryanb777@umbc.edu","friends":["Kulsoom2","Nick2","Maksim2","Naomi2"],"user_name":"ryan2","password_hash":"well,hello there","points":98274,"rank":"diamond","save_games":[{'game_id': '60afce36-085a-11eb-b6ab-acde48001122', 'graph': {'nodes': 'DID IT WRETITREE ???5))'}, 'player_ids': ['id2', 'id3', 'id4', 'id5'], 'player_names': ['naomi', 'kulsoom', 'nick', 'ryan'], 'player_points': {'id2': 2, 'id3': 2, 'id4': 3, 'id5': 10}, 'turn': 'id2', 'cards': {'id2': ['card1', 'card2', 'card3'], 'id3': ['card1', 'card2', 'card3'], 'id4': ['card1', 'card2', 'card3'], 'id5': ['card1', 'card2', 'card3']}, 'gold_node': False, 'difficulty': 'Medium', 'num_players': 4, 'online': True, 'curr_data_structure': 'AVL', 'selected_data_structures': ['AVL', 'Stack'], 'timed_game': False, 'seconds_until_next_ds': 60, 'time_created': '07/10/2020 00:05:47', 'end_game': False},"4(2(3)(1))(6(5))","4(2(3)(1))(6(5))"]}
-        self.fail_phrase = 'nah bro idk about it'
-        mongo.create_user( self.user )
+        self.fail_phrase = False
+        mongo.save_user( self.user )
 
     def test_delete_correct(self):
         """ The user document was deleted in the database """
         deleted_user = mongo.remove_user( self.user["user_id"] )
-
         self.assertEqual( deleted_user, 1, msg=f'{BColors.FAIL}\t[-]\tDatabase was not able to delete the user!{BColors.ENDC}')
         print(f"{BColors.OKGREEN}\t[+]\tPass User-Profile database delete.{BColors.ENDC}")
 
     def test_delete_nonexist(self):
         """ The user document should not be deleted from the database """
         deleted_user = mongo.remove_user( "This name should really not exist in the database, and if it does, it desrves to be deleted" )
-
         self.assertEqual( deleted_user, self.fail_phrase, msg=f'{BColors.FAIL}\t[-]\tIncorrect return for non-existant user!{BColors.ENDC}')
         print(f"{BColors.OKGREEN}\t[+]\tPass User-Profile database delete nonexistant.{BColors.ENDC}")
 
 class DBDeleteGames(TestCase):
     def setUp(self):
         self.user = {"user_id":"5f7d1b1d8fd2b816c48c148b","badges":[31,24,83],"current_story_level":9,"email":"ryanb777@umbc.edu","friends":["Kulsoom2","Nick2","Maksim2","Naomi2"],"user_name":"ryan2","password_hash":"well,hello there","points":98274,"rank":"diamond","save_games":[{'game_id': '60afce36-085a-11eb-b6ab-acde48001122', 'graph': {'nodes': 'DID IT WRETITREE ???5))'}, 'player_ids': ['id2', 'id3', 'id4', 'id5'], 'player_names': ['naomi', 'kulsoom', 'nick', 'ryan'], 'player_points': {'id2': 2, 'id3': 2, 'id4': 3, 'id5': 10}, 'turn': 'id2', 'cards': {'id2': ['card1', 'card2', 'card3'], 'id3': ['card1', 'card2', 'card3'], 'id4': ['card1', 'card2', 'card3'], 'id5': ['card1', 'card2', 'card3']}, 'gold_node': False, 'difficulty': 'Medium', 'num_players': 4, 'online': True, 'curr_data_structure': 'AVL', 'selected_data_structures': ['AVL', 'Stack'], 'timed_game': False, 'seconds_until_next_ds': 60, 'time_created': '07/10/2020 00:05:47', 'end_game': False},"4(2(3)(1))(6(5))","4(2(3)(1))(6(5))"]}
-        self.fail_phrase = 'nah bro idk about it'
-        mongo.create_user( self.user )
+        self.fail_phrase = False
+        mongo.save_user( self.user )
 
     def test_delete_correct(self):
         """ The user document was deleted in the database """
-        deleted_user = mongo.delete_user_game( self.user["user_id"], self.user['save_games'][0]["game_id"])
-
+        deleted_user = mongo.delete_game( self.user["user_id"], self.user['save_games'][0]["game_id"])
         self.assertEqual( deleted_user, 1, msg=f'{BColors.FAIL}\t[-]\tDatabase was not able to delete the user!{BColors.ENDC}')
         print(f"{BColors.OKGREEN}\t[+]\tPass User-Profile database delete.{BColors.ENDC}")
 
     def test_delete_nonexist(self):
         """ The user document should not be deleted from the database """
-        deleted_user = mongo.delete_user_game( "This name should really not exist in the database, and if it does, it desrves to be deleted", self.user['save_games'][0]["game_id"] )
-
-        self.assertEqual( deleted_user, self.fail_phrase, msg=f'{BColors.FAIL}\t[-]\tIncorrect return for non-existant user!{BColors.ENDC}')
+        deleted_user = mongo.delete_game( "This name should really not exist in the database, and if it does, it desrves to be deleted", self.user['save_games'][0]["game_id"] )
+        self.assertEqual( deleted_user, False, msg=f'{BColors.FAIL}\t[-]\tIncorrect return for non-existant user!{BColors.ENDC}')
         print(f"{BColors.OKGREEN}\t[+]\tPass User-Profile database delete nonexistant.{BColors.ENDC}")
-
-class DBDeleteGraph(TestCase):
-    def setUp(self):
-        self.user = {"user_id":"5f7d1b1d8fd2b816c48c148b","badges":[31,24,83],"current_story_level":9,"email":"ryanb777@umbc.edu","friends":["Kulsoom2","Nick2","Maksim2","Naomi2"],"user_name":"ryan2","password_hash":"well,hello there","points":98274,"rank":"diamond","save_games":[{'game_id': '60afce36-085a-11eb-b6ab-acde48001122', 'graph': {'nodes': 'DID IT WRETITREE ???5))'}, 'player_ids': ['id2', 'id3', 'id4', 'id5'], 'player_names': ['naomi', 'kulsoom', 'nick', 'ryan'], 'player_points': {'id2': 2, 'id3': 2, 'id4': 3, 'id5': 10}, 'turn': 'id2', 'cards': {'id2': ['card1', 'card2', 'card3'], 'id3': ['card1', 'card2', 'card3'], 'id4': ['card1', 'card2', 'card3'], 'id5': ['card1', 'card2', 'card3']}, 'gold_node': False, 'difficulty': 'Medium', 'num_players': 4, 'online': True, 'curr_data_structure': 'AVL', 'selected_data_structures': ['AVL', 'Stack'], 'timed_game': False, 'seconds_until_next_ds': 60, 'time_created': '07/10/2020 00:05:47', 'end_game': False},"4(2(3)(1))(6(5))","4(2(3)(1))(6(5))"]}
-        self.fail_phrase = 'nah bro idk about it'
-        mongo.create_user( self.user )
-
-    def test_delete_graphcorrect(self):
-        """ The user graph was deleted in the database """
-        deleted_user = mongo.delete_user_game_graph( self.user["user_id"], self.user['save_games'][0]["game_id"] )
-
-        self.assertEqual( deleted_user, 1, msg=f'{BColors.FAIL}\t[-]\tDatabase was not able to delete the graph!{BColors.ENDC}')
-        print(f"{BColors.OKGREEN}\t[+]\tPass User-Profile database graph delete.{BColors.ENDC}")
-
-    def test_delete_nonexist(self):
-        """ The user graph should not be deleted from the database """
-        deleted_user = mongo.delete_user_game_graph( "This name should really not exist in the database, and if it does, it desrves to be deleted", self.user['save_games'][0]["game_id"] )
-
-        self.assertEqual( deleted_user, self.fail_phrase, msg=f'{BColors.FAIL}\t[-]\tIncorrect return for non-existant user!{BColors.ENDC}')
-        print(f"{BColors.OKGREEN}\t[+]\tPass User-Profile database delete graph nonexistant.{BColors.ENDC}")
 
 class DBList(TestCase):
     def setUp(self):
         self.user = {"user_id":"5f7d1b1d8fd2b816c48c148b","badges":[31,24,83],"current_story_level":9,"email":"ryanb777@umbc.edu","friends":["Kulsoom2","Nick2","Maksim2","Naomi2"],"user_name":"ryan2","password_hash":"well,hello there","points":98274,"rank":"diamond","save_games":[{'game_id': '60afce36-085a-11eb-b6ab-acde48001122', 'graph': {'nodes': 'DID IT WRETITREE ???5))'}, 'player_ids': ['id2', 'id3', 'id4', 'id5'], 'player_names': ['naomi', 'kulsoom', 'nick', 'ryan'], 'player_points': {'id2': 2, 'id3': 2, 'id4': 3, 'id5': 10}, 'turn': 'id2', 'cards': {'id2': ['card1', 'card2', 'card3'], 'id3': ['card1', 'card2', 'card3'], 'id4': ['card1', 'card2', 'card3'], 'id5': ['card1', 'card2', 'card3']}, 'gold_node': False, 'difficulty': 'Medium', 'num_players': 4, 'online': True, 'curr_data_structure': 'AVL', 'selected_data_structures': ['AVL', 'Stack'], 'timed_game': False, 'seconds_until_next_ds': 60, 'time_created': '07/10/2020 00:05:47', 'end_game': False},"4(2(3)(1))(6(5))","4(2(3)(1))(6(5))"]}
-        mongo.create_user( self.user )
+
+        mongo.save_user( self.user )
 
     def test_list_users_correct(self):
         """ The user document was added to the list and appears in the returned list """
         found = False
+
         game_cursor = mongo.list_users()
         for gameid in game_cursor:
             if self.user["user_id"] == gameid["user_id"]:
@@ -227,8 +208,8 @@ class DBList(TestCase):
         print(f"{BColors.OKGREEN}\t[+]\tPass User-Profile database list.{BColors.ENDC}")
 
     def test_list_user_games_correct(self):
+        """ The user's games appears in the returned list """
         user_games = mongo.list_user_games(self.user["user_id"])
-
         self.assertEqual(user_games[0], self.user["save_games"][0], msg=f'{BColors.FAIL}\t[-]\tAdded user was not in the listed games!{BColors.ENDC}')
         print(f"{BColors.OKGREEN}\t[+]\tPass User-Profile database list.{BColors.ENDC}")
 
@@ -237,39 +218,153 @@ class DBList(TestCase):
 
 class DBReadUserGamesAndGraphs(TestCase):
     def setUp(self):
-        self.user = {"user_id":"5f7d1b1d8fd2b816c48c148b","badges":[31,24,83],"current_story_level":9,"email":"ryanb777@umbc.edu","friends":["Kulsoom2","Nick2","Maksim2","Naomi2"],"user_name":"ryan2","password_hash":"well,hello there","points":98274,"rank":"diamond","save_games":[{'game_id': '60afce36-085a-11eb-b6ab-acde48001122', 'graph': {'nodes': 'DID IT WRETITREE ???5))'}, 'player_ids': ['id2', 'id3', 'id4', 'id5'], 'player_names': ['naomi', 'kulsoom', 'nick', 'ryan'], 'player_points': {'id2': 2, 'id3': 2, 'id4': 3, 'id5': 10}, 'turn': 'id2', 'cards': {'id2': ['card1', 'card2', 'card3'], 'id3': ['card1', 'card2', 'card3'], 'id4': ['card1', 'card2', 'card3'], 'id5': ['card1', 'card2', 'card3']}, 'gold_node': False, 'difficulty': 'Medium', 'num_players': 4, 'online': True, 'curr_data_structure': 'AVL', 'selected_data_structures': ['AVL', 'Stack'], 'timed_game': False, 'seconds_until_next_ds': 60, 'time_created': '07/10/2020 00:05:47', 'end_game': False},"4(2(3)(1))(6(5))","4(2(3)(1))(6(5))"]}
-        self.fail_phrase = 'nah bro idk about it'
-        mongo.create_user( self.user )
+        self.user = {"sharing": True, "auth_token":"cool!","user_id":"5f7d1b1d8fd2b816c48c148b","badges":[31,24,83],"current_story_level":9,"email":"ryanb777@umbc.edu","friends":["Kulsoom2","Nick2","Maksim2","Naomi2"],"user_name":"ryan2","password_hash":"well,hello there","points":98274,"rank":"diamond","save_games":[{'game_id': '60afce36-085a-11eb-b6ab-acde48001122', 'graph': {'nodes': 'DID IT WRETITREE ???5))'}, 'player_ids': ['id2', 'id3', 'id4', 'id5'], 'player_names': ['naomi', 'kulsoom', 'nick', 'ryan'], 'player_points': {'id2': 2, 'id3': 2, 'id4': 3, 'id5': 10}, 'turn': 'id2', 'cards': {'id2': ['card1', 'card2', 'card3'], 'id3': ['card1', 'card2', 'card3'], 'id4': ['card1', 'card2', 'card3'], 'id5': ['card1', 'card2', 'card3']}, 'gold_node': False, 'difficulty': 'Medium', 'num_players': 4, 'online': True, 'curr_data_structure': 'AVL', 'selected_data_structures': ['AVL', 'Stack'], 'timed_game': False, 'seconds_until_next_ds': 60, 'time_created': '07/10/2020 00:05:47', 'end_game': False},"4(2(3)(1))(6(5))","4(2(3)(1))(6(5))"]}
+        self.fail_phrase = False
+        mongo.save_user( self.user )
 
-    def test_find_user_game(self):
+    def test_load_board(self):
         """ The user game document was found """
         found = False
-        user_game = mongo.find_user_game(self.user["user_id"], self.user['save_games'][0]["game_id"])
-
+        user_game = mongo.load_board(self.user["user_id"], self.user['save_games'][0]["game_id"])
         self.assertEqual( user_game, self.user["save_games"][0], msg=f'{BColors.FAIL}\t[-]\tUser game save was not found!{BColors.ENDC}')
-        print(f"{BColors.OKGREEN}\t[+]\tPass User-Profile database find game.{BColors.ENDC}")
+        print(f"{BColors.OKGREEN}\t[+]\tPass User-Profile database load game.{BColors.ENDC}")
 
     def test_share_user_game(self):
         """ The user game was shared """
-        user_share_game = mongo.find_user_game(self.user["user_id"], self.user['save_games'][0]["game_id"])
-
+        user_share_game = mongo.load_board(self.user["user_id"], self.user['save_games'][0]["game_id"])
         self.assertEqual( user_share_game, self.user["save_games"][0], msg=f'{BColors.FAIL}\t[-]\tUser game save was not found!{BColors.ENDC}')
         print(f"{BColors.OKGREEN}\t[+]\tPass User-Profile database share game.{BColors.ENDC}")
 
-    def test_find_user_game_graph(self):
-        """ The user graph was found """
+    def tearDown(self):
+        mongo.remove_user(self.user["user_id"])
 
-        user_graph = mongo.find_user_game_graph(self.user["user_id"], self.user['save_games'][0]["game_id"])
 
-        self.assertEqual(user_graph, self.user["save_games"][0]["graph"], msg=f'{BColors.FAIL}\t[-]\tUser graph was not in the listed games!{BColors.ENDC}')
-        print(f"{BColors.OKGREEN}\t[+]\tPass User-Profile database share graph.{BColors.ENDC}")
+class DBUserAuthentication(TestCase):
+    def setUp(self):
+        self.user = {"sharing": True, "auth_token":"cool!","user_id":"5f7d1b1d8fd2b816c48c148b","badges":[31,24,83],"current_story_level":9,"email":"ryanb777@umbc.edu","friends":["Kulsoom2","Nick2","Maksim2","Naomi2"],"user_name":"ryan2","password_hash":"well,hello there","points":98274,"rank":"diamond","save_games":[{'game_id': '60afce36-085a-11eb-b6ab-acde48001122', 'graph': {'nodes': 'DID IT WRETITREE ???5))'}, 'player_ids': ['id2', 'id3', 'id4', 'id5'], 'player_names': ['naomi', 'kulsoom', 'nick', 'ryan'], 'player_points': {'id2': 2, 'id3': 2, 'id4': 3, 'id5': 10}, 'turn': 'id2', 'cards': {'id2': ['card1', 'card2', 'card3'], 'id3': ['card1', 'card2', 'card3'], 'id4': ['card1', 'card2', 'card3'], 'id5': ['card1', 'card2', 'card3']}, 'gold_node': False, 'difficulty': 'Medium', 'num_players': 4, 'online': True, 'curr_data_structure': 'AVL', 'selected_data_structures': ['AVL', 'Stack'], 'timed_game': False, 'seconds_until_next_ds': 60, 'time_created': '07/10/2020 00:05:47', 'end_game': False},"4(2(3)(1))(6(5))","4(2(3)(1))(6(5))"]}
 
-    def test_share_user_game_graph(self):
-        """ The user graph was shared """
-        share_user_graph = mongo.share_user_graph(self.user["user_id"], self.user['save_games'][0]["game_id"])
+        mongo.save_user( self.user )
 
-        self.assertEqual(share_user_graph, self.user['save_games'][0]["graph"], msg=f'{BColors.FAIL}\t[-]\tUser graph was not in the listed games!{BColors.ENDC}')
-        print(f"{BColors.OKGREEN}\t[+]\tPass User-Profile database share graph.{BColors.ENDC}")
+    def test_check_uid_email(self):
+        """ The user's name and email are found in the database """
+        user_exists = mongo.user_or_email(self.user["user_id"], self.user["email"])
+        self.assertEqual(user_exists, True, msg=f'{BColors.FAIL}\t[-]\tUser doesn\'t exist!{BColors.ENDC}')
+        print(f"{BColors.OKGREEN}\t[+]\tPass User-Profile database user or email found.{BColors.ENDC}")
+
+    def test_check_uid(self):
+        """ The user's name is found in the database """
+        user_exists = mongo.user_or_email(self.user["user_id"], "none")
+        self.assertEqual(user_exists, True, msg=f'{BColors.FAIL}\t[-]\tUser id doesn\'t exist!{BColors.ENDC}')
+        print(f"{BColors.OKGREEN}\t[+]\tPass User-Profile database user found.{BColors.ENDC}")
+
+    def test_check_email(self):
+        """ The user's email is found in the database """
+        user_exists = mongo.user_or_email("none", self.user["email"])
+        self.assertEqual(user_exists, True, msg=f'{BColors.FAIL}\t[-]\tUser email doesn\'t exist!{BColors.ENDC}')
+        print(f"{BColors.OKGREEN}\t[+]\tPass User-Profile database email found.{BColors.ENDC}")
+
+    def test_check_uid_email_incorrect(self):
+        """ The user's name and email are not found in the database """
+        user_exists = mongo.user_or_email("none", "also none")
+        self.assertEqual(user_exists, False, msg=f'{BColors.FAIL}\t[-]\tUser doesn\'t exist!{BColors.ENDC}')
+        print(f"{BColors.OKGREEN}\t[+]\tPass User-Profile database user or email nonexist.{BColors.ENDC}")
+
+    def test_login_correct(self):
+        """ The user's password hash match the database record """
+        logged_in = mongo.user_or_email(self.user["user_id"], self.user["password_hash"])
+        self.assertEqual(logged_in, True, msg=f'{BColors.FAIL}\t[-]\tUser password doesn\'t match!{BColors.ENDC}')
+        print(f"{BColors.OKGREEN}\t[+]\tPass User-Profile database login.{BColors.ENDC}")
+
+    def test_login_incorrect(self):
+        """ The user's password hash does not match the database record """
+        logged_in = mongo.user_or_email(self.user["user_id"], "none")
+        self.assertEqual(logged_in, False, msg=f'{BColors.FAIL}\t[-]\tUser\'s fake password was accepted!{BColors.ENDC}')
+        print(f"{BColors.OKGREEN}\t[+]\tPass User-Profile database login incorrect.{BColors.ENDC}")
+
+    def test_login_incorrect(self):
+        """ The invalid user's password hash should not be checked """
+        logged_in = mongo.user_or_email("none", "none")
+        self.assertEqual(logged_in, False, msg=f'{BColors.FAIL}\t[-]\tFake user\'s fake password was accepted!{BColors.ENDC}')
+        print(f"{BColors.OKGREEN}\t[+]\tPass User-Profile database login incorrect user, incorrect password.{BColors.ENDC}")
+
+    def test_update_token(self):
+        """ The user's token was updated """
+        new_token = mongo.update_token(self.user["user_id"], "new_token22")
+        self.assertEqual(new_token, True, msg=f'{BColors.FAIL}\t[-]\tUser\'s new token was not saved!{BColors.ENDC}')
+        print(f"{BColors.OKGREEN}\t[+]\tPass User-Profile database update token.{BColors.ENDC}")
+
+    def test_update_token_incorrect(self):
+        """ The user's is invalid, so no token is updated """
+        new_token = mongo.update_token("fake user", "new_token22")
+        self.assertEqual(new_token, False, msg=f'{BColors.FAIL}\t[-]\tFake user\'s new token was saved!{BColors.ENDC}')
+        print(f"{BColors.OKGREEN}\t[+]\tPass User-Profile database update token, fake user.{BColors.ENDC}")
+
+    def test_check_user(self):
+        """ The user's token is valid """
+        is_valid_tok = mongo.check_user(self.user["user_id"], self.user["auth_token"])
+        self.assertEqual(is_valid_tok, True, msg=f'{BColors.FAIL}\t[-]\tUser\'s token is not valid!{BColors.ENDC}')
+        print(f"{BColors.OKGREEN}\t[+]\tPass User-Profile database check token.{BColors.ENDC}")
+
+    def test_check_user_incorrect(self):
+        """ The user's token is invalid """
+        is_valid_tok = mongo.check_user(self.user["user_id"], "new_token22")
+        self.assertEqual(is_valid_tok, False, msg=f'{BColors.FAIL}\t[-]\tUser\'s invalid token was valid!{BColors.ENDC}')
+        print(f"{BColors.OKGREEN}\t[+]\tPass User-Profile database check token, invalid token.{BColors.ENDC}")
 
     def tearDown(self):
         mongo.remove_user(self.user["user_id"])
+
+class DBUserProfileGeneral(TestCase):
+    def setUp(self):
+        self.user = {"sharing": True, "auth_token":"cool!","user_id":"5f7d1b1d8fd2b816c48c148b","badges":[31,24,83],"current_story_level":9,"email":"ryanb777@umbc.edu","friends":["Kulsoom2","Nick2","Maksim2","Naomi2"],"user_name":"ryan2","password_hash":"well,hello there","points":98274,"rank":"diamond","save_games":[{'game_id': '60afce36-085a-11eb-b6ab-acde48001122', 'graph': {'nodes': 'DID IT WRETITREE ???5))'}, 'player_ids': ['id2', 'id3', 'id4', 'id5'], 'player_names': ['naomi', 'kulsoom', 'nick', 'ryan'], 'player_points': {'id2': 2, 'id3': 2, 'id4': 3, 'id5': 10}, 'turn': 'id2', 'cards': {'id2': ['card1', 'card2', 'card3'], 'id3': ['card1', 'card2', 'card3'], 'id4': ['card1', 'card2', 'card3'], 'id5': ['card1', 'card2', 'card3']}, 'gold_node': False, 'difficulty': 'Medium', 'num_players': 4, 'online': True, 'curr_data_structure': 'AVL', 'selected_data_structures': ['AVL', 'Stack'], 'timed_game': False, 'seconds_until_next_ds': 60, 'time_created': '07/10/2020 00:05:47', 'end_game': False},"4(2(3)(1))(6(5))","4(2(3)(1))(6(5))"]}
+        self.user2 = {"sharing": True, "auth_token":"second auth!","user_id":"useridneedswork","badges":[31,24,83],"current_story_level":9,"email":"ryacmon man@umbc.edu","friends":["Kulsoom2","Nick2","Maksim2","Naomi2"],"user_name":"ryan2","password_hash":"well,hello there","points":98274,"rank":"diamond","save_games":[{'game_id': 'not the same as the other user\'s game', 'graph': {'nodes': 'DID IT WRETITREE ???5))'}, 'player_ids': ['id2', 'id3', 'id4', 'id5'], 'player_names': ['naomi', 'kulsoom', 'nick', 'ryan'], 'player_points': {'id2': 2, 'id3': 2, 'id4': 3, 'id5': 10}, 'turn': 'id2', 'cards': {'id2': ['card1', 'card2', 'card3'], 'id3': ['card1', 'card2', 'card3'], 'id4': ['card1', 'card2', 'card3'], 'id5': ['card1', 'card2', 'card3']}, 'gold_node': False, 'difficulty': 'Medium', 'num_players': 4, 'online': True, 'curr_data_structure': 'AVL', 'selected_data_structures': ['AVL', 'Stack'], 'timed_game': False, 'seconds_until_next_ds': 60, 'time_created': '07/10/2020 00:05:47', 'end_game': False},"4(2(3)(1))(6(5))","4(2(3)(1))(6(5))"]}
+
+        mongo.save_user( self.user )
+        mongo.save_user( self.user2 )
+
+    def test_change_password(self):
+        """ The user's password is changed in the database """
+        new_passhash = mongo.change_password(self.user["user_id"], "new password hash")
+        self.assertEqual(new_passhash, True, msg=f'{BColors.FAIL}\t[-]\tUser\'s cannot reset passhash!{BColors.ENDC}')
+        print(f"{BColors.OKGREEN}\t[+]\tPass User-Profile database change passhash.{BColors.ENDC}")
+
+    def test_change_sharing(self):
+        """ The user's share setting is changed in the database """
+        sharable = mongo.change_share_setting(self.user["user_id"], False)
+        mongo.change_share_setting(self.user["user_id"], True)
+        self.assertEqual(sharable, True, msg=f'{BColors.FAIL}\t[-]\tUser\'s cannot change sharing!{BColors.ENDC}')
+        print(f"{BColors.OKGREEN}\t[+]\tPass User-Profile database change sharing .{BColors.ENDC}")
+
+    def test_check_share(self):
+        """ The user is willing to share games """
+        can_share = mongo.check_user_share_setting(self.user["user_id"])
+        self.assertEqual(can_share, True, msg=f'{BColors.FAIL}\t[-]\tUser\'s cannot share when they should be able to!{BColors.ENDC}')
+        print(f"{BColors.OKGREEN}\t[+]\tPass User-Profile database check share.{BColors.ENDC}")
+
+    def test_share_board(self):
+        """ The user is able to share games """
+        game_shared = mongo.share_game_board(self.user["user_id"], self.user2["user_id"], self.user['save_games'][0]["game_id"])
+        self.assertEqual(game_shared, True, msg=f'{BColors.FAIL}\t[-]\tUser\'s game was not shared!{BColors.ENDC}')
+        print(f"{BColors.OKGREEN}\t[+]\tPass User-Profile database share game.{BColors.ENDC}")
+
+    def test_share_board_invalid_source(self):
+        """ The game is not shared, invalid source """
+        game_shared = mongo.share_game_board("Fake user 1", self.user2["user_id"], self.user['save_games'][0]["game_id"])
+        self.assertEqual(game_shared, False, msg=f'{BColors.FAIL}\t[-]\tFake User\'s game was shared!{BColors.ENDC}')
+        print(f"{BColors.OKGREEN}\t[+]\tPass User-Profile database share game, fake user 1.{BColors.ENDC}")
+
+    def test_share_board_invalid_dest(self):
+        """ The game is not shared, invalid destination """
+        game_shared = mongo.share_game_board(self.user["user_id"], "Fake user 2", self.user['save_games'][0]["game_id"])
+        self.assertEqual(game_shared, False, msg=f'{BColors.FAIL}\t[-]\tUser\'s game was shared to fake user!{BColors.ENDC}')
+        print(f"{BColors.OKGREEN}\t[+]\tPass User-Profile database share game, fake user 2.{BColors.ENDC}")
+
+    def test_share_board_invalid_gameid(self):
+        """ The game is not shared, invalid source game id """
+        game_shared = mongo.share_game_board(self.user["user_id"], self.user2["user_id"], "Fake Game")
+        self.assertEqual(game_shared, False, msg=f'{BColors.FAIL}\t[-]\tUser\'s fake game was shared!{BColors.ENDC}')
+        print(f"{BColors.OKGREEN}\t[+]\tPass User-Profile database share invalid game.{BColors.ENDC}")
+
+    def tearDown(self):
+        mongo.remove_user(self.user["user_id"])
+        mongo.remove_user(self.user2["user_id"])
