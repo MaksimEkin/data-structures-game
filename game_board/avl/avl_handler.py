@@ -128,8 +128,9 @@ class AVLHandler(object):
 		
 	def delNodeByID(self, nid, b=True):
 		""" remove node from tree by value """
-		self.root = self.tree.delete_node_id(self.root, nid, balance=b)
-		self.balanced = self.tree.isBalanced(self.root)		
+		if nid != self.golden_id:
+			self.root = self.tree.delete_node_id(self.root, nid, balance=b)
+			self.balanced = self.tree.isBalanced(self.root)		
 			
 		
 	def get_gamestate(self):
@@ -157,6 +158,8 @@ class AVLHandler(object):
 		self.debug_print(use_id=True)
 		print(f'Golden Node:\t{self.golden_id}')
 		print(f'Balanced:\t{self.balanced}')
+		print(self.tree.getKeys(self.root), '\n')
+		
 		
 		
 ##### API Callable Functions #####

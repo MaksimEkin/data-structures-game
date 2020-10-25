@@ -137,7 +137,6 @@ class AVLTree(object):
 		Keyword arguments:
 		root -- current node being compared
 		key  -- key value being added
-		nid  -- node id
 		"""  
 		if not root:  							# base case
 			return False
@@ -207,6 +206,7 @@ class AVLTree(object):
 			return
 			
 			
+	# DEPRECATED METHOD - USE ADJACENCY LIST
 	def getNewick(self, root):
 		""" get newick string format of tree """
 		out = ''
@@ -309,12 +309,17 @@ class AVLTree(object):
 	
 		
 	def isBalanced(self, root):
-		""" Get balance factor of the node """
-		balanceFactor = self.getBalance(root)
-		if abs(balanceFactor) > 1:
-			return False
-		else:
+		""" Check if tree is balanced """
+		if root is None:
 			return True
+			
+		fac = abs(self.getBalance(root))
+		if (fac <= 1 and
+			self.isBalanced(root.left) and
+			self.isBalanced(root.right)):		
+			return True
+		
+		return False
 
 
 	def rebalance(self, root):
