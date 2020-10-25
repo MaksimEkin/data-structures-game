@@ -9,15 +9,15 @@ class GameInfo extends React.Component {
         super(props);
         this.customNodeRef = React.createRef();
         //let hyparlink = props.hyparlink || new Hyparlink();
-        this.state = {level:'Hard', playerList:'ID1', gameDS:'AVL'};
+        this.state = {level:'Easy', playerList:'ID1', gameDS:'AVL'};
         this.handleInput = this.handleInput.bind(this);
         this.submitDSG = this.handleInput.bind(this)
     }
 
     //this handls the change in input and is later binded to state values
     //cookies then are set to the changed values
-    handleInput = (e) => {
-        this.setState({ [e.target.name]: e.target.value });
+        handleInput = async (e) => {
+        await this.setState({ [e.target.name]: e.target.value });
         console.log(this.state)
 
         const cookies = new Cookies();
@@ -38,10 +38,11 @@ render(){
         <Grid container spacing={1} style={{ marginBottom: '5em' }}>
             <Grid item sm={6} md={6} lg={6}>
 
-                <select value={this.state.level} onInput={this.handleInput} name='level' label='Difficulty Level' style={{ marginBottom: '1em' }}  >
+                <select value={this.state.level} name='level' onChange={this.handleInput} label='Difficulty Level' style={{ marginBottom: '1em' }}  >
                     <option value="Easy">Easy</option>
                     <option value="Medium">Medium</option>
                     <option value="Hard">Hard</option>
+                    
                  </select>
 
                 <select value={this.state.gameDS} onInput={this.handleInput} name='gameDS' label='DSgame' style={{ marginBottom: '1em' }}  >
