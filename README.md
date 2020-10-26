@@ -52,6 +52,10 @@ Cross-origins calls are blocked due to a header that is in place to protect agai
 - **AVL Data Structure**
     - Located at [game_board/avl/test_avl.py](https://github.com/MaksimEkin/data-structures-game/blob/master/game_board/avl/test_avl.py)
     - Run from the root directory of the project with ```python manage.py test game_board.avl.test_avl```
+- **Front-End Cypress Testing**
+    - Located at [cypress/integration](https://github.com/MaksimEkin/data-structures-game/tree/front_end_testing/cypress/integration)
+    - Run using Cypress, which can be started with ```npx cypress open```
+    - Once Cypress is running, select any tests that the Cypress-generated GUI displays to run them
     
 [See Wiki for details.](https://github.com/MaksimEkin/data-structures-game/wiki)
 
