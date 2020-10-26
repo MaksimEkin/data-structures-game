@@ -1,7 +1,6 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 # Status codes documentation: https://www.django-rest-framework.org/api-guide/status-codes/
-from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 
 import uuid
@@ -22,10 +21,12 @@ def api_overview(request):
     :return: Response, list of API URLs.
     '''
     api_urls = {
+        # Authentication API calls
         'Create a new user': '/register',
         'Log-in': '/login',
         'Log-out': '/logout',
 
+        # Game Board API Calls for User Profile
         'Save Game Board': '/save_board',
         'Delete Game Board': '/delete_board',
         'Share': '/share',
@@ -61,8 +62,8 @@ def register(request):
 
     # Here ask db if this username or e-mail already exist
     # if DB says yes, return error, else proceed
-    if db.user_or_email_exist(data['user_name'], data['email']):
-        return Response({'error': str('User or e-mail already exist!')}, status=status.HTTP_406_NOT_ACCEPTABLE)
+    #if db.user_or_email_exist(data['user_name'], data['email']):
+    #    return Response({'error': str('User or e-mail already exist!')}, status=status.HTTP_406_NOT_ACCEPTABLE)
 
     # Here ask db to create a new user with its token
     token = str(uuid.uuid1())
@@ -126,7 +127,7 @@ def logout(request):
 
     # Here let db know we are logging out by removing user's token
     # db.remove_token(user_id)
-    if not db.remove_token(data['token']):
+    if not db.remove_token(data['user_id']):
         return Response({'error': str('Error when logging out!')}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     return Response({'status': 'User Successfully Logged-out!'})
@@ -162,7 +163,7 @@ def save_board(request):
     if not db.save_game(data['user_id'], board):
         return Response({'error': str('Error when saving the game!')}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    return Response({'status':'Game is Successfully Saved!'})
+    return Response({'status': 'Game is Successfully Saved!'})
 
 
 @api_view(['POST'])
@@ -211,8 +212,8 @@ def share(request):
         return Response({'error': str('UNAUTHORIZED')}, status=status.HTTP_401_UNAUTHORIZED)
 
     # Here check if dest_user_id is accepting shared content
-    if not db.check_user_share_setting(data['dest_user_id']):
-        return Response({'error': str('NOT ALLOWED')}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+    #  if not db.check_user_share_setting(data['dest_user_id']):
+    #    return Response({'error': str('NOT ALLOWED')}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
     # Here call db to copy saved game board from source_user_id to dest_user_id
     # This database call just copies the saved board into dest_user_id's saved game boards
