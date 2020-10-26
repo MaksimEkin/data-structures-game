@@ -400,7 +400,7 @@ def share_game_board(source_id : str, destination_id : str, user_game_id: str):
     """
 
     user1_valid = user_or_email ( source_id )
-    user1_shares = check_user_share_setting( source_id )
+    user1_shares = check_user_share_setting( destination_id )
     user2_valid = user_or_email ( destination_id )
     game_valid = load_board ( source_id, user_game_id )
 
