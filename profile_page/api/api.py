@@ -9,8 +9,8 @@ import json
 from game_board.api import utils as game_utils
 from game_board.database import game_board_db as game_db
 
-# from profile_page.database import profile_page_db as db
-from . import mock_db as db
+from profile_page.database import profile_page_db as db
+# from . import mock_db as db
 
 @api_view(['GET'])
 def api_overview(request):
@@ -59,11 +59,6 @@ def register(request):
     # Check if passwords match
     if data['password1'] != data['password2']:
         return Response({'error': str('Passwords does not match!')}, status=status.HTTP_400_BAD_REQUEST)
-
-    # Here ask db if this username or e-mail already exist
-    # if DB says yes, return error, else proceed
-    #if db.user_or_email_exist(data['user_name'], data['email']):
-    #    return Response({'error': str('User or e-mail already exist!')}, status=status.HTTP_406_NOT_ACCEPTABLE)
 
     # Here ask db to create a new user with its token
     token = str(uuid.uuid1())
@@ -126,7 +121,6 @@ def logout(request):
         return Response({'error': str('UNAUTHORIZED')}, status=status.HTTP_401_UNAUTHORIZED)
 
     # Here let db know we are logging out by removing user's token
-    # db.remove_token(user_id)
     if not db.remove_token(data['user_id']):
         return Response({'error': str('Error when logging out!')}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -211,17 +205,10 @@ def share(request):
     if not db.check_user(data['source_user_id'], data['token']):
         return Response({'error': str('UNAUTHORIZED')}, status=status.HTTP_401_UNAUTHORIZED)
 
-    # Here check if dest_user_id is accepting shared content
-    #  if not db.check_user_share_setting(data['dest_user_id']):
-    #    return Response({'error': str('NOT ALLOWED')}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
-
     # Here call db to copy saved game board from source_user_id to dest_user_id
     # This database call just copies the saved board into dest_user_id's saved game boards
     if not db.share_game_board(data['source_user_id'], data['dest_user_id'], data['game_id']):
         return Response({'error': str('Error when sharing the game!')}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-    # Note that this could also be multiple db calls where first you give me a game board and allow me to
-    # call db.save_game(dest_user_id, board)
 
     return Response({'status': 'Content is Successfully Shared!'})
 
@@ -274,7 +261,7 @@ def load_board(request):
     # So we possibly as of now don't need to update stuff in user's saved board
     # But we can use the update stuff once we have more functionality going.
     response_status = game_utils.create_board_db(game_board)
-
+    print(response_status)
     if response_status['error']:
         return Response({'error': response_status['reason']},
                         status=status.HTTP_500_INTERNAL_SERVER_ERROR)

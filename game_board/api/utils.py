@@ -24,6 +24,12 @@ def create_board_db(new_board):
 
     try:
         game_id = db.create_game(new_board)
+
+        if game_id == "nah bro idk about it":
+            result['error'] = True
+            result['reason'] = "Game Already Exist!"
+            return result
+
         result['game_id'] = json.loads(json_util.dumps(game_id))
 
     except Exception as e:
@@ -89,6 +95,7 @@ def load_board_db(game_id):
     try:
         game_board = db.read_game(str(game_id))
         if game_board == "nah bro idk about it":
+            result['error'] = True
             result['reason'] = "Game Not Found!"
             return result
 
