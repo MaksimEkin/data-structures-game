@@ -155,7 +155,18 @@ class DBUpdateUserGameAndGraph(TestCase):
 
 class DBDeleteUser(TestCase):
     def setUp(self):
-        self.user = {"user_id":"5f7d1b1d8fd2b816c48c148b","badges":[31,24,83],"current_story_level":9,"email":"ryanb777@umbc.edu","friends":["Kulsoom2","Nick2","Maksim2","Naomi2"],"user_name":"ryan2","password_hash":"well,hello there","points":98274,"rank":"diamond","save_games":[{'game_id': '60afce36-085a-11eb-b6ab-acde48001122', 'graph': {'nodes': 'DID IT WRETITREE ???5))'}, 'player_ids': ['id2', 'id3', 'id4', 'id5'], 'player_names': ['naomi', 'kulsoom', 'nick', 'ryan'], 'player_points': {'id2': 2, 'id3': 2, 'id4': 3, 'id5': 10}, 'turn': 'id2', 'cards': {'id2': ['card1', 'card2', 'card3'], 'id3': ['card1', 'card2', 'card3'], 'id4': ['card1', 'card2', 'card3'], 'id5': ['card1', 'card2', 'card3']}, 'gold_node': False, 'difficulty': 'Medium', 'num_players': 4, 'online': True, 'curr_data_structure': 'AVL', 'selected_data_structures': ['AVL', 'Stack'], 'timed_game': False, 'seconds_until_next_ds': 60, 'time_created': '07/10/2020 00:05:47', 'end_game': False},"4(2(3)(1))(6(5))","4(2(3)(1))(6(5))"]}
+        self.user = {"user_id":"5f7d1b1d8fd2b816c48c148b","badges":[31,24,83],
+        "current_story_level":9,"email":"ryanb777@umbc.edu","friends":["Kulsoom2","Nick2","Maksim2","Naomi2"],
+        "user_name":"ryan2","password_hash":"well,hello there","points":98274,"rank":"diamond",
+        "save_games":[{'game_id': '60afce36-085a-11eb-b6ab-acde48001122', 'graph': {'nodes': 'DID IT WRETITREE ???5))'},
+         'player_ids': ['id2', 'id3', 'id4', 'id5'], 'player_names': ['naomi', 'kulsoom', 'nick', 'ryan'],
+          'player_points': {'id2': 2, 'id3': 2, 'id4': 3, 'id5': 10}, 'turn': 'id2',
+          'cards': {'id2': ['card1', 'card2', 'card3'], 'id3': ['card1', 'card2', 'card3'],
+          'id4': ['card1', 'card2', 'card3'], 'id5': ['card1', 'card2', 'card3']},
+          'gold_node': False, 'difficulty': 'Medium', 'num_players': 4, 'online': True,
+           'curr_data_structure': 'AVL', 'selected_data_structures': ['AVL', 'Stack'],
+            'timed_game': False, 'seconds_until_next_ds': 60, 'time_created': '07/10/2020 00:05:47',
+             'end_game': False},"4(2(3)(1))(6(5))","4(2(3)(1))(6(5))"]}
         self.fail_phrase = False
         mongo.save_user( self.user )
 
@@ -173,7 +184,19 @@ class DBDeleteUser(TestCase):
 
 class DBDeleteGames(TestCase):
     def setUp(self):
-        self.user = {"user_id":"5f7d1b1d8fd2b816c48c148b","badges":[31,24,83],"current_story_level":9,"email":"ryanb777@umbc.edu","friends":["Kulsoom2","Nick2","Maksim2","Naomi2"],"user_name":"ryan2","password_hash":"well,hello there","points":98274,"rank":"diamond","save_games":[{'game_id': '60afce36-085a-11eb-b6ab-acde48001122', 'graph': {'nodes': 'DID IT WRETITREE ???5))'}, 'player_ids': ['id2', 'id3', 'id4', 'id5'], 'player_names': ['naomi', 'kulsoom', 'nick', 'ryan'], 'player_points': {'id2': 2, 'id3': 2, 'id4': 3, 'id5': 10}, 'turn': 'id2', 'cards': {'id2': ['card1', 'card2', 'card3'], 'id3': ['card1', 'card2', 'card3'], 'id4': ['card1', 'card2', 'card3'], 'id5': ['card1', 'card2', 'card3']}, 'gold_node': False, 'difficulty': 'Medium', 'num_players': 4, 'online': True, 'curr_data_structure': 'AVL', 'selected_data_structures': ['AVL', 'Stack'], 'timed_game': False, 'seconds_until_next_ds': 60, 'time_created': '07/10/2020 00:05:47', 'end_game': False},"4(2(3)(1))(6(5))","4(2(3)(1))(6(5))"]}
+        self.user = {"user_id":"5f7d1b1d8fd2b816c48c148b","badges":[31,24,83],
+        "current_story_level":9,"email":"ryanb777@umbc.edu","friends":["Kulsoom2","Nick2","Maksim2","Naomi2"],
+        "user_name":"ryan2","password_hash":"well,hello there","points":98274,
+        "rank":"diamond","save_games":[{'game_id': '60afce36-085a-11eb-b6ab-acde48001122',
+        'graph': {'nodes': 'DID IT WRETITREE ???5))'}, 'player_ids': ['id2', 'id3', 'id4', 'id5'],
+        'player_names': ['naomi', 'kulsoom', 'nick', 'ryan'], 'player_points': {'id2': 2, 'id3': 2,
+         'id4': 3, 'id5': 10}, 'turn': 'id2', 'cards': {'id2': ['card1', 'card2', 'card3'],
+          'id3': ['card1', 'card2', 'card3'], 'id4': ['card1', 'card2', 'card3'],
+          'id5': ['card1', 'card2', 'card3']}, 'gold_node': False, 'difficulty': 'Medium',
+          'num_players': 4, 'online': True, 'curr_data_structure': 'AVL',
+          'selected_data_structures': ['AVL', 'Stack'], 'timed_game': False,
+          'seconds_until_next_ds': 60, 'time_created': '07/10/2020 00:05:47',
+          'end_game': False},"4(2(3)(1))(6(5))","4(2(3)(1))(6(5))"]}
         self.fail_phrase = False
         mongo.save_user( self.user )
 
@@ -191,7 +214,18 @@ class DBDeleteGames(TestCase):
 
 class DBList(TestCase):
     def setUp(self):
-        self.user = {"user_id":"5f7d1b1d8fd2b816c48c148b","badges":[31,24,83],"current_story_level":9,"email":"ryanb777@umbc.edu","friends":["Kulsoom2","Nick2","Maksim2","Naomi2"],"user_name":"ryan2","password_hash":"well,hello there","points":98274,"rank":"diamond","save_games":[{'game_id': '60afce36-085a-11eb-b6ab-acde48001122', 'graph': {'nodes': 'DID IT WRETITREE ???5))'}, 'player_ids': ['id2', 'id3', 'id4', 'id5'], 'player_names': ['naomi', 'kulsoom', 'nick', 'ryan'], 'player_points': {'id2': 2, 'id3': 2, 'id4': 3, 'id5': 10}, 'turn': 'id2', 'cards': {'id2': ['card1', 'card2', 'card3'], 'id3': ['card1', 'card2', 'card3'], 'id4': ['card1', 'card2', 'card3'], 'id5': ['card1', 'card2', 'card3']}, 'gold_node': False, 'difficulty': 'Medium', 'num_players': 4, 'online': True, 'curr_data_structure': 'AVL', 'selected_data_structures': ['AVL', 'Stack'], 'timed_game': False, 'seconds_until_next_ds': 60, 'time_created': '07/10/2020 00:05:47', 'end_game': False},"4(2(3)(1))(6(5))","4(2(3)(1))(6(5))"]}
+        self.user = {"user_id":"5f7d1b1d8fd2b816c48c148b","badges":[31,24,83],
+        "current_story_level":9,"email":"ryanb777@umbc.edu","friends":["Kulsoom2","Nick2","Maksim2","Naomi2"],
+        "user_name":"ryan2","password_hash":"well,hello there","points":98274,
+        "rank":"diamond","save_games":[{'game_id': '60afce36-085a-11eb-b6ab-acde48001122',
+        'graph': {'nodes': 'DID IT WRETITREE ???5))'}, 'player_ids': ['id2', 'id3', 'id4', 'id5'],
+        'player_names': ['naomi', 'kulsoom', 'nick', 'ryan'], 'player_points': {'id2': 2, 'id3': 2, 'id4': 3, 'id5': 10},
+        'turn': 'id2', 'cards': {'id2': ['card1', 'card2', 'card3'], 'id3': ['card1', 'card2', 'card3'],
+        'id4': ['card1', 'card2', 'card3'], 'id5': ['card1', 'card2', 'card3']},
+         'gold_node': False, 'difficulty': 'Medium', 'num_players': 4, 'online': True,
+         'curr_data_structure': 'AVL', 'selected_data_structures': ['AVL', 'Stack'],
+         'timed_game': False, 'seconds_until_next_ds': 60, 'time_created': '07/10/2020 00:05:47',
+         'end_game': False},"4(2(3)(1))(6(5))","4(2(3)(1))(6(5))"]}
 
         mongo.save_user( self.user )
 
@@ -218,7 +252,18 @@ class DBList(TestCase):
 
 class DBReadUserGamesAndGraphs(TestCase):
     def setUp(self):
-        self.user = {"sharing": True, "auth_token":"cool!","user_id":"5f7d1b1d8fd2b816c48c148b","badges":[31,24,83],"current_story_level":9,"email":"ryanb777@umbc.edu","friends":["Kulsoom2","Nick2","Maksim2","Naomi2"],"user_name":"ryan2","password_hash":"well,hello there","points":98274,"rank":"diamond","save_games":[{'game_id': '60afce36-085a-11eb-b6ab-acde48001122', 'graph': {'nodes': 'DID IT WRETITREE ???5))'}, 'player_ids': ['id2', 'id3', 'id4', 'id5'], 'player_names': ['naomi', 'kulsoom', 'nick', 'ryan'], 'player_points': {'id2': 2, 'id3': 2, 'id4': 3, 'id5': 10}, 'turn': 'id2', 'cards': {'id2': ['card1', 'card2', 'card3'], 'id3': ['card1', 'card2', 'card3'], 'id4': ['card1', 'card2', 'card3'], 'id5': ['card1', 'card2', 'card3']}, 'gold_node': False, 'difficulty': 'Medium', 'num_players': 4, 'online': True, 'curr_data_structure': 'AVL', 'selected_data_structures': ['AVL', 'Stack'], 'timed_game': False, 'seconds_until_next_ds': 60, 'time_created': '07/10/2020 00:05:47', 'end_game': False},"4(2(3)(1))(6(5))","4(2(3)(1))(6(5))"]}
+        self.user = {"sharing": True, "auth_token":"cool!","user_id":"5f7d1b1d8fd2b816c48c148b",
+        "badges":[31,24,83],"current_story_level":9,"email":"ryanb777@umbc.edu","friends":["Kulsoom2","Nick2","Maksim2","Naomi2"],
+        "user_name":"ryan2","password_hash":"well,hello there","points":98274,"rank":"diamond",
+        "save_games":[{'game_id': '60afce36-085a-11eb-b6ab-acde48001122', 'graph': {'nodes': 'DID IT WRETITREE ???5))'},
+        'player_ids': ['id2', 'id3', 'id4', 'id5'], 'player_names': ['naomi', 'kulsoom', 'nick', 'ryan'],
+        'player_points': {'id2': 2, 'id3': 2, 'id4': 3, 'id5': 10}, 'turn': 'id2',
+        'cards': {'id2': ['card1', 'card2', 'card3'], 'id3': ['card1', 'card2', 'card3'],
+        'id4': ['card1', 'card2', 'card3'], 'id5': ['card1', 'card2', 'card3']},
+        'gold_node': False, 'difficulty': 'Medium', 'num_players': 4, 'online': True,
+        'curr_data_structure': 'AVL', 'selected_data_structures': ['AVL', 'Stack'],
+        'timed_game': False, 'seconds_until_next_ds': 60, 'time_created': '07/10/2020 00:05:47',
+        'end_game': False},"4(2(3)(1))(6(5))","4(2(3)(1))(6(5))"]}
         self.fail_phrase = False
         mongo.save_user( self.user )
 
@@ -241,7 +286,19 @@ class DBReadUserGamesAndGraphs(TestCase):
 
 class DBUserAuthentication(TestCase):
     def setUp(self):
-        self.user = {"sharing": True, "auth_token":"cool!","user_id":"5f7d1b1d8fd2b816c48c148b","badges":[31,24,83],"current_story_level":9,"email":"ryanb777@umbc.edu","friends":["Kulsoom2","Nick2","Maksim2","Naomi2"],"user_name":"ryan2","password_hash":"well,hello there","points":98274,"rank":"diamond","save_games":[{'game_id': '60afce36-085a-11eb-b6ab-acde48001122', 'graph': {'nodes': 'DID IT WRETITREE ???5))'}, 'player_ids': ['id2', 'id3', 'id4', 'id5'], 'player_names': ['naomi', 'kulsoom', 'nick', 'ryan'], 'player_points': {'id2': 2, 'id3': 2, 'id4': 3, 'id5': 10}, 'turn': 'id2', 'cards': {'id2': ['card1', 'card2', 'card3'], 'id3': ['card1', 'card2', 'card3'], 'id4': ['card1', 'card2', 'card3'], 'id5': ['card1', 'card2', 'card3']}, 'gold_node': False, 'difficulty': 'Medium', 'num_players': 4, 'online': True, 'curr_data_structure': 'AVL', 'selected_data_structures': ['AVL', 'Stack'], 'timed_game': False, 'seconds_until_next_ds': 60, 'time_created': '07/10/2020 00:05:47', 'end_game': False},"4(2(3)(1))(6(5))","4(2(3)(1))(6(5))"]}
+        self.user = {"sharing": True, "auth_token":"cool!","user_id":"5f7d1b1d8fd2b816c48c148b",
+        "badges":[31,24,83],"current_story_level":9,"email":"ryanb777@umbc.edu",
+        "friends":["Kulsoom2","Nick2","Maksim2","Naomi2"],"user_name":"ryan2",
+        "password_hash":"well,hello there","points":98274,"rank":"diamond",
+        "save_games":[{'game_id': '60afce36-085a-11eb-b6ab-acde48001122',
+        'graph': {'nodes': 'DID IT WRETITREE ???5))'}, 'player_ids': ['id2', 'id3', 'id4', 'id5'],
+        'player_names': ['naomi', 'kulsoom', 'nick', 'ryan'], 'player_points': {'id2': 2, 'id3': 2, 'id4': 3, 'id5': 10},
+        'turn': 'id2', 'cards': {'id2': ['card1', 'card2', 'card3'],
+        'id3': ['card1', 'card2', 'card3'], 'id4': ['card1', 'card2', 'card3'],
+        'id5': ['card1', 'card2', 'card3']}, 'gold_node': False, 'difficulty': 'Medium',
+        'num_players': 4, 'online': True, 'curr_data_structure': 'AVL', 'selected_data_structures': ['AVL', 'Stack'],
+        'timed_game': False, 'seconds_until_next_ds': 60, 'time_created': '07/10/2020 00:05:47',
+        'end_game': False},"4(2(3)(1))(6(5))","4(2(3)(1))(6(5))"]}
 
         mongo.save_user( self.user )
 
@@ -316,8 +373,32 @@ class DBUserAuthentication(TestCase):
 
 class DBUserProfileGeneral(TestCase):
     def setUp(self):
-        self.user = {"sharing": True, "auth_token":"cool!","user_id":"5f7d1b1d8fd2b816c48c148b","badges":[31,24,83],"current_story_level":9,"email":"ryanb777@umbc.edu","friends":["Kulsoom2","Nick2","Maksim2","Naomi2"],"user_name":"ryan2","password_hash":"well,hello there","points":98274,"rank":"diamond","save_games":[{'game_id': '60afce36-085a-11eb-b6ab-acde48001122', 'graph': {'nodes': 'DID IT WRETITREE ???5))'}, 'player_ids': ['id2', 'id3', 'id4', 'id5'], 'player_names': ['naomi', 'kulsoom', 'nick', 'ryan'], 'player_points': {'id2': 2, 'id3': 2, 'id4': 3, 'id5': 10}, 'turn': 'id2', 'cards': {'id2': ['card1', 'card2', 'card3'], 'id3': ['card1', 'card2', 'card3'], 'id4': ['card1', 'card2', 'card3'], 'id5': ['card1', 'card2', 'card3']}, 'gold_node': False, 'difficulty': 'Medium', 'num_players': 4, 'online': True, 'curr_data_structure': 'AVL', 'selected_data_structures': ['AVL', 'Stack'], 'timed_game': False, 'seconds_until_next_ds': 60, 'time_created': '07/10/2020 00:05:47', 'end_game': False},"4(2(3)(1))(6(5))","4(2(3)(1))(6(5))"]}
-        self.user2 = {"sharing": True, "auth_token":"second auth!","user_id":"useridneedswork","badges":[31,24,83],"current_story_level":9,"email":"ryacmon man@umbc.edu","friends":["Kulsoom2","Nick2","Maksim2","Naomi2"],"user_name":"ryan2","password_hash":"well,hello there","points":98274,"rank":"diamond","save_games":[{'game_id': 'not the same as the other user\'s game', 'graph': {'nodes': 'DID IT WRETITREE ???5))'}, 'player_ids': ['id2', 'id3', 'id4', 'id5'], 'player_names': ['naomi', 'kulsoom', 'nick', 'ryan'], 'player_points': {'id2': 2, 'id3': 2, 'id4': 3, 'id5': 10}, 'turn': 'id2', 'cards': {'id2': ['card1', 'card2', 'card3'], 'id3': ['card1', 'card2', 'card3'], 'id4': ['card1', 'card2', 'card3'], 'id5': ['card1', 'card2', 'card3']}, 'gold_node': False, 'difficulty': 'Medium', 'num_players': 4, 'online': True, 'curr_data_structure': 'AVL', 'selected_data_structures': ['AVL', 'Stack'], 'timed_game': False, 'seconds_until_next_ds': 60, 'time_created': '07/10/2020 00:05:47', 'end_game': False},"4(2(3)(1))(6(5))","4(2(3)(1))(6(5))"]}
+        self.user = {"sharing": True, "auth_token":"cool!","user_id":"5f7d1b1d8fd2b816c48c148b",
+        "badges":[31,24,83],"current_story_level":9,"email":"ryanb777@umbc.edu",
+        "friends":["Kulsoom2","Nick2","Maksim2","Naomi2"],"user_name":"ryan2",
+        "password_hash":"well,hello there","points":98274,"rank":"diamond",
+        "save_games":[{'game_id': '60afce36-085a-11eb-b6ab-acde48001122',
+        'graph': {'nodes': 'DID IT WRETITREE ???5))'}, 'player_ids': ['id2', 'id3', 'id4', 'id5'],
+        'player_names': ['naomi', 'kulsoom', 'nick', 'ryan'], 'player_points': {'id2': 2, 'id3': 2, 'id4': 3, 'id5': 10},
+        'turn': 'id2', 'cards': {'id2': ['card1', 'card2', 'card3'], 'id3': ['card1', 'card2', 'card3'],
+        'id4': ['card1', 'card2', 'card3'], 'id5': ['card1', 'card2', 'card3']}, 'gold_node': False,
+        'difficulty': 'Medium', 'num_players': 4, 'online': True, 'curr_data_structure': 'AVL',
+        'selected_data_structures': ['AVL', 'Stack'], 'timed_game': False, 'seconds_until_next_ds': 60,
+        'time_created': '07/10/2020 00:05:47', 'end_game': False},"4(2(3)(1))(6(5))","4(2(3)(1))(6(5))"]}
+        self.user2 = {"sharing": True, "auth_token":"second auth!","user_id":"useridneedswork",
+        "badges":[31,24,83],"current_story_level":9,"email":"ryacmon man@umbc.edu",
+        "friends":["Kulsoom2","Nick2","Maksim2","Naomi2"],"user_name":"ryan2",
+        "password_hash":"well,hello there","points":98274,"rank":"diamond",
+        "save_games":[{'game_id': 'not the same as the other user\'s game',
+        'graph': {'nodes': 'DID IT WRETITREE ???5))'}, 'player_ids': ['id2', 'id3', 'id4', 'id5'],
+        'player_names': ['naomi', 'kulsoom', 'nick', 'ryan'], 'player_points': {'id2': 2, 'id3': 2,
+        'id4': 3, 'id5': 10}, 'turn': 'id2', 'cards': {'id2': ['card1', 'card2', 'card3'],
+        'id3': ['card1', 'card2', 'card3'], 'id4': ['card1', 'card2', 'card3'],
+        'id5': ['card1', 'card2', 'card3']}, 'gold_node': False, 'difficulty': 'Medium',
+        'num_players': 4, 'online': True, 'curr_data_structure': 'AVL',
+        'selected_data_structures': ['AVL', 'Stack'], 'timed_game': False,
+        'seconds_until_next_ds': 60, 'time_created': '07/10/2020 00:05:47',
+        'end_game': False},"4(2(3)(1))(6(5))","4(2(3)(1))(6(5))"]}
 
         mongo.save_user( self.user )
         mongo.save_user( self.user2 )
