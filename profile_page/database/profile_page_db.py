@@ -5,7 +5,7 @@ import os
 DATABASE_URL1 = os.environ.get('DATABASE_URL1')
 client = MongoClient(DATABASE_URL1)
 
-def create_user(user: dict):
+def save_user(user: dict):
     """
     Saves a new user into the database after being passed through the Django API
 
@@ -14,24 +14,15 @@ def create_user(user: dict):
 
     Returns:
     On Success:
-        str: unique identification for the user
+        Boolean: True
     On Fail:
-        str: friendly response to inform of an error
+        Boolean: False
     """
-    user_id = user["user_id"]
-
-    User_Profile_collection = client.InitialDB.User_Profile
-    #User_Saves_collection = client.InitialDB.User_Game_Saves
-
-    returned_data = User_Profile_collection.find_one({"user_id": user_id})
-    if returned_data is None:
-        User_Profile_collection.insert_one(user)
-
-        #save_allocations = {"user_id":user_id, "save_games":["game_one":{}, "game_two":{}, "game_three":{}]}
-        #User_Saves_collection.insert_one(save_allocations)
-        return user_id
+    info_used = user_or_email( user["user_id"],  user["email"])
+    if info_used:
+        return False
     else:
-        return 'nah bro idk about it'
+        return client.InitialDB.User_Profile.insert_one(user).acknowledged
 
 def update_user(user_id : str, user: dict):
     """
@@ -45,11 +36,11 @@ def update_user(user_id : str, user: dict):
     On Success:
         dictionary: original user document
     On Fail:
-        str: friendly response to infrom of an error
+        Boolean: False
     """
     value_returned = client.InitialDB.User_Profile.find_one_and_replace({"user_id": user_id}, user)
     if value_returned == None:
-        return 'nah bro idk about it'
+        return False
     return value_returned
 
 def read_one_user(user_id: str):
@@ -63,12 +54,12 @@ def read_one_user(user_id: str):
     On Success:
         dictionary: an active user document
     On Fail:
-        str: friendly response to inform of an error
+        Boolean: False
     """
 
     value_returned = client.InitialDB.User_Profile.find_one({"user_id": user_id})
     if value_returned == None:
-        return 'nah bro idk about it'
+        return False
     return value_returned
 
 def read_user_name(user_id: str):
@@ -82,12 +73,13 @@ def read_user_name(user_id: str):
     On Success:
         str: user's name
     On Fail:
-        str: friendly response to inform of an error
+        Boolean: False
     """
 
     value_returned = client.InitialDB.User_Profile.find_one({"user_id": user_id}, {'_id':0, 'user_name':1})
     if value_returned == None:
-        return 'nah bro idk about it'
+        return False
+
     return value_returned
 
 def remove_user(user_id: str):
@@ -99,14 +91,12 @@ def remove_user(user_id: str):
 
     Returns:
     On Success:
-        int: number of deleted user documents
+        Boolean: True
     On Fail:
-        str: friendly response to inform of an error
+        Boolean: False
     """
     value_returned = client.InitialDB.User_Profile.delete_one({"user_id": user_id}).deleted_count
-    if value_returned == 0:
-        return 'nah bro idk about it'
-    return value_returned
+    return value_returned > 0
 
 def list_users():
     """
@@ -131,11 +121,10 @@ def update_user_game(user_id : str, user_game_id: str, game_data: dict):
 
     Returns:
     On Success:
-        dictionary: original user game
+        Boolean: True
     On Fail:
-        str: friendly response to infrom of an error
+        Boolean: False
     """
-
 
     value_returned = client.InitialDB.User_Profile.find_one_and_update(
         {"user_id": user_id},
@@ -143,49 +132,15 @@ def update_user_game(user_id : str, user_game_id: str, game_data: dict):
         upsert=False, return_document = ReturnDocument.AFTER,
         array_filters=[{"index.game_id":{"$eq": user_game_id}}]
     )
-    
-    if value_returned == None:
-        return 'nah bro idk about it'
-    return value_returned
 
-def find_user_game(user_id : str, user_game_id: str):
-    """
-    Finds an active user in the Database and returns a specific game to the API
+    if value_returned == game_data:
+        return True
 
-    Parameters:
-    user_id (str): unique identification for the user
-    game_index (int): locates which save game to overwrite
-
-    Returns:
-    On Success:
-        dictionary: original user game
-    On Fail:
-        str: friendly response to infrom of an error
-    """
-
-    value_returned = client.InitialDB.User_Profile.find_one(
-        {"user_id": user_id},
-        {'_id':0,"save_games":1}
-    )
-
-    if value_returned == None:
-        return 'nah bro idk about it'
-
-    """
-    Find the correct game from its idea
-    -- Pymongo cannot further reduce the db response using an array filter,
-    so an iteration of user saves is required to find the correct game
-    """
-    for game in value_returned["save_games"]:
-        if game["game_id"] == user_game_id:
-            return game
-
-    # Found the user, but none of the games match the game_id
-    return 'nah bro idk about it'
+    return False
 
 def list_user_games(user_id : str):
     """
-    Finds an active user in the Database and updates a specific game
+    Finds an active user in the Database and returns their games
 
     Parameters:
     user_id (str): unique identification for the user
@@ -194,7 +149,7 @@ def list_user_games(user_id : str):
     On Success:
         list: all original user games
     On Fail:
-        str: friendly response to infrom of an error
+        Boolean: False
     """
 
     value_returned = client.InitialDB.User_Profile.find_one(
@@ -203,37 +158,160 @@ def list_user_games(user_id : str):
     )
 
     if value_returned == None:
-        return 'nah bro idk about it'
-    else:
-        return value_returned["save_games"]
+        return False
 
-def update_user_game_graph(user_id : str, user_game_id: str, graph_data: dict):
+    return value_returned["save_games"]
+
+def user_or_email (user_id : str, email: str = ""):
     """
-    Finds an active user in the Database and updates a specific game's graph
+    Finds an active user in the Database and returns true if email of user id is found
 
     Parameters:
     user_id (str): unique identification for the user
-    game_index (int): locates which save game to overwrite
-    graph_data (dictionary): game board graph dictionary
+    email (int): user's saved email address
 
     Returns:
     On Success:
-        dictionary: original user game
+        Boolean: True
     On Fail:
-        str: friendly response to infrom of an error
+        Boolean: False
     """
-    value_returned = client.InitialDB.User_Profile.find_one_and_update(
+
+    value_returned = client.InitialDB.User_Profile.find({"$or": [{ "user_id": user_id},{"email": email}]}).count()
+    return value_returned > 0
+
+def create_user(user_id : str, passhash : str, email : str, token : str):
+    """
+    Creates user datapoints given user and API generated data
+
+    Parameters:
+    user_id (str): unique identification for the user
+    passhash (str): hashed string representing the user's password
+    email (int): user's saved email address
+    token (str): authentication for API calls
+
+    Returns:
+    On Success:
+        Boolean: True
+    On Fail:
+        Boolean: False
+    """
+    info_used = user_or_email(user_id, email)
+
+    if info_used:
+        return False
+
+    else:
+        user = {"user_id":user_id,
+        "password_hash":passhash,
+        "email":email,
+        "auth_token": token,
+        "badges":[],
+        "current_story_level":1,
+        "friends":[],
+        "points":0,
+        "rank":"Baby Panda",
+        "save_games":[],
+        "sharing": True
+        }
+
+        return save_user(user)
+
+def login ( user_id : str, passhash : str ):
+    """
+    Validates a user's password in the database
+
+    Parameters:
+    user_id (str): unique identification for the user
+    passhash (str): hashed string representing the user's password
+
+    Returns:
+    On Success:
+        Boolean: True
+    On Fail:
+        Boolean: False
+    """
+
+    value_returned = client.InitialDB.User_Profile.find({"$and": [{ "user_id": user_id}, {"password_hash": passhash}]}).count()
+    return value_returned > 0
+
+def update_token( user_id : str, token : str ):
+    """
+    Updates a user's API token in the database
+
+    Parameters:
+    user_id (str): unique identification for the user
+    token (str): authentication for API calls
+
+    Returns:
+    On Success:
+        Boolean: True
+    On Fail:
+        Boolean: False
+    """
+    value_returned = client.InitialDB.User_Profile.update_one(
         {"user_id": user_id},
-        {"$set":{"save_games.$[index].graph":graph_data}},
-        upsert=False, return_document = ReturnDocument.AFTER,
-        array_filters=[{"index.game_id":{"$eq": user_game_id}}]
-    )
+        {"$set":{"auth_token":token}},
+        upsert=False
+    ).modified_count
 
-    if value_returned == None:
-        return 'nah bro idk about it'
-    return value_returned
+    return value_returned > 0
 
-def find_user_game_graph(user_id : str, user_game_id: str):
+def check_user( user_id : str, token : str ):
+    """
+    Validates a user's API token in the database
+
+    Parameters:
+    user_id (str): unique identification for the user
+    token (str): authentication for API calls
+
+    Returns:
+    On Success:
+        Boolean: True
+    On Fail:
+        Boolean: False
+    """
+    value_returned = client.InitialDB.User_Profile.find({"$and": [{ "user_id": user_id}, {"auth_token": token}]}).count()
+    return value_returned > 0
+
+def remove_token ( user_id : str ):
+    """
+    Deletes a user's API token in the database
+
+    Parameters:
+    user_id (str): unique identification for the user
+
+    Returns:
+    On Success:
+        Boolean: True
+    On Fail:
+        Boolean: False
+    """
+    value_returned = client.InitialDB.User_Profile.update_one(
+        {"user_id": user_id},
+        {"$unset":{"auth_token": ""}},
+        upsert=False
+    ).modified_count
+
+    return value_returned > 0
+
+def check_user_share_setting( user_id : str ):
+    """
+    Checks if the user is allowing sharing
+
+    Parameters:
+    user_id (str): unique identification for the user
+
+    Returns:
+    On Success:
+        Boolean: True
+    On Fail:
+        Boolean: False
+    """
+    value_returned = client.InitialDB.User_Profile.find({"$and": [{ "user_id": user_id}, {"sharing": True}]}).count()
+    return value_returned > 0
+
+def load_board(user_id : str, user_game_id: str):
     """
     Finds an active user in the Database and returns a specific game to the API
 
@@ -245,82 +323,68 @@ def find_user_game_graph(user_id : str, user_game_id: str):
     On Success:
         dictionary: original user game
     On Fail:
-        str: friendly response to infrom of an error
+        Boolean: False
     """
 
     value_returned = client.InitialDB.User_Profile.find_one(
         {"user_id": user_id},
-        {'_id':0,"save_games":1}
+        {'_id':0,"save_games":{"$elemMatch":{"game_id":user_game_id}}}
     )
 
     if value_returned == None:
-        return 'nah bro idk about it'
+        return False
+    else:
+        try:
+            value_returned = value_returned['save_games'][0]
+            return value_returned
+        except:
+            return False
 
+def save_game( user_id : str, board : dict ):
     """
-    Find the correct game from its idea
-    -- Pymongo cannot further reduce the db response using an array filter,
-    so an iteration of user saves is required to find the correct game graph
-    """
-    for game in value_returned["save_games"]:
-        if game["game_id"] == user_game_id:
-            return game["graph"]
-
-    # Found the user, but none of the games match the game_id
-    return 'nah bro idk about it'
-
-def delete_user_game_graph(user_id : str, user_game_id: str):
-    """
-    Finds an active user in the Database and deletes a specific game's graph
+    Finds an active user in the Database and appends a specific game to saves
 
     Parameters:
     user_id (str): unique identification for the user
-    game_index (int): locates which save game to overwrite
+    game_data (dictionary): game board dictionary
 
     Returns:
     On Success:
-        dictionary: original user game
+        Boolean: True
     On Fail:
-        str: friendly response to infrom of an error
+        Boolean: False
     """
-    value_returned = client.InitialDB.User_Profile.find_one_and_update(
+    value_returned = client.InitialDB.User_Profile.update_one(
         {"user_id": user_id},
-        {"$set":{"save_games.$[index].graph":{}}},
-        upsert=False,
-        array_filters=[{"index.game_id":{"$eq": user_game_id}}]
-    )
+        {"$push":{"save_games":board}},
+        upsert = False,
+    ).modified_count
 
-    if value_returned == None:
-        return 'nah bro idk about it'
-    return 1
+    return value_returned > 0
 
-def delete_user_game(user_id : str, user_game_id: str):
+def delete_game(user_id : str, user_game_id: str):
     """
     Finds an active user in the Database and deletes a specific game
 
     Parameters:
     user_id (str): unique identification for the user
-    game_index (int): locates which save game to overwrite
-    game_data (dictionary): game board dictionary
+    game_id (dictionary): unique game identifier
 
     Returns:
     On Success:
-        dictionary: original user game
+        Boolean: True
     On Fail:
-        str: friendly response to infrom of an error
+        Boolean: False
     """
 
-    value_returned = client.InitialDB.User_Profile.find_one_and_update(
+    value_returned = client.InitialDB.User_Profile.update_one(
         {"user_id": user_id},
-        {"$set":{"save_games.$[index]":{}}},
-        upsert=False,
-        array_filters=[{"index.game_id":{"$eq": user_game_id}}]
-    )
+        {"$pull":{"save_games":{"game_id":user_game_id}}},
+        upsert = False,
+    ).modified_count
+    return value_returned > 0
 
-    if value_returned == None:
-        return 'nah bro idk about it'
-    return 1
-
-def share_user_game(user_id : str, user_game_id: str):
+def share_game_board(source_id : str, destination_id : str, user_game_id: str):
     """
     Finds an active user's game graph to share and gives to the API
 
@@ -332,22 +396,59 @@ def share_user_game(user_id : str, user_game_id: str):
     On Success:
         dictionary: original user game
     On Fail:
-        str: friendly response to infrom of an error
+        Boolean: False
     """
-    return find_user_game(user_id, user_game_id)
 
-def share_user_graph(user_id : str, user_game_id: str):
+    user1_valid = user_or_email ( source_id )
+    user1_shares = check_user_share_setting( destination_id )
+    user2_valid = user_or_email ( destination_id )
+    game_valid = load_board ( source_id, user_game_id )
+
+    if user1_valid and user1_shares and user2_valid and game_valid:
+        return save_game ( destination_id, game_valid )
+    else:
+        return False
+
+def change_password( user_id : str, passhash : str ):
     """
-    Finds an active user's game graph to share and gives to the API
+    Allows a user to update their password
 
     Parameters:
     user_id (str): unique identification for the user
-    game_index (int): locates which save game to overwrite
+    passhash (str): hashed string representing the user's password
 
     Returns:
     On Success:
-        dictionary: original user game
+        Boolean: True
     On Fail:
-        str: friendly response to infrom of an error
+        Boolean: False
     """
-    return find_user_game_graph(user_id, user_game_id)
+    value_returned = client.InitialDB.User_Profile.update_one(
+        {"user_id": user_id},
+        {"$set":{"password_hash":passhash}},
+        upsert=False
+    ).modified_count
+
+    return value_returned > 0
+
+def change_share_setting( user_id : str, can_share : bool ):
+    """
+    Allows a user to update their share setting
+
+    Parameters:
+    user_id (str): unique identification for the user
+    can_share (bool): new boolean to set for user sharing
+
+    Returns:
+    On Success:
+        Boolean: True
+    On Fail:
+        Boolean: False
+    """
+    value_returned = client.InitialDB.User_Profile.update_one(
+        {"user_id": user_id},
+        {"$set":{"sharing":can_share}},
+        upsert=False
+    ).modified_count
+
+    return value_returned > 0
