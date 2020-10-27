@@ -36,17 +36,29 @@ render(){
         //that is changed and resets the cookies
         <span class="border border-secondary">
         <form>
+<<<<<<< HEAD
         <div class="form-group">
         <label for='difficulty-level'>Difficulty Level</label>
                 <select type='text' id='difficulty-level' value={this.state.level} name='level' onChange={this.handleInput} label='Difficulty Level' style={{ marginBottom: '1em' }}  >
+=======
+        <Grid container spacing={1} style={{ marginBottom: '5em' }}>
+            <Grid item sm={6} md={6} lg={6}>
+
+                <select id = 'level_select' value={this.state.level} onInput={this.handleInput} name='level' label='Difficulty Level' style={{ marginBottom: '1em' }}  >
+>>>>>>> Added id's to select menus (to help wth testing)
                     <option value="Easy">Easy</option>
                     <option value="Medium">Medium</option>
                     <option value="Hard">Hard</option>
                  </select>
+<<<<<<< HEAD
         </div>
         <div class="form-group">
         <label for='game'>Tree Type  </label>
                 <select type='text' id="game" value={this.state.gameDS} onInput={this.handleInput} name='gameDS' label='DSgame' style={{ marginBottom: '1em' }}  >
+=======
+
+                <select id = 'structure-select' value={this.state.gameDS} onInput={this.handleInput} name='gameDS' label='DSgame' style={{ marginBottom: '1em' }}  >
+>>>>>>> Added id's to select menus (to help wth testing)
                     <option value="AVL">AVL</option>
                     
                  </select>
