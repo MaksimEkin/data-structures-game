@@ -35,5 +35,5 @@ jobs:
         ALLOWED_HOSTS_1: ${{ secrets.ALLOWED_HOSTS_1 }}
         DATABASE_URL1: ${{ secrets.DATABASE_URL1 }}
         DEBUG_VALUE: ${{ secrets.DEBUG_VALUE }}
-        SECRET_KEY: ${{ secrets.SECRET_KEY }}:  
+        SECRET_KEY: ${{ secrets.SECRET_KEY }}
         
