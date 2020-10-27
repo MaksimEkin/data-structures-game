@@ -355,7 +355,7 @@ def save_game( user_id : str, board : dict ):
         Boolean: False
     """
 
-    # Returns a cursor -- only reason for loop (expecting {'save_games': 1} if game exists)
+     # Returns a cursor -- only reason for loop (expecting {'save_games': 1} if game exists)
     for item in client.InitialDB.User_Profile.aggregate([
         {"$match":{"user_id": user_id}},
         {"$unwind":"$save_games"},
