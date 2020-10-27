@@ -25,10 +25,12 @@ jobs:
       run: |
         # Game Board API
         python manage.py test game_board.api.tests_api
-        
+
         # Database
         python manage.py test game_board.database.test_db
-        
+        python manage.py test profile_page.database.test_db
+        python manage.py test home_page.database.test_db
+
         # AVL
         python manage.py test game_board.avl.test_avl
       env:
@@ -36,4 +38,3 @@ jobs:
         DATABASE_URL1: ${{ secrets.DATABASE_URL1 }}
         DEBUG_VALUE: ${{ secrets.DEBUG_VALUE }}
         SECRET_KEY: ${{ secrets.SECRET_KEY }}
-        
