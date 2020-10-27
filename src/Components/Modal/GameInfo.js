@@ -38,13 +38,13 @@ render(){
         <Grid container spacing={1} style={{ marginBottom: '5em' }}>
             <Grid item sm={6} md={6} lg={6}>
 
-                <select value={this.state.level} onInput={this.handleInput} name='level' label='Difficulty Level' style={{ marginBottom: '1em' }}  >
+                <select id = 'level_select' value={this.state.level} onInput={this.handleInput} name='level' label='Difficulty Level' style={{ marginBottom: '1em' }}  >
                     <option value="Easy">Easy</option>
                     <option value="Medium">Medium</option>
                     <option value="Hard">Hard</option>
                  </select>
 
-                <select value={this.state.gameDS} onInput={this.handleInput} name='gameDS' label='DSgame' style={{ marginBottom: '1em' }}  >
+                <select id = 'structure-select' value={this.state.gameDS} onInput={this.handleInput} name='gameDS' label='DSgame' style={{ marginBottom: '1em' }}  >
                     <option value="AVL">AVL</option>
                     
                  </select>
