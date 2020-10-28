@@ -13,7 +13,7 @@ if __name__ == '__main__':
     #remove_user(user2)
     save_user(user)
     #save_user(user2)
-    print(update_user_game(user["user_id"], board["game_id"], board2))
+    #print(update_user_game(user["user_id"], board["game_id"], board2))
 
     #print(type(find_user_game(user["user_id"], board["game_id"])))
     #print(list_user_games(user["user_id"]))
@@ -31,6 +31,8 @@ if __name__ == '__main__':
     #print(check_user_share_setting(user["user_id"]))
     #print(load_board(user["user_id"], board["game_id"]))
     #print(delete_game(user["user_id"], board["game_id"]))
-    #print(save_game(user["user_id"],board2 ))
+    print(save_game(user["user_id"],board2 ))
+    print(save_game(user["user_id"],board ))
+
     #print(load_board ( user["user_id"], user['save_games'][0]["game_id"] ))
     #share_game_board(user["user_id"], user2["user_id"], user['save_games'][0]["game_id"])

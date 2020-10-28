@@ -1,6 +1,6 @@
 """
 Run: python manage.py test game_board.api.tests_api
-Refrence: https://www.django-rest-framework.org/api-guide/testing/
+Reference: https://www.django-rest-framework.org/api-guide/testing/
 """
 
 from django.test import TestCase

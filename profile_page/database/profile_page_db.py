@@ -354,6 +354,18 @@ def save_game( user_id : str, board : dict ):
     On Fail:
         Boolean: False
     """
+
+     # Returns a cursor -- only reason for loop (expecting {'save_games': 1} if game exists)
+    for item in client.InitialDB.User_Profile.aggregate([
+        {"$match":{"user_id": user_id}},
+        {"$unwind":"$save_games"},
+        {"$match":{"save_games.game_id": board["game_id"]}},
+        {"$count":"save_games"}
+    ]):
+        if (item['save_games'] > 0):
+            return False
+
+    # Pushes the game to user's save game list
     value_returned = client.InitialDB.User_Profile.update_one(
         {"user_id": user_id},
         {"$push":{"save_games":board}},

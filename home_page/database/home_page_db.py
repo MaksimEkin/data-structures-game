@@ -18,4 +18,4 @@ def get_rankings():
     Returns:
         cursor: to iterate  all user profile documents
     """
-    return client.InitialDB.User_Profile.find({},{'_id':0,'user_id': 1, 'user_name':1, 'points':1}).limit(RECORD_LIMIT).sort('points', DESCENDING)
+    return client.InitialDB.User_Profile.find({},{'_id':0,'user_id': 1, 'points':1}).limit(RECORD_LIMIT).sort('points', DESCENDING)
