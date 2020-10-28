@@ -19,4 +19,4 @@ jobs:
         pip install pylint
     - name: Analysing the code with pylint
       run: |
-        find . -type f -name "*.pyfind . -type f -name "*.py" | xargs pylint --disable=import-error,no-name-in-module,no-member,too-few-public-methods,invalid-name" | xargs pylint --disable=import-error,no-name-in-module,no-member,too-few-public-methods,too-few-public-methods
+        find . -type f -name "*.py" | xargs pylint --disable=import-error,no-name-in-module,no-member,too-few-public-methods,invalid-name" | xargs pylint --disable=import-error,no-name-in-module,no-member,too-few-public-methods,too-few-public-methods
