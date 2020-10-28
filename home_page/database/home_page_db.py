@@ -1,3 +1,7 @@
+"""
+Allows the homepage to retrive information from the highest ranked players to display
+"""
+
 import os
 from pymongo import MongoClient, DESCENDING
 

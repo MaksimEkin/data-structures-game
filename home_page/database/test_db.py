@@ -39,8 +39,9 @@ class DBRankings( TestCase ):
             if self.user["user_id"] == player["user_id"]:
                 found = True
 
-        self.assertEqual( found, True, msg=f'{BColors.FAIL}
-        \t[-]\tPlayer with artificially high points was not first!{BColors.ENDC}' )
+        self.assertEqual( found, True,
+            msg=f'{BColors.FAIL}\t[-]\tPlayer with artificially high points was not first!\
+            {BColors.ENDC}' )
         print( f"{BColors.OKGREEN}\t[+]\tPass homepage get rankings.{BColors.ENDC}" )
 
     def tearDown( self ):
