@@ -1,3 +1,7 @@
+"""
+Allows users to have a profile in the datastucture game, builds in basic authentication features
+"""
+
 from pymongo import MongoClient, ReturnDocument
 import os
 
@@ -41,8 +45,10 @@ def update_user(user_id : str, user: dict):
         Boolean: False
     """
     value_returned = client.InitialDB.User_Profile.find_one_and_replace({"user_id": user_id}, user)
-    if value_returned == None:
+
+    if value_returned is None:
         return False
+
     return value_returned
 
 def read_one_user(user_id: str):
@@ -60,8 +66,10 @@ def read_one_user(user_id: str):
     """
 
     value_returned = client.InitialDB.User_Profile.find_one({"user_id": user_id})
-    if value_returned == None:
+
+    if value_returned is None:
         return False
+
     return value_returned
 
 def read_user_name(user_id: str):
@@ -81,7 +89,7 @@ def read_user_name(user_id: str):
     value_returned = client.InitialDB.User_Profile.find_one(
         {"user_id": user_id}, {'_id':0, 'user_name':1})
 
-    if value_returned == None:
+    if value_returned is None:
         return False
 
     return value_returned
@@ -161,7 +169,7 @@ def list_user_games(user_id : str):
         {'_id':0,"save_games":1}
     )
 
-    if value_returned == None:
+    if value_returned is None:
         return False
 
     return value_returned["save_games"]
@@ -343,7 +351,7 @@ def load_board(user_id : str, user_game_id: str):
         {'_id':0,"save_games":{"$elemMatch":{"game_id":user_game_id}}}
     )
 
-    if value_returned == None:
+    if value_returned is None:
         return False
     else:
         try:

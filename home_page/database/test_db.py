@@ -19,8 +19,8 @@ class BColors:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 
-class DBRankings(TestCase):
-    def setUp(self):
+class DBRankings( TestCase ):
+    def setUp( self ):
         self.user = {"user_id":"5f7d1b1d8fd2b816c48c148b","badges":[31,24,83],
         "current_story_level":9,"email":"ryanb777@umbc.edu",
         "friends":["Kulsoom2","Nick2","Maksim2","Naomi2"],
@@ -30,7 +30,7 @@ class DBRankings(TestCase):
 
         mongo2.save_user( self.user )
 
-    def test_get_player_rankings(self):
+    def test_get_player_rankings( self ):
         """ The rankings were retreived """
 
         players = mongo.get_rankings()
@@ -41,7 +41,7 @@ class DBRankings(TestCase):
 
         self.assertEqual( found, True, msg=f'{BColors.FAIL}
         \t[-]\tPlayer with artificially high points was not first!{BColors.ENDC}' )
-        print(f"{BColors.OKGREEN}\t[+]\tPass homepage get rankings.{BColors.ENDC}" )
+        print( f"{BColors.OKGREEN}\t[+]\tPass homepage get rankings.{BColors.ENDC}" )
 
-    def tearDown(self):
+    def tearDown( self ):
         mongo2.remove_user(self.user["user_id"])

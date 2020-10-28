@@ -54,7 +54,7 @@ def update_game(game_id: str, board):
         str: friendly response to infrom of an error
     """
     value_returned = client.InitialDB.Active_Games.find_one_and_replace({"game_id": game_id}, board)
-    if value_returned == None:
+    if value_returned is None:
         return 'nah bro idk about it'
     return value_returned
 
@@ -73,7 +73,7 @@ def read_game(game_id: str):
     """
 
     value_returned = client.InitialDB.Active_Games.find_one({"game_id": game_id})
-    if value_returned == None:
+    if value_returned is None:
         return 'nah bro idk about it'
     return value_returned
 
@@ -101,7 +101,7 @@ def list_games():
 
     Parameters:
     None
-    
+
     Returns:
         cursor: to iterate game ids
     """

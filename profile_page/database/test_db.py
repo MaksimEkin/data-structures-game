@@ -21,8 +21,8 @@ class BColors:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 
-class DBCreateUserProfile(TestCase):
-    def setUp(self):
+class DBCreateUserProfile( TestCase ):
+    def setUp( self ):
         self.user = {"user_id":"5f7d1b1d8fd2b816c48c148b","badges":[31,24,83],
         "current_story_level":9,"email":"ryanb777@umbc.edu",
         "friends":["Kulsoom2","Nick2","Maksim2","Naomi2"],
@@ -35,14 +35,14 @@ class DBCreateUserProfile(TestCase):
         "user_name":"ryan2","password_hash":"well,hello there","points":98274,"rank":"diamond",
         "save_games":["4(2(3)(no))(6(5))","4(2(3)(1))(6(5))","4(2(3)(1))(6(5))"]}
 
-    def test_save(self):
+    def test_save( self ):
         """ The user document was saved in the database """
         created_user = mongo.save_user( self.user )
         self.assertEqual( created_user, True,
         msg=f'{BColors.FAIL}\t[-]\tUser was not created in the Database!{BColors.ENDC}' + where() )
         print(f"{BColors.OKGREEN}\t[+]\tPass User-Profile database save user.{BColors.ENDC}")
 
-    def test_duplicate_save(self):
+    def test_duplicate_save( self ):
         """ The user document is a duplicate and should fail saving in the database """
         created_user = mongo.save_user( self.user )
         created_user = mongo.save_user( self.user )
@@ -52,7 +52,7 @@ class DBCreateUserProfile(TestCase):
         print(f"{BColors.OKGREEN}\t[+]\tPass User-Profile database save user duplicate.\
             {BColors.ENDC}")
 
-    def test_create(self):
+    def test_create( self ):
         """ The user document was created in the database """
         created_user = mongo.create_user( self.user2["user_id"],
             self.user2["password_hash"], self.user2["email"], self.user2["auth_token"] )
@@ -62,7 +62,7 @@ class DBCreateUserProfile(TestCase):
             {BColors.ENDC}' + where() )
         print(f"{BColors.OKGREEN}\t[+]\tPass User-Profile database create user.{BColors.ENDC}")
 
-    def test_create_duplicate_uid(self):
+    def test_create_duplicate_uid( self ):
         """ The user document was not created, duplicate user id the database """
         created_user = mongo.save_user( self.user )
         created_user = mongo.create_user( self.user["user_id"], self.user2["password_hash"],
@@ -74,7 +74,7 @@ class DBCreateUserProfile(TestCase):
         print(f"{BColors.OKGREEN}\t[+]\tPass User-Profile database create user duplicate id.\
             {BColors.ENDC}")
 
-    def test_create_duplicate_email(self):
+    def test_create_duplicate_email( self ):
         """ The user document was not created, duplicate user email in the database """
         created_user = mongo.save_user( self.user )
         created_user = mongo.create_user( self.user2["user_id"],
@@ -86,12 +86,12 @@ class DBCreateUserProfile(TestCase):
         print(f"{BColors.OKGREEN}\t[+]\tPass User-Profile database create duplicate user email.\
             {BColors.ENDC}")
 
-    def tearDown(self):
+    def tearDown( self ):
         mongo.remove_user(self.user["user_id"])
         mongo.remove_user(self.user2["user_id"])
 
-class DBReadUserProfile(TestCase):
-    def setUp(self):
+class DBReadUserProfile( TestCase ):
+    def setUp( self ):
         self.user = {"user_id":"5f7d1b1d8fd2b816c48c148b","badges":[31,24,83],
         "current_story_level":9,"email":"ryanb777@umbc.edu",
         "friends":["Kulsoom2","Nick2","Maksim2","Naomi2"],
@@ -100,7 +100,7 @@ class DBReadUserProfile(TestCase):
 
         mongo.save_user( self.user )
 
-    def test_read_correct(self):
+    def test_read_correct( self ):
         """ The user document was read from the database """
         read_user = mongo.read_one_user( self.user["user_id"] )
 
@@ -109,7 +109,7 @@ class DBReadUserProfile(TestCase):
             {BColors.ENDC}' + where() )
         print(f"{BColors.OKGREEN}\t[+]\tPass User-Profile database read.{BColors.ENDC}" )
 
-    def test_read_nonexist(self):
+    def test_read_nonexist( self ):
         """ The user document should not be read from the database """
         read_user = mongo.read_one_user(
             "This name should really not exist in the database, and if it does, YEESH!" )
@@ -118,7 +118,7 @@ class DBReadUserProfile(TestCase):
             \t[-]\tIncorrect return for non-existant user!{BColors.ENDC}' + where() )
         print(f"{BColors.OKGREEN}\t[+]\tPass User-Profile database read nonexistant.{BColors.ENDC}")
 
-    def test_read_user_name(self):
+    def test_read_user_name( self ):
         """ The user's name was read from the database """
         read_user_name = mongo.read_user_name( self.user["user_id"] )
 
@@ -127,7 +127,7 @@ class DBReadUserProfile(TestCase):
             {BColors.ENDC}')
         print(f"{BColors.OKGREEN}\t[+]\tPass User-Profile database read-name.{BColors.ENDC}")
 
-    def test_read_user_name_nonexist(self):
+    def test_read_user_name_nonexist( self ):
         """ The user-name document should not be read from the database """
         read_user = mongo.read_user_name(
             "This id should really not exist in the database, and if it does, YEESH!" )
@@ -137,11 +137,11 @@ class DBReadUserProfile(TestCase):
         print(f"{BColors.OKGREEN}\t[+]\tPass User-Profile database read-name nonexistant.\
             {BColors.ENDC}")
 
-    def tearDown(self):
+    def tearDown( self ):
         mongo.remove_user(self.user["user_id"])
 
-class DBUpdateUserProfile(TestCase):
-    def setUp(self):
+class DBUpdateUserProfile( TestCase ):
+    def setUp( self ):
         self.user = {"user_id":"5f7d1b1d8fd2b816c48c148b","badges":[31,24,83],
         "current_story_level":9,"email":"ryanb777@umbc.edu",
         "friends":["Kulsoom2","Nick2","Maksim2","Naomi2"],
@@ -156,7 +156,7 @@ class DBUpdateUserProfile(TestCase):
 
         mongo.save_user( self.user )
 
-    def test_update_correct(self):
+    def test_update_correct( self ):
         """ The user document is updated in the database """
         updated_user = mongo.update_user( self.user["user_id"], self.user2 )
 
@@ -165,7 +165,7 @@ class DBUpdateUserProfile(TestCase):
             {BColors.ENDC}' + where() )
         print(f"{BColors.OKGREEN}\t[+]\tPass User-Profile database update.{BColors.ENDC}")
 
-    def test_update_nonexist(self):
+    def test_update_nonexist( self ):
         """ The user document should not be updated from the database """
         updated_user = mongo.update_user(
             "This name should really not exist in the database, and if it does, YEESH!", self.user )
@@ -179,8 +179,8 @@ class DBUpdateUserProfile(TestCase):
         mongo.remove_user(self.user["user_id"])
 
 
-class DBUpdateUserGame(TestCase):
-    def setUp(self):
+class DBUpdateUserGame( TestCase ):
+    def setUp( self ):
         self.board = {"game_id": "60afce36-085a-11eb-b6ab-acde48001122",
         "graph": {"nodes": "node4(node2(node3)(node1))(node6(node5))",
         "node_points": {"node1": 1,"node2": 2,"node3": 3,"node4": 4,"node5": 5,"node6": 6},
@@ -217,7 +217,7 @@ class DBUpdateUserGame(TestCase):
 
         mongo.save_user( self.user )
 
-    def test_update_game_correct(self):
+    def test_update_game_correct( self ):
         """ The user document is updated in the database """
         original_user = self.user
         updated_game = mongo.update_user_game( self.user["user_id"],
@@ -228,7 +228,7 @@ class DBUpdateUserGame(TestCase):
             {BColors.ENDC}' + where() )
         print(f"{BColors.OKGREEN}\t[+]\tPass User-Profile database update.{BColors.ENDC}")
 
-    def test_update_game_nonexist(self):
+    def test_update_game_nonexist( self ):
         """ The user document should not be updated from the database """
         original_user = self.user
         updated_user = mongo.update_user_game( self.user["user_id"],
@@ -240,12 +240,12 @@ class DBUpdateUserGame(TestCase):
         print(f"{BColors.OKGREEN}\
             \t[+]\tPass User-Profile database update game nonexistant.{BColors.ENDC}")
 
-    def tearDown(self):
+    def tearDown( self ):
         mongo.remove_user(self.user["user_id"])
 
 
-class DBDeleteUser(TestCase):
-    def setUp(self):
+class DBDeleteUser( TestCase ):
+    def setUp( self ):
         self.user = {"user_id":"5f7d1b1d8fd2b816c48c148b","badges":[31,24,83],
         "current_story_level":9,"email":"ryanb777@umbc.edu",
         "friends":["Kulsoom2","Nick2","Maksim2","Naomi2"],
@@ -265,7 +265,7 @@ class DBDeleteUser(TestCase):
 
         mongo.save_user( self.user )
 
-    def test_delete_correct(self):
+    def test_delete_correct( self ):
         """ The user document was deleted in the database """
         deleted_user = mongo.remove_user( self.user["user_id"] )
 
@@ -273,7 +273,7 @@ class DBDeleteUser(TestCase):
             \t[-]\tDatabase was not able to delete the user!{BColors.ENDC}' + where() )
         print(f"{BColors.OKGREEN}\t[+]\tPass User-Profile database delete.{BColors.ENDC}")
 
-    def test_delete_nonexist(self):
+    def test_delete_nonexist( self ):
         """ The user document should not be deleted from the database """
         deleted_user = mongo.remove_user(
             "This name shouldn't exist in the database, and if it does, it deserves to be deleted" )
@@ -284,8 +284,8 @@ class DBDeleteUser(TestCase):
         print(f"{BColors.OKGREEN}\t[+]\tPass User-Profile database delete nonexistant.\
             {BColors.ENDC}")
 
-class DBDeleteGames(TestCase):
-    def setUp(self):
+class DBDeleteGames( TestCase ):
+    def setUp( self ):
         self.user = {"user_id":"5f7d1b1d8fd2b816c48c148b","badges":[31,24,83],
         "current_story_level":9,"email":"ryanb777@umbc.edu",
         "friends":["Kulsoom2","Nick2","Maksim2","Naomi2"],
@@ -303,7 +303,7 @@ class DBDeleteGames(TestCase):
 
         mongo.save_user( self.user )
 
-    def test_delete_correct(self):
+    def test_delete_correct( self ):
         """ The user document was deleted in the database """
         deleted_user = mongo.delete_game(
             self.user["user_id"], self.user['save_games'][0]["game_id"])
@@ -312,7 +312,7 @@ class DBDeleteGames(TestCase):
             \t[-]\tDatabase was not able to delete the user!{BColors.ENDC}' + where() )
         print(f"{BColors.OKGREEN}\t[+]\tPass User-Profile database delete.{BColors.ENDC}")
 
-    def test_delete_nonexist(self):
+    def test_delete_nonexist( self ):
         """ The user document should not be deleted from the database """
         deleted_user = mongo.delete_game(
             "This name shouldn't exist in the database, and if it does, it desrves to be deleted",
@@ -324,8 +324,8 @@ class DBDeleteGames(TestCase):
         print(f"{BColors.OKGREEN}\t[+]\tPass User-Profile database delete nonexistant.\
             {BColors.ENDC}")
 
-class DBList(TestCase):
-    def setUp(self):
+class DBList( TestCase ):
+    def setUp( self ):
         self.user = {"user_id":"5f7d1b1d8fd2b816c48c148b","badges":[31,24,83],
         "current_story_level":9,"email":"ryanb777@umbc.edu",
         "friends":["Kulsoom2","Nick2","Maksim2","Naomi2"],
@@ -346,7 +346,7 @@ class DBList(TestCase):
 
         mongo.save_user( self.user )
 
-    def test_list_users_correct(self):
+    def test_list_users_correct( self ):
         """ The user document was added to the list and appears in the returned list """
         found = False
 
@@ -360,14 +360,14 @@ class DBList(TestCase):
              + where() )
         print(f"{BColors.OKGREEN}\t[+]\tPass User-Profile database list.{BColors.ENDC}")
 
-    def test_list_user_games_correct(self):
+    def test_list_user_games_correct( self ):
         """ The user's games appears in the returned list """
         user_games = mongo.list_user_games(self.user["user_id"])
         self.assertEqual(user_games[0], self.user["save_games"][0], msg=f'{BColors.FAIL}\
             \t[-]\tAdded user was not in the listed games!{BColors.ENDC}' + where() )
         print(f"{BColors.OKGREEN}\t[+]\tPass User-Profile database list.{BColors.ENDC}")
 
-    def tearDown(self):
+    def tearDown( self ):
         mongo.remove_user(self.user["user_id"])
 
 class DBSaveUserGames( TestCase ):
@@ -406,17 +406,17 @@ class DBSaveUserGames( TestCase ):
 
         mongo.save_user( self.user )
 
-        def tearDown(self):
+        def tearDown( self ):
             mongo.remove_user(self.user["user_id"])
 
-    def test_save_game_correct(self):
+    def test_save_game_correct( self ):
         """ The user 's new game is saved in the database """
         saved_game = mongo.save_game( self.user["user_id"], self.board2 )
         self.assertEqual( saved_game, True, msg=f'{BColors.FAIL}\
             \t[-]\tUser\'s new game was not saved!{BColors.ENDC}' + where() )
         print(f"{BColors.OKGREEN}\t[+]\tPass User-Profile database save new game.{BColors.ENDC}")
 
-    def test_save_game_duplicate(self):
+    def test_save_game_duplicate( self ):
         """ The user 's new game is saved in the database """
         saved_game = mongo.save_game( self.user["user_id"], self.board )
         self.assertEqual( saved_game, False, msg=f'{BColors.FAIL}\
@@ -428,7 +428,7 @@ class DBReadUserGames( TestCase ):
     def setUp( self ):
         self.user = {"sharing": True, "auth_token":"cool!","user_id":"5f7d1b1d8fd2b816c48c148b",
         "badges":[31,24,83],"current_story_level":9,"email":"ryanb777@umbc.edu",
-        "friends":["Kulsoom2","Nick2","Maksim2","Naomi2"],
+         "friends":["Kulsoom2","Nick2","Maksim2","Naomi2"],
         "user_name":"ryan2","password_hash":"well,hello there","points":98274,"rank":"diamond",
         "save_games":[{'game_id': '60afce36-085a-11eb-b6ab-acde48001122',
         'graph': {'nodes': 'DID IT WRETITREE ???5))'},
