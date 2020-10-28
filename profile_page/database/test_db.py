@@ -2,9 +2,9 @@
 python manage.py test profile_page.database.test_db
 """
 
-from profile_page.database import profile_page_db as mongo
-from django.test import TestCase
 import sys
+from django.test import TestCase
+from profile_page.database import profile_page_db as mongo
 
 def where():
     return " -- test on line "+str(sys._getframe(1).f_lineno)
@@ -23,6 +23,8 @@ class BColors:
 
 class DBCreateUserProfile( TestCase ):
     def setUp( self ):
+        """ creates user data needed for tests """
+
         self.user = {"user_id":"5f7d1b1d8fd2b816c48c148b","badges":[31,24,83],
         "current_story_level":9,"email":"ryanb777@umbc.edu",
         "friends":["Kulsoom2","Nick2","Maksim2","Naomi2"],
@@ -87,11 +89,14 @@ class DBCreateUserProfile( TestCase ):
             {BColors.ENDC}")
 
     def tearDown( self ):
+        """ Removes users needed in tests """
         mongo.remove_user(self.user["user_id"])
         mongo.remove_user(self.user2["user_id"])
 
 class DBReadUserProfile( TestCase ):
     def setUp( self ):
+        """ creates user data needed for tests """
+
         self.user = {"user_id":"5f7d1b1d8fd2b816c48c148b","badges":[31,24,83],
         "current_story_level":9,"email":"ryanb777@umbc.edu",
         "friends":["Kulsoom2","Nick2","Maksim2","Naomi2"],
@@ -138,10 +143,13 @@ class DBReadUserProfile( TestCase ):
             {BColors.ENDC}")
 
     def tearDown( self ):
+        """ Removes user needed in tests """
         mongo.remove_user(self.user["user_id"])
 
 class DBUpdateUserProfile( TestCase ):
     def setUp( self ):
+        """ creates user data needed for tests """
+
         self.user = {"user_id":"5f7d1b1d8fd2b816c48c148b","badges":[31,24,83],
         "current_story_level":9,"email":"ryanb777@umbc.edu",
         "friends":["Kulsoom2","Nick2","Maksim2","Naomi2"],
@@ -172,15 +180,17 @@ class DBUpdateUserProfile( TestCase ):
 
         self.assertEqual( updated_user, False, msg=f'{BColors.FAIL}\
             \t[-]\tIncorrect return for non-existant user!{BColors.ENDC}' + where() )
-        print(f"{BColors.OKGREEN}\
-            \t[+]\tPass User-Profile database update nonexistant.{BColors.ENDC}")
+        print(f"{BColors.OKGREEN}\t[+]\tPass User-Profile database update nonexistant.\
+            {BColors.ENDC}")
 
     def tearDown(self):
+        """ Removes user needed in tests """
         mongo.remove_user(self.user["user_id"])
-
 
 class DBUpdateUserGame( TestCase ):
     def setUp( self ):
+        """ creates user data needed for tests """
+
         self.board = {"game_id": "60afce36-085a-11eb-b6ab-acde48001122",
         "graph": {"nodes": "node4(node2(node3)(node1))(node6(node5))",
         "node_points": {"node1": 1,"node2": 2,"node3": 3,"node4": 4,"node5": 5,"node6": 6},
@@ -237,15 +247,17 @@ class DBUpdateUserGame( TestCase ):
 
         self.assertEqual( updated_user, False, msg=f'{BColors.FAIL}\
             \t[-]\tIncorrect return for non-existant user!{BColors.ENDC}' + where() )
-        print(f"{BColors.OKGREEN}\
-            \t[+]\tPass User-Profile database update game nonexistant.{BColors.ENDC}")
+        print(f"{BColors.OKGREEN}\t[+]\tPass User-Profile database update game nonexistant.\
+            {BColors.ENDC}")
 
     def tearDown( self ):
+        """ Removes user needed in tests """
         mongo.remove_user(self.user["user_id"])
-
 
 class DBDeleteUser( TestCase ):
     def setUp( self ):
+        """ creates user data needed for tests """
+
         self.user = {"user_id":"5f7d1b1d8fd2b816c48c148b","badges":[31,24,83],
         "current_story_level":9,"email":"ryanb777@umbc.edu",
         "friends":["Kulsoom2","Nick2","Maksim2","Naomi2"],
@@ -286,6 +298,8 @@ class DBDeleteUser( TestCase ):
 
 class DBDeleteGames( TestCase ):
     def setUp( self ):
+        """ creates user data needed for tests """
+
         self.user = {"user_id":"5f7d1b1d8fd2b816c48c148b","badges":[31,24,83],
         "current_story_level":9,"email":"ryanb777@umbc.edu",
         "friends":["Kulsoom2","Nick2","Maksim2","Naomi2"],
@@ -326,6 +340,8 @@ class DBDeleteGames( TestCase ):
 
 class DBList( TestCase ):
     def setUp( self ):
+        """ creates user data needed for tests """
+
         self.user = {"user_id":"5f7d1b1d8fd2b816c48c148b","badges":[31,24,83],
         "current_story_level":9,"email":"ryanb777@umbc.edu",
         "friends":["Kulsoom2","Nick2","Maksim2","Naomi2"],
@@ -363,15 +379,19 @@ class DBList( TestCase ):
     def test_list_user_games_correct( self ):
         """ The user's games appears in the returned list """
         user_games = mongo.list_user_games(self.user["user_id"])
+
         self.assertEqual(user_games[0], self.user["save_games"][0], msg=f'{BColors.FAIL}\
             \t[-]\tAdded user was not in the listed games!{BColors.ENDC}' + where() )
         print(f"{BColors.OKGREEN}\t[+]\tPass User-Profile database list.{BColors.ENDC}")
 
     def tearDown( self ):
+        """ Removes user needed in tests """
         mongo.remove_user(self.user["user_id"])
 
 class DBSaveUserGames( TestCase ):
     def setUp( self ):
+        """ creates user data needed for tests """
+
         self.board = {"game_id": "60afce36-085a-11eb-b6ab-acde48001122",
         "graph": {"nodes": "node4(node2(node3)(node1))(node6(node5))",
         "node_points": {"node1": 1,"node2": 2,"node3": 3,"node4": 4,"node5": 5,"node6": 6},
@@ -406,12 +426,14 @@ class DBSaveUserGames( TestCase ):
 
         mongo.save_user( self.user )
 
-        def tearDown( self ):
-            mongo.remove_user(self.user["user_id"])
+    def tearDown( self ):
+        """ Removes user needed in tests """
+        mongo.remove_user(self.user["user_id"])
 
     def test_save_game_correct( self ):
         """ The user 's new game is saved in the database """
         saved_game = mongo.save_game( self.user["user_id"], self.board2 )
+
         self.assertEqual( saved_game, True, msg=f'{BColors.FAIL}\
             \t[-]\tUser\'s new game was not saved!{BColors.ENDC}' + where() )
         print(f"{BColors.OKGREEN}\t[+]\tPass User-Profile database save new game.{BColors.ENDC}")
@@ -419,6 +441,7 @@ class DBSaveUserGames( TestCase ):
     def test_save_game_duplicate( self ):
         """ The user 's new game is saved in the database """
         saved_game = mongo.save_game( self.user["user_id"], self.board )
+
         self.assertEqual( saved_game, False, msg=f'{BColors.FAIL}\
             \t[-]\tUser\'s duplicate game was saved!{BColors.ENDC}' + where() )
         print(f"{BColors.OKGREEN}\t[+]\tPass User-Profile database save duplicate game.\
@@ -426,6 +449,8 @@ class DBSaveUserGames( TestCase ):
 
 class DBReadUserGames( TestCase ):
     def setUp( self ):
+        """ creates user data needed for tests """
+
         self.user = {"sharing": True, "auth_token":"cool!","user_id":"5f7d1b1d8fd2b816c48c148b",
         "badges":[31,24,83],"current_story_level":9,"email":"ryanb777@umbc.edu",
          "friends":["Kulsoom2","Nick2","Maksim2","Naomi2"],
@@ -463,10 +488,13 @@ class DBReadUserGames( TestCase ):
         print( f"{BColors.OKGREEN}\t[+]\tPass User-Profile database share game.{BColors.ENDC}" )
 
     def tearDown( self ):
+        """ Removes user needed in tests """
         mongo.remove_user( self.user["user_id"] )
 
 class DBUserAuthentication( TestCase ):
     def setUp( self ):
+        """ creates user data needed for tests """
+
         self.user = {"sharing": True, "auth_token":"cool!","user_id":"5f7d1b1d8fd2b816c48c148b",
         "badges":[31,24,83],"current_story_level":9,"email":"ryanb777@umbc.edu",
         "friends":["Kulsoom2","Nick2","Maksim2","Naomi2"],"user_name":"ryan2",
@@ -521,7 +549,7 @@ class DBUserAuthentication( TestCase ):
 
     def test_login_correct( self ):
         """ The user's password hash match the database record """
-        logged_in = mongo.user_or_email( self.user["user_id"], self.user["password_hash"] )
+        logged_in = mongo.login( self.user["user_id"], self.user["password_hash"] )
 
         self.assertEqual( logged_in, True,
             msg=f'{BColors.FAIL}\t[-]\tUser password doesn\'t match!{BColors.ENDC}' + where() )
@@ -529,7 +557,7 @@ class DBUserAuthentication( TestCase ):
 
     def test_login_incorrect( self ):
         """ The user's password hash does not match the database record """
-        logged_in = mongo.user_or_email( self.user["user_id"], "none" )
+        logged_in = mongo.login( self.user["user_id"], "none" )
 
         self.assertEqual( logged_in, False,
             msg=f'{BColors.FAIL}\t[-]\tUser\'s fake password was accepted!{BColors.ENDC}'
@@ -537,15 +565,14 @@ class DBUserAuthentication( TestCase ):
         print( f"{BColors.OKGREEN}\t[+]\tPass User-Profile database login incorrect.\
             {BColors.ENDC}" )
 
-    def test_login_incorrect( self ):
+    def test_login_invalid( self ):
         """ The invalid user's password hash should not be checked """
-        logged_in = mongo.user_or_email( "none", "none" )
+        logged_in = mongo.login( "none", "none" )
 
         self.assertEqual( logged_in, False,
             msg=f'{BColors.FAIL}\t[-]\tFake user\'s fake password was accepted!{BColors.ENDC}'
             + where() )
-        print( f"{BColors.OKGREEN}\
-            \t[+]\tPass User-Profile database login incorrect user, incorrect password.\
+        print( f"{BColors.OKGREEN}\t[+]\tPass User-Profile database login invalid user & password.\
             {BColors.ENDC}" )
 
     def test_update_token( self ):
@@ -583,10 +610,13 @@ class DBUserAuthentication( TestCase ):
             {BColors.ENDC}" )
 
     def tearDown( self ):
+        """ Removes user needed in tests """
         mongo.remove_user( self.user["user_id"] )
 
 class DBUserProfileGeneral( TestCase ):
     def setUp( self ):
+        """ creates user data needed for tests """
+
         self.user = {"sharing": True, "auth_token":"cool!","user_id":"5f7d1b1d8fd2b816c48c148b",
         "badges":[31,24,83],"current_story_level":9,"email":"ryanb777@umbc.edu",
         "friends":["Kulsoom2","Nick2","Maksim2","Naomi2"],"user_name":"ryan2",
@@ -691,5 +721,6 @@ class DBUserProfileGeneral( TestCase ):
             {BColors.ENDC}" )
 
     def tearDown( self ):
+        """ Removes users needed in tests """
         mongo.remove_user( self.user["user_id"] )
         mongo.remove_user( self.user2["user_id"] )

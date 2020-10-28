@@ -357,7 +357,8 @@ def load_board(user_id : str, user_game_id: str):
     try:
         value_returned = value_returned['save_games'][0]
         return value_returned
-    return False
+    except:
+        return False
 
 def save_game( user_id : str, board : dict ):
     """
@@ -437,7 +438,7 @@ def share_game_board(source_id : str, destination_id : str, user_game_id: str):
 
     if user1_valid and user1_shares and user2_valid and game_valid:
         return save_game ( destination_id, game_valid )
-        
+
     return False
 
 def change_password( user_id : str, passhash : str ):
