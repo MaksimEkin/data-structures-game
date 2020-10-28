@@ -2,8 +2,8 @@
 Allows users to have a profile in the datastucture game, builds in basic authentication features
 """
 
-from pymongo import MongoClient, ReturnDocument
 import os
+from pymongo import MongoClient, ReturnDocument
 
 # Gets database & it's authorization from the environment
 DATABASE_URL1 = os.environ.get('DATABASE_URL1')
@@ -24,10 +24,11 @@ def save_user(user: dict):
         Boolean: False
     """
     info_used = user_or_email( user["user_id"],  user["email"])
+
     if info_used:
         return False
-    else:
-        return client.InitialDB.User_Profile.insert_one(user).acknowledged
+
+    return client.InitialDB.User_Profile.insert_one(user).acknowledged
 
 def update_user(user_id : str, user: dict):
     """
@@ -215,21 +216,20 @@ def create_user(user_id : str, passhash : str, email : str, token : str):
     if info_used:
         return False
 
-    else:
-        user = {"user_id":user_id,
-        "password_hash":passhash,
-        "email":email,
-        "auth_token": token,
-        "badges":[],
-        "current_story_level":1,
-        "friends":[],
-        "points":0,
-        "rank":"Baby Panda",
-        "save_games":[],
-        "sharing": True
-        }
+    user = {"user_id":user_id,
+    "password_hash":passhash,
+    "email":email,
+    "auth_token": token,
+    "badges":[],
+    "current_story_level":1,
+    "friends":[],
+    "points":0,
+    "rank":"Baby Panda",
+    "save_games":[],
+    "sharing": True
+    }
 
-        return save_user(user)
+    return save_user(user)
 
 def login ( user_id : str, passhash : str ):
     """
@@ -353,12 +353,11 @@ def load_board(user_id : str, user_game_id: str):
 
     if value_returned is None:
         return False
-    else:
-        try:
-            value_returned = value_returned['save_games'][0]
-            return value_returned
-        except:
-            return False
+
+    try:
+        value_returned = value_returned['save_games'][0]
+        return value_returned
+    return False
 
 def save_game( user_id : str, board : dict ):
     """
@@ -382,7 +381,7 @@ def save_game( user_id : str, board : dict ):
         {"$match":{"save_games.game_id": board["game_id"]}},
         {"$count":"save_games"}
     ]):
-        if (item['save_games'] > 0):
+        if item['save_games'] > 0:
             return False
 
     # Pushes the game to user's save game list
@@ -438,8 +437,8 @@ def share_game_board(source_id : str, destination_id : str, user_game_id: str):
 
     if user1_valid and user1_shares and user2_valid and game_valid:
         return save_game ( destination_id, game_valid )
-    else:
-        return False
+        
+    return False
 
 def change_password( user_id : str, passhash : str ):
     """
