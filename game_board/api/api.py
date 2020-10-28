@@ -20,7 +20,7 @@ import json
 
 
 @api_view(['GET'])
-def api_overview():
+def api_overview(request):
     '''
     Overview of the API calls exist.
 
@@ -39,7 +39,7 @@ def api_overview():
 @api_view(['GET'])
 @throttle_classes([AnonRateThrottle])
 @throttle_classes([UserRateThrottle])
-def start_game(difficulty, player_ids, data_structures):
+def start_game(request, difficulty, player_ids, data_structures):
     '''
     Creates a new game board.
 
@@ -72,7 +72,7 @@ def start_game(difficulty, player_ids, data_structures):
 
 
 @api_view(['GET'])
-def board(game_id):
+def board(request, game_id):
     '''
     Returns the current game board state.
 
