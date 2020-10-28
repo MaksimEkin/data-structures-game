@@ -1,3 +1,7 @@
+"""
+    API for Game Board that allows interaction with boards.
+"""
+
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 # Status codes documentation: https://www.django-rest-framework.org/api-guide/status-codes/
@@ -16,7 +20,7 @@ import json
 
 
 @api_view(['GET'])
-def api_overview(request):
+def api_overview():
     '''
     Overview of the API calls exist.
 
@@ -35,7 +39,7 @@ def api_overview(request):
 @api_view(['GET'])
 @throttle_classes([AnonRateThrottle])
 @throttle_classes([UserRateThrottle])
-def start_game(request, difficulty, player_ids, data_structures):
+def start_game(difficulty, player_ids, data_structures):
     '''
     Creates a new game board.
 
@@ -68,7 +72,7 @@ def start_game(request, difficulty, player_ids, data_structures):
 
 
 @api_view(['GET'])
-def board(request, game_id):
+def board(game_id):
     '''
     Returns the current game board state.
 
@@ -141,9 +145,9 @@ def rebalance(request, game_id):
         return Response({'error': response_status['reason']},
                         status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    board = response_status['game_board']
+    board_response = response_status['game_board']
 
-    return Response(board)
+    return Response(board_response)
 
 
 @api_view(['GET'])
