@@ -2,10 +2,10 @@
 python manage.py test home_page.database.test_db
 """
 
+from django.test import TestCase
 from home_page.database import home_page_db as mongo
 from profile_page.database import profile_page_db as mongo2
 
-from django.test import TestCase
 
 class BColors:
     # Colors for printing
@@ -21,7 +21,13 @@ class BColors:
 
 class DBRankings(TestCase):
     def setUp(self):
-        self.user = {"user_id":"5f7d1b1d8fd2b816c48c148b","badges":[31,24,83],"current_story_level":9,"email":"ryanb777@umbc.edu","friends":["Kulsoom2","Nick2","Maksim2","Naomi2"],"user_name":"ryan2","password_hash":"well,hello there","points":9829999999974,"rank":"diamond","save_games":["4(2(3)(no))(6(5))","4(2(3)(1))(6(5))","4(2(3)(1))(6(5))"]}
+        self.user = {"user_id":"5f7d1b1d8fd2b816c48c148b","badges":[31,24,83],
+        "current_story_level":9,"email":"ryanb777@umbc.edu",
+        "friends":["Kulsoom2","Nick2","Maksim2","Naomi2"],
+        "user_name":"ryan2","password_hash":"well,hello there",
+        "points":9829999999974,"rank":"diamond",
+        "save_games":["4(2(3)(no))(6(5))","4(2(3)(1))(6(5))","4(2(3)(1))(6(5))"]}
+
         mongo2.save_user( self.user )
 
     def test_get_player_rankings(self):
@@ -33,8 +39,9 @@ class DBRankings(TestCase):
             if self.user["user_id"] == player["user_id"]:
                 found = True
 
-        self.assertEqual( found, True, msg=f'{BColors.FAIL}\t[-]\tPlayer with artificially high points was not first!{BColors.ENDC}')
-        print(f"{BColors.OKGREEN}\t[+]\tPass homepage get rankings.{BColors.ENDC}")
+        self.assertEqual( found, True, msg=f'{BColors.FAIL}
+        \t[-]\tPlayer with artificially high points was not first!{BColors.ENDC}' )
+        print(f"{BColors.OKGREEN}\t[+]\tPass homepage get rankings.{BColors.ENDC}" )
 
     def tearDown(self):
         mongo2.remove_user(self.user["user_id"])

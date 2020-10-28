@@ -10,7 +10,8 @@ def save_user(user: dict):
     Saves a new user into the database after being passed through the Django API
 
     Parameters:
-    user (dictionary): user infromation, such as email, creation date, points, badges, saved games, etc
+    user (dictionary): user infromation, such as email, creation date, points,
+                        badges, saved games, etc
 
     Returns:
     On Success:
@@ -30,7 +31,8 @@ def update_user(user_id : str, user: dict):
 
     Parameters:
     user_id (str): unique identification for the user
-    user (dictionary): user infromation, such as email, creation date, points, badges, saved games, etc
+    user (dictionary): user infromation, such as email, creation date, points,
+                        badges, saved games, etc
 
     Returns:
     On Success:
@@ -76,7 +78,9 @@ def read_user_name(user_id: str):
         Boolean: False
     """
 
-    value_returned = client.InitialDB.User_Profile.find_one({"user_id": user_id}, {'_id':0, 'user_name':1})
+    value_returned = client.InitialDB.User_Profile.find_one(
+        {"user_id": user_id}, {'_id':0, 'user_name':1})
+
     if value_returned == None:
         return False
 
@@ -177,7 +181,9 @@ def user_or_email (user_id : str, email: str = ""):
         Boolean: False
     """
 
-    value_returned = client.InitialDB.User_Profile.find({"$or": [{ "user_id": user_id},{"email": email}]}).count()
+    value_returned = client.InitialDB.User_Profile.find(
+        {"$or": [{ "user_id": user_id},{"email": email}]}).count()
+
     return value_returned > 0
 
 def create_user(user_id : str, passhash : str, email : str, token : str):
@@ -232,7 +238,9 @@ def login ( user_id : str, passhash : str ):
         Boolean: False
     """
 
-    value_returned = client.InitialDB.User_Profile.find({"$and": [{ "user_id": user_id}, {"password_hash": passhash}]}).count()
+    value_returned = client.InitialDB.User_Profile.find(
+        {"$and": [{ "user_id": user_id}, {"password_hash": passhash}]}).count()
+
     return value_returned > 0
 
 def update_token( user_id : str, token : str ):
@@ -271,7 +279,9 @@ def check_user( user_id : str, token : str ):
     On Fail:
         Boolean: False
     """
-    value_returned = client.InitialDB.User_Profile.find({"$and": [{ "user_id": user_id}, {"auth_token": token}]}).count()
+    value_returned = client.InitialDB.User_Profile.find(
+        {"$and": [{ "user_id": user_id}, {"auth_token": token}]}).count()
+
     return value_returned > 0
 
 def remove_token ( user_id : str ):
@@ -308,7 +318,9 @@ def check_user_share_setting( user_id : str ):
     On Fail:
         Boolean: False
     """
-    value_returned = client.InitialDB.User_Profile.find({"$and": [{ "user_id": user_id}, {"sharing": True}]}).count()
+    value_returned = client.InitialDB.User_Profile.find(
+        {"$and": [{ "user_id": user_id}, {"sharing": True}]}).count()
+
     return value_returned > 0
 
 def load_board(user_id : str, user_game_id: str):
