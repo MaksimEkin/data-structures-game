@@ -1,16 +1,15 @@
+"""
+    Profile page API calls that allow interaction with
+    the user's information such as log-in and sign-up.
+    It can also be used to share, save, and load saved game boards.
+"""
+import uuid
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-# Status codes documentation: https://www.django-rest-framework.org/api-guide/status-codes/
 from rest_framework import status
-
-import uuid
-import json
-
 from game_board.api import utils as game_utils
-from game_board.database import game_board_db as game_db
-
 from profile_page.database import profile_page_db as db
-# from . import mock_db as db
+
 
 @api_view(['GET'])
 def api_overview(request):
@@ -47,10 +46,10 @@ def register(request):
     :return:
     """
     # user_name == user_id
-    REQUIRED_FIELDS = ['user_name', 'password1', 'password2', 'email']
+    required_fields = ['user_name', 'password1', 'password2', 'email']
 
     # Check if the post request contain the required fields
-    if set(REQUIRED_FIELDS) != set(list(request.data.keys())):
+    if set(required_fields) != set(list(request.data.keys())):
         return Response({'error': str('Missing required fields!')}, status=status.HTTP_400_BAD_REQUEST)
 
     # POST Request content
@@ -78,10 +77,10 @@ def login(request):
     :return:
     """
     # user_name == user_id
-    REQUIRED_FIELDS = ['user_id', 'password']
+    required_fields = ['user_id', 'password']
 
     # Check if the post request contain the required fields
-    if set(REQUIRED_FIELDS) != set(list(request.data.keys())):
+    if set(required_fields) != set(list(request.data.keys())):
         return Response({'error': str('Missing required fields!')}, status=status.HTTP_400_BAD_REQUEST)
 
     # POST Request content
@@ -107,10 +106,10 @@ def logout(request):
     :return:
     """
     # user_name == user_id
-    REQUIRED_FIELDS = ['user_id', 'token']
+    required_fields = ['user_id', 'token']
 
     # Check if the post request contain the required fields
-    if set(REQUIRED_FIELDS) != set(list(request.data.keys())):
+    if set(required_fields) != set(list(request.data.keys())):
         return Response({'error': str('Missing required fields!')}, status=status.HTTP_400_BAD_REQUEST)
 
     # POST Request content
@@ -133,10 +132,10 @@ def save_board(request):
     :param self:
     :return:
     """
-    REQUIRED_FIELDS = ['user_id', 'game_id', 'token']
+    required_fields = ['user_id', 'game_id', 'token']
 
     # Check if the post request contain the required fields
-    if set(REQUIRED_FIELDS) != set(list(request.data.keys())):
+    if set(required_fields) != set(list(request.data.keys())):
         return Response({'error': str('Missing required fields!')}, status=status.HTTP_400_BAD_REQUEST)
 
     # POST Request content
@@ -166,10 +165,10 @@ def delete_board(request):
     :param self:
     :return:
     """
-    REQUIRED_FIELDS = ['user_id', 'game_id', 'token']
+    required_fields = ['user_id', 'game_id', 'token']
 
     # Check if the post request contain the required fields
-    if set(REQUIRED_FIELDS) != set(list(request.data.keys())):
+    if set(required_fields) != set(list(request.data.keys())):
         return Response({'error': str('Missing required fields!')}, status=status.HTTP_400_BAD_REQUEST)
 
     # POST Request content
@@ -192,10 +191,10 @@ def share(request):
     :param self:
     :return:
     """
-    REQUIRED_FIELDS = ['source_user_id', 'dest_user_id', 'game_id', 'token']
+    required_fields = ['source_user_id', 'dest_user_id', 'game_id', 'token']
 
     # Check if the post request contain the required fields
-    if set(REQUIRED_FIELDS) != set(list(request.data.keys())):
+    if set(required_fields) != set(list(request.data.keys())):
         return Response({'error': str('Missing required fields!')}, status=status.HTTP_400_BAD_REQUEST)
 
     # POST Request content
@@ -239,10 +238,10 @@ def load_board(request):
     :param self:
     :return:
     """
-    REQUIRED_FIELDS = ['user_id', 'game_id', 'token']
+    required_fields = ['user_id', 'game_id', 'token']
 
     # Check if the post request contain the required fields
-    if set(REQUIRED_FIELDS) != set(list(request.data.keys())):
+    if set(required_fields) != set(list(request.data.keys())):
         return Response({'error': str('Missing required fields!')}, status=status.HTTP_400_BAD_REQUEST)
 
     # POST Request content

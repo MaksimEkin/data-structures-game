@@ -1,6 +1,8 @@
+"""
+ Profile Page app API URLs.
+"""
 from django.urls import path
 from profile_page.api import api
-from . import views
 
 urlpatterns = [
     # Profile Page API Calls for Authentication

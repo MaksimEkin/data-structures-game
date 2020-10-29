@@ -2,19 +2,17 @@
 Run: python manage.py test game_board.api.tests_api
 Reference: https://www.django-rest-framework.org/api-guide/testing/
 """
-
-from django.test import TestCase
-from rest_framework.test import APIClient
-from game_board import config
-from game_board.database import game_board_db as db
 from time import sleep
 import random
 import string
 import json
+from django.test import TestCase
+from game_board import config
+from game_board.database import game_board_db as db
 
 
 class BColors:
-    # Colors for printing
+    """ "Colors for printing"""
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
     OKCYAN = '\033[96m'
@@ -27,6 +25,8 @@ class BColors:
 
 
 class APIOverview(TestCase):
+    """Tests calls related to the overview of the API."""
+
     def test_index_loads_properly(self):
         """The index page loads properly"""
 
@@ -36,6 +36,8 @@ class APIOverview(TestCase):
 
 
 class StartGame(TestCase):
+    """Tests the API calls that is related to starting games."""
+
     def test_invalid_api_request(self):
         """Invalid API request fields"""
 
@@ -56,13 +58,13 @@ class StartGame(TestCase):
         fail = False
 
         print(f"{BColors.OKBLUE}\t[i]\tStarting 20 games and ending them...{BColors.ENDC}")
-        for ii in range(20):
+        for _ in range(20):
             try:
                 # Create players
                 difficulty = random.choice(config.DIFFICULTY_LEVELS)
                 players = list()
                 num_players = random.randint(1, 4)
-                for num in range(num_players):
+                for _ in range(num_players):
                     name = random.choice(string.ascii_letters)
                     players.append("ID" + str(name))
                 players = ','.join(players)
@@ -78,10 +80,10 @@ class StartGame(TestCase):
                 sleep(0.2)
                 db.remove_game(response.data['game_id'])
 
-            except Exception as e:
-                print(f"{BColors.FAIL}\t[-]\tFail creating games: {BColors.ENDC}", str(e))
+            except Exception as err:
+                print(f"{BColors.FAIL}\t[-]\tFail creating games: {BColors.ENDC}", str(err))
                 fail = True
-        if fail == False:
+        if not fail:
             print(f"{BColors.OKGREEN}\t[+]\tPass generating games.{BColors.ENDC}")
 
     def test_game_board_state(self):
@@ -118,6 +120,8 @@ class StartGame(TestCase):
 
 
 class Action(TestCase):
+    """Tests API calls realted to card actions on the board."""
+
     def test_invalid_card(self):
         """Test if API will accept playing an invalid action"""
 
@@ -144,6 +148,8 @@ class Action(TestCase):
 
 
 class Rebalance(TestCase):
+    """Tests the API calls that are related to balancing of the AVL tree."""
+
     def test_invalid_rebalance(self):
         """Test if API will accept playing an invalid action"""
 
@@ -161,9 +167,11 @@ class Rebalance(TestCase):
         # remove the created game
         sleep(0.2)
         db.remove_game(created_game.data['game_id'])
-        
-        
+
+
 class PlayGame(TestCase):
+    """Simulates game plays."""
+
     def setUp(self):
         # create a new game
         self.game = self.client.get('/game_board/api/start_game/Easy/ID1,ID2,ID3/AVL').data
@@ -177,7 +185,7 @@ class PlayGame(TestCase):
         print(f"{BColors.OKBLUE}\t[i]\tSimulating a simple game play (max 50 rounds)...{BColors.ENDC}")
         game_ended = False
 
-        for ii in range(50):
+        for _ in range(50):
             sleep(0.5)
             board = self.client.get('/game_board/api/board/' + str(self.game['game_id'])).data
 
@@ -232,5 +240,5 @@ class PlayGame(TestCase):
 
                     break
 
-        if game_ended == False:
+        if not game_ended:
             print(f"{BColors.OKGREEN}\t[+]\tPass simulating a game. Reach max iterations.{BColors.ENDC}")
