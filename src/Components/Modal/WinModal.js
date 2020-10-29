@@ -1,6 +1,6 @@
 //JS file for modal that displays when game ends
 import React, { Component } from 'react';
-import {Button, Dialog} from "@material-ui/core";
+import {Button, Modal} from "react-bootstrap";
 
 class WinModal extends Component {
 
@@ -12,8 +12,16 @@ class WinModal extends Component {
 
     return (
         <div>
-            <Button onClick={() => { alert('closed')}} > Click me </Button>
-            <h1> Testing Modal </h1>
+            <Button> Open Modal </Button>
+            <Modal show={true} >
+            <Modal.Header> GAME OVER </Modal.Header>
+            <Modal.Body> This is the body </Modal.Body>
+
+            <Modal.Footer>
+                This is the footer
+            </Modal.Footer>
+
+            </Modal>
         </div>
         );
 }
