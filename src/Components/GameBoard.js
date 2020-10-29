@@ -3,6 +3,7 @@ import ReactDOM from "react-dom";
 import { Button, Grid, Typography, Card, CardHeader, CardActions, CardActionArea, CardContent, Chip } from '@material-ui/core';
 import {create_adjacency, create_graph} from './CreateGraphAdj.js';
 import Cookies from 'universal-cookie';
+import WinModal from './Modal/WinModal.js';
 
 
 //Uber's digraph react folder
@@ -483,6 +484,12 @@ class GameBoard extends Component {
     let card_1 = null;
     let card_2 = null;
     let card_3 = null;
+
+    //TODO: FOR TESTING PURPOSES ONLY - NEED TO CHANGE LATER
+    let game_over = true;
+    if (game_over){
+      return <WinModal/>
+    }
 
     //if loading is completed, statically store cards
     if (!this.state.loading) {
