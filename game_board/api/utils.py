@@ -63,14 +63,15 @@ def update_board_db(board):
 
         # Game continues
         else:
-            _ = db.update_game(board['game_id'], board)
-
-            # hide the UID used by data structure backend from user
-            del board['graph']['uid']
 
             # Next player's turn
             next_player_index = (board['player_ids'].index(board['turn']) + 1) % len(board['player_ids'])
             board['turn'] = board['player_ids'][next_player_index]
+
+            _ = db.update_game(board['game_id'], board)
+
+            # hide the UID used by data structure backend from user
+            del board['graph']['uid']
 
             # Update
             result['game_board'] = board
