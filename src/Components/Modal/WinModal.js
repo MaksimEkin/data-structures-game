@@ -1,5 +1,6 @@
 //JS file for modal that displays when game ends
 import React, { Component } from 'react';
+import {Button, Dialog} from "@material-ui/core";
 
 class WinModal extends Component {
 
@@ -9,7 +10,12 @@ class WinModal extends Component {
 
     render() {
 
-    return (<h1> Testing Modal </h1>);
+    return (
+        <div>
+            <Button onClick={() => { alert('closed')}} > Click me </Button>
+            <h1> Testing Modal </h1>
+        </div>
+        );
 }
 }
 
