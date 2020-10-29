@@ -20,7 +20,7 @@ The Data Structures Game is a competitive online game. The goal of this game is 
  - Mac
     - ```nano ~/.bash_profile``` and add the variables at the bottom. Close, and save.
     - ```source ~/.bash_profile``` to use the changed bash profile. 
-    - ```source activate dsg``` to change it back to the virtual environment.
+    - ```source activate dsg``` to change it back to the virtual environment (or ```conda activate dsg```).
     - ```env``` to check the variables. It should print them on the console.
 - [Windows](https://docs.oracle.com/en/database/oracle/r-enterprise/1.5.1/oread/creating-and-modifying-environment-variables-on-windows.html#GUID-DD6F9982-60D5-48F6-8270-A27EC53807D0)
    
@@ -39,13 +39,16 @@ Cross-origins calls are blocked due to a header that is in place to protect agai
 10. Run from the root directory of the project:
 - ```python manage.py runserver``` and visit ```http://127.0.0.1:8000```
 11. If you recieve security warnings resulting from Mimetype or cross-origin, run with below instead:
-- ```python manage.py --insecure runserver``` and visit ```http://127.0.0.1:8000```
+- ```python manage.py runserver --insecure``` and visit ```http://127.0.0.1:8000```
 
 ## Developer Test Suites
 
 - **Game Board API**
     - Located at [game_board/api/tests_api.py](https://github.com/MaksimEkin/data-structures-game/tree/master/game_board/api/tests_api.py)
     - Run from the root directory of the project with ```python manage.py test game_board.api.tests_api```
+- **Profile Page API**
+    - Located at [profile_page/api/tests_api.py](https://github.com/MaksimEkin/data-structures-game/tree/master/profile_page/api/tests_api.py)
+    - Run from the root directory of the project with ```python manage.py test profile_page.api.tests_api```
 - **Game Board Database**
     - Located at [game_board/database/test_db.py](https://github.com/MaksimEkin/data-structures-game/tree/master/game_board/database/test_db.py)
     - Run from the root directory of the project with ```python manage.py test game_board.database.test_db```

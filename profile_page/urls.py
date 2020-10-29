@@ -11,6 +11,9 @@ urlpatterns = [
     path('api/login', api.login, name='profile-page-login'),
     path('api/logout', api.logout, name='profile-page-logout'),
 
+    # Get all profile information
+    path('api/profile', api.profile, name='profile-page-profile'),
+
     # Game Board Import/Export API calls
     path('api/save_board', api.save_board, name='profile-save_board'),
     path('api/delete_board', api.delete_board, name='profile-delete_board'),
