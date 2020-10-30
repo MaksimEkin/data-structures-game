@@ -41,3 +41,10 @@
   padding: 15px 32px;
   font-weight: bold;
 }
+nav{
+  display:flex;
+  justify-content:space-around;
+  align-items: center;
+  min-height: 8vh;
+  
+}

@@ -40,7 +40,7 @@ class Home extends Component{
             }}
           />
 
-        <h1 className="font-bold text-2xl"> Home</h1>
+        <h1 >Start Game</h1>
         <Button>
         <GameInfo
         level = {this.state.difficulty}

@@ -34,6 +34,7 @@ const reactLocal = "http://localhost:3000/"
 const remote = "https://data-structures-game.herokuapp.com/";
 
 //can also be const url = local; or const url = reactLocal;
+//const url = remote;
 const url = remote;
 
 const sample = {
@@ -85,6 +86,7 @@ class GameBoard extends Component {
 
        //get cookie variables from state and insert into url
        let createGameURL = url+"game_board/api/start_game/" + difficulty + "/" + players + "/" + ds
+       
        let getGameURL = url+"game_board/api/board/";
 
        //get request to get game id
