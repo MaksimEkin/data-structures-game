@@ -14,7 +14,11 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
+<<<<<<< HEAD
   "/precache-manifest.bb5502e76878bca71c5267645204d466.js"
+=======
+  "/precache-manifest.6361c356e41be384654c6c42d86b8233.js"
+>>>>>>> removed code that may be stopping my fetch request
 );
 
 self.addEventListener('message', (event) => {
