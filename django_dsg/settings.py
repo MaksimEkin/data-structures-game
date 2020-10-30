@@ -36,6 +36,7 @@ ALLOWED_HOSTS = [os.environ.get('ALLOWED_HOSTS_1')]
 # Application definition
 
 INSTALLED_APPS = [
+    # Django Apps
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -43,8 +44,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+
+    # The Data Structure Game Apps
     'home_page',
-    'game_board'
+    'game_board',
+    'profile_page'
 ]
 
 MIDDLEWARE = [

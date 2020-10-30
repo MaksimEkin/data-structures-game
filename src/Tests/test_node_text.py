@@ -11,16 +11,18 @@ How to run:
     1) Run Django: python manage.py runserver
     2) Run the test: python -m unittest test_node_text.py
 """
+import json
+import unittest
+from time import sleep
+import requests
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.common.by import By
-from time import sleep
-import requests
-import json
-import unittest
+
 
 class TestStringMethods(unittest.TestCase):
+    """Tests contents of the nodes in front-end."""
 
     def setUp(self):
         """Setup the test"""
@@ -57,8 +59,8 @@ class TestStringMethods(unittest.TestCase):
         # Extract each point and node ID from the website as text
         for point in node_points:
             self.points.append(int(point.text))
-        for id in node_ids:
-            self.ids.append(id.text)
+        for id_ in node_ids:
+            self.ids.append(id_.text)
 
         # Get cookies
         cookies = self.driver.get_cookies()

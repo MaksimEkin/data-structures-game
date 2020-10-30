@@ -1,7 +1,8 @@
+"""
+    Home Page application view. Loads the home page from React.
+"""
 from django.shortcuts import render
-from django.http import HttpResponse
-from django.views.generic import TemplateView
 
 def home(request):
+    """Return React front-end."""
     return render(request, 'index.html')
-
