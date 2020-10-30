@@ -12,7 +12,7 @@ from game_board.database import game_board_db as db
 
 
 class BColors:
-    """ "Colors for printing"""
+    """Colors for printing"""
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
     OKCYAN = '\033[96m'
@@ -44,7 +44,7 @@ class StartGame(TestCase):
         # Test non existing difficulty level
         response = self.client.get('/game_board/api/start_game/Super Easy/ID1/AVL')
 
-        self.assertEqual(response.status_code, 400, msg=f'{BColors.FAIL}\t[-]\tResponse was not 200!{BColors.ENDC}')
+        self.assertEqual(response.status_code, 400, msg=f'{BColors.FAIL}\t[-]\tResponse was not 400!{BColors.ENDC}')
         print(f"{BColors.OKGREEN}\t[+]\tPass returning the correct response code.{BColors.ENDC}")
 
         self.assertEqual(response.data, {'error': 'Difficulty level not found!',

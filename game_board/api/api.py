@@ -189,6 +189,6 @@ def action(request, card, game_id):
         return Response({'error': response_status['reason']},
                         status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    response_board = response_status['game_board']
+    board_response = response_status['game_board']
 
-    return Response(response_board)
+    return Response(board_response)
