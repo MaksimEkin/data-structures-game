@@ -22,7 +22,8 @@
     "react-router-dom": "^5.2.0",
     "react-scripts": "^4.0.0",
     "tailwindcss": "^1.8.12",
-    "universal-cookie": "^4.0.4"
+    "universal-cookie": "^4.0.4",
+    "sweetalert2": "^10.9.0"
   },
   "scripts": {
     "build:css": "postcss src/index.css -o src/tailwind.css",

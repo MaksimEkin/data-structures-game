@@ -1,6 +1,8 @@
 //JS file for modal that displays when game ends
 import React, { Component } from 'react';
-import {Button, Modal} from "react-bootstrap";
+//import {Button, Modal} from "react-bootstrap";
+import Swal from "sweetalert2"
+import Party_Face from "../Party Face.svg"
 
 class WinModal extends Component {
 
@@ -9,8 +11,14 @@ class WinModal extends Component {
     }
 
     render() {
+        Swal.fire({
+            title: "Congrats! You are the Data Structures Wizard",
+            imageUrl: Party_Face
+        });
+        return (<h1> For return </h1>)
 
-    return (
+
+    /*return (
         <div>
             <Button> Open Modal </Button>
             <Modal show={true} >
@@ -23,7 +31,7 @@ class WinModal extends Component {
 
             </Modal>
         </div>
-        );
+        );*/
 }
 }
 
