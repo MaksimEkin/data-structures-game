@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import "./styles.css";
 import Particles from 'react-particles-js';
-import { Button, Grid, Typography, Card, CardHeader, CardActions, CardActionArea, CardContent, Chip } from '@material-ui/core';
+import { Button} from '@material-ui/core';
 import GameInfo from './Modal/GameInfo.js'
 //this function is called from App.js to start the interface of the game
 //calls the GameInfo modal to get the new game's information

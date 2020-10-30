@@ -1,11 +1,7 @@
 import React, { useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBars } from '@fortawesome/free-solid-svg-icons'
-import Home from './Home'
-import GameBoard from './GameBoard';
-import LogIn from './LogIn';
-import {Route, Link, Switch} from "react-router-dom";
-import { BrowserRouter as Router } from 'react-router-dom'
+
 
 function Navigation(){
     //react hook to click and expand/minimize menu

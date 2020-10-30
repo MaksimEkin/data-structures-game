@@ -1,11 +1,11 @@
 //import React from 'react';
-import React, { Component } from "react";
+import React from "react";
 import GameBoard from './Components/GameBoard'
 import Home from './Components/Home'
 import Header from './Components/Header';
 import {Route, Link, Switch} from "react-router-dom";
 import { BrowserRouter as Router } from 'react-router-dom'
-import Navigation from './Components/Navigation'
+
  
 function App(){
   return (
