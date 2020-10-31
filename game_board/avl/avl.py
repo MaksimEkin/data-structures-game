@@ -93,7 +93,7 @@ class AVLTree():
         if root and root.nid != nid:
             if root.left and not root.right:  # go left only
                 root.left = self.delete_node_id(root.left, nid, balance)
-            elif not root.left and root.right:  # go left only
+            elif not root.left and root.right:  # go right only
                 root.right = self.delete_node_id(root.right, nid, balance)
             elif root.left and root.right:  # do both
                 root.left = self.delete_node_id(root.left, nid, balance)
@@ -101,10 +101,10 @@ class AVLTree():
             else:  # do neither
                 return root
 
-        elif not root:
-            return root
+        # elif not root:
+        #     return root
 
-        else:
+        elif root and root.nid == nid:
             if root.left is None:
                 temp = root.right
                 root = None
@@ -246,7 +246,8 @@ class AVLTree():
                            self.getHeight(y.right))
         return y
 
-    def getHeight(self, root):
+    @staticmethod
+    def getHeight(root):
         """ get the height of the node """
         if not root:
             return 0

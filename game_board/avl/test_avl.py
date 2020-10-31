@@ -13,7 +13,9 @@ from random import randint
 from random import seed
 
 ### TEST CONSTANTS ###
-NUM_CALLS = 1000
+NUM_CALLS = 750
+HEIGHT = [3, 12]  # test trees with 9 - 2049 nodes
+POINT_CAP = 100
 
 
 class BColors:
@@ -81,6 +83,55 @@ def check_balance(root):
     return False
 
 
+def create_adj_elem(root):
+    """ Small helper function to add left/right nodes to adj list """
+    out = []
+    if root.left is not None:
+        out.append('node' + str(root.left.nid))
+    if root.right is not None:
+        out.append('node' + str(root.right.nid))
+
+    return out
+
+
+def adj_generator(root):
+    """ Generator helper used to verify adjacency list """
+    if root.left:
+        for elem in adj_generator(root.left):
+            node = list(elem.keys())[0]
+            sub = create_adj_elem(node)
+            yield {node: sub}
+
+    sub = create_adj_elem(root)
+    yield {root: sub}
+    if root.right:
+        for elem in adj_generator(root.right):
+            node = list(elem.keys())[0]
+            sub = create_adj_elem(node)
+            yield {node: sub}
+
+
+def check_adjacency_list(root, adjacency_list):
+    """ Iteratively check accuracy of adjacency list of a tree
+
+    Returns true if adjacency list accurately reflects tree structure
+    Returns false otherwise
+    """
+    if root is None:  # null tree, list should not exist
+        return False
+
+    for elem in adj_generator(root):
+        key = list(elem.keys())[0]
+        root_id = key.nid
+
+        adj_key = 'node' + str(root_id)
+        if adj_key in adjacency_list and adjacency_list[adj_key] == elem[key]:
+            continue
+        else:
+            return False
+    return True
+
+
 def get_height(root):
     """ Get height of a node
 
@@ -98,8 +149,8 @@ class AVLNewGeneration(TestCase):
     def new_handler(self):
         """ create new handler to test """
         seed(datetime.now())  # im so random
-        height = randint(3, 12)  # test trees with 9 - 2049 nodes
-        handler = AVLHandler.from_scratch(height, 100)
+        height = randint(HEIGHT[0], HEIGHT[1])
+        handler = AVLHandler.from_scratch(height, POINT_CAP)
         return handler
 
     def test_golden_new(self):
@@ -177,8 +228,8 @@ class AVLOldGeneration(TestCase):
     def new_handler(self):
         """ create new handler to test """
         seed(datetime.now())  # im so random
-        height = randint(3, 12)  # test trees with 9 - 2049 nodes
-        scratch = AVLHandler.from_scratch(height, 100)
+        height = randint(HEIGHT[0], HEIGHT[1])
+        scratch = AVLHandler.from_scratch(height, POINT_CAP)
         state = scratch.get_gamestate()
         handler = AVLHandler.from_graph(state)
         return handler
@@ -258,8 +309,8 @@ class AVLModification(TestCase):
     def new_handler(self):
         """ create new handler to test, modify it a little """
         seed(datetime.now())  # im so random
-        height = randint(3, 12)  # test trees with 9 - 2049 nodes
-        handler = AVLHandler.from_scratch(height, 100)
+        height = randint(HEIGHT[0], HEIGHT[1])
+        handler = AVLHandler.from_scratch(height, POINT_CAP)
 
         num_adds = randint(1, height)  # add (1, height) nodes
         num_dels = randint(1, height)  # del (1, height) nodes
@@ -340,6 +391,7 @@ class AVLModification(TestCase):
         print(
             f"{BColors.OKGREEN}\t[+]\tModification: Validated that balance bool is updated in {successes} trees.{BColors.ENDC}")
 
+
     def test_rebalance(self):
         """ make sure tree will rebalance when built from graph """
         successes = 0
@@ -361,3 +413,25 @@ class AVLModification(TestCase):
                          msg=f'{BColors.FAIL}\n\t[-]\tModification: Failed to correctly rebalance deserialized tree! {failures}/{iterations} failures! {BColors.ENDC}')
         print(
             f"{BColors.OKGREEN}\t[+]\tModification: Validated deserialization rebalancing in {successes} trees.{BColors.ENDC}")
+
+
+    def test_adjacency(self):
+        """ make sure tree will rebalance when built from graph """
+        successes = 0
+        failures = 0
+        iterations = NUM_CALLS
+
+        for i in range(iterations):
+
+            handler = self.new_handler()
+            state = handler.get_gamestate()
+            ret = check_adjacency_list(handler.root, state['adjacency_list'])
+            if (ret == True):
+                successes += 1
+            else:
+                failures += 1
+
+        self.assertEqual(failures, 0,
+                         msg=f'{BColors.FAIL}\n\t[-]\tModification: Failed to correctly generate adjacency list! {failures}/{iterations} failures! {BColors.ENDC}')
+        print(
+            f"{BColors.OKGREEN}\t[+]\tModification: Validated adjacency list generation in {successes} trees.{BColors.ENDC}")
