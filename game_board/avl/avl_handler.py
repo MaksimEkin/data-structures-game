@@ -1,17 +1,17 @@
 """ Handles AVL tree state """
 
 import re
-from .avl import TreeNode
 from .avl import AVLTree
 from random import seed
 from random import randint
 from random import choice
 
 
-# seed(42)  # fixed seed for debugging
+seed(42)  # fixed seed for debugging
 
 
 def tryint(s):
+    """ try casting s to an int. if exception occurs, return s unchanged """
     try:
         return int(s)
     except ValueError:
@@ -27,15 +27,19 @@ def alphanum_key(s):
 
 
 class AVLHandler(object):
-
+    """ Mediary between AVL and API"""
     def __init__(self):
-
         self.root = None
         self.tree = None
+        self.uid = None  # unique id tracker
+        self.golden_id = None  # id of golden node
+        self.point_cap = None
+        self.expected_height = None
+        self.balanced = True
 
     @classmethod
     def from_scratch(cls, expected_height, point_cap):
-
+        """ create new AVL tree with random insertions """
         if expected_height <= 1:
             raise Exception(f"Argument 'expected_height' given invalid value: {expected_height} Must be >1")
         if point_cap <= 2:
@@ -44,7 +48,6 @@ class AVLHandler(object):
         handler = cls()
         handler.uid = 0
         handler.golden_id = None  # id of golden node
-        handler.balanced = True  # currently balancing is done in tandem when insert/remove is called
         handler.point_cap = point_cap
         handler.expected_height = expected_height
         handler.__generate_board()  # generate new game board at runtime
@@ -52,7 +55,7 @@ class AVLHandler(object):
 
     @classmethod
     def from_graph(cls, graph):
-
+        """ deserialize existing tree from adjacency list """
         # verify graph has correct keys
         expected_keys = ['adjacency_list', 'node_points', 'gold_node',
                          'root_node', 'balanced', 'uid']
@@ -74,7 +77,7 @@ class AVLHandler(object):
 
         self.tree = AVLTree()
         self.addNewNode(randint(1, self.point_cap))
-        while (self.root.height < self.expected_height):
+        while self.root.height < self.expected_height:
             self.addNewNode(randint(1, self.point_cap))
 
         allUIDs = list(range(self.uid))  # randomly choose golden node
@@ -139,13 +142,14 @@ class AVLHandler(object):
         return out_dict
 
     def debug_print(self, use_id=False):
-        # print(f"Tree with {self.num_nodes} nodes. . .")
+        """ print tree for debugging """
         if use_id:
             self.tree.printIds(self.root, "", True)
         else:
             self.tree.printKeys(self.root, "", True)
 
     def debug_wrapper(self):
+        """ extra info to be printed for debugging """
         self.debug_print(use_id=False)
         print('\n\nNow with ids. . .')
         self.debug_print(use_id=True)
@@ -166,7 +170,6 @@ def avlNew(height, point_cap, debug=False):
 
 def avlAction(command, graph, debug=False):
     """ take an action on the tree """
-
     handler = AVLHandler.from_graph(graph)
     c, t = command.split()  # get command and target
     if c == 'Delete':
@@ -188,8 +191,8 @@ def avlAction(command, graph, debug=False):
 
 
 def avlRebalance(graph, debug=False):
+    """ rebalance graph and return """
     handler = AVLHandler.from_graph(graph)
     if debug:
         handler.debug_wrapper()
     return handler.get_gamestate()
-    """ rebalance graph and return """
