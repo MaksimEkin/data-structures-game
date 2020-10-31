@@ -1,10 +1,10 @@
 """ Handles AVL tree state """
 
 import re
-from .avl import AVLTree
 from random import seed
-from random import randint
 from random import choice
+from random import randint
+from .avl import AVLTree
 
 
 seed(42)  # fixed seed for debugging
@@ -26,7 +26,7 @@ def alphanum_key(s):
     return [tryint(c) for c in re.split('([0-9]+)', s)]
 
 
-class AVLHandler(object):
+class AVLHandler():
     """ Mediary between AVL and API"""
     def __init__(self):
         self.root = None
@@ -50,7 +50,7 @@ class AVLHandler(object):
         handler.golden_id = None  # id of golden node
         handler.point_cap = point_cap
         handler.expected_height = expected_height
-        handler.__generate_board()  # generate new game board at runtime
+        handler.generate_board()  # generate new game board at runtime
         return handler
 
     @classmethod
@@ -67,10 +67,10 @@ class AVLHandler(object):
         handler.uid = tryint(graph['uid'])
         handler.golden_id = tryint(graph['gold_node'][4:])  # remove 'node' from id
         handler.balanced = graph['balanced']
-        handler.__parse_graph(graph)  # deserialize graph
+        handler.parse_graph(graph)  # deserialize graph
         return handler
 
-    def __generate_board(self):
+    def generate_board(self):
         """ generate game board if it doesnt exists """
         if self.tree:
             return
@@ -84,7 +84,7 @@ class AVLHandler(object):
         allUIDs.remove(self.root.nid)
         self.golden_id = choice(allUIDs)
 
-    def __parse_graph(self, graph):
+    def parse_graph(self, graph):
         """ deseralize tree from existing tree graph """
         if self.tree:
             return

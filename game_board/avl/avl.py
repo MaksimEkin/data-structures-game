@@ -191,13 +191,7 @@ class AVLTree():
                 self.getAdjList_helper(root.right, adj)
                 adj['node' + str(root.nid)].append('node' + str(root.left.nid))
                 adj['node' + str(root.nid)].append('node' + str(root.right.nid))
-            # else:
-            #     return
-
             return adj
-
-        # else:
-        #     return
 
     # DEPRECATED METHOD - USE ADJACENCY LIST
     def getNewick(self, root):
