@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {Button, Grid, TextField} from '@material-ui/core';
 import Cookies from 'universal-cookie';
-
+import {Link} from "react-router-dom";
 //set the construct by sharing/setting the constructor states between
 // Home and GameInfo & bind the state value's to the input change that happens
 class GameInfo extends React.Component {
@@ -61,8 +61,14 @@ render(){
                     style={{ marginBottom: '1em' }}
                 />
 
-                <button type="submit">Sign In</button>
-             </form>
+                <ul>
+                <li>
+                    <Link className="text-blue-500 py-3 border-t border-b block" to="/game_board" name="start_game">
+                        Start Game</Link>
+                    </li>
+                </ul>
+                </form>
+
              </span>
 
     );
