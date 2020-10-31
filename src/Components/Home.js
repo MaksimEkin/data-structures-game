@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import "./styles.css";
+import {Link} from "react-router-dom";
 import Particles from 'react-particles-js';
 import { Button, Grid, Typography, Card, CardHeader, CardActions, CardActionArea, CardContent, Chip } from '@material-ui/core';
 import GameInfo from './Modal/GameInfo.js'
@@ -48,6 +49,14 @@ class Home extends Component{
         gameDS={this.state.data_structure}
         />
     </Button>
+    <form>
+      <ul>
+    <li>
+          <Link className="text-blue-500 py-3 border-t border-b block" to="/game_board" name="start_game">
+            Start Game</Link>
+        </li>
+      </ul>
+    </form>
     </div>
     )
 }

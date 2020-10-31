@@ -1,9 +1,9 @@
 //import React from 'react';
-import React, { Component } from "react";
+import React from "react";
 import GameBoard from './Components/GameBoard'
 import Home from './Components/Home'
 import Header from './Components/Header';
-import {Route, Link, Switch} from "react-router-dom";
+import {Route, Switch} from "react-router-dom";
 import { BrowserRouter as Router } from 'react-router-dom'
 //react router used to make this web app multiple pages instead of single page application
 function App(){
