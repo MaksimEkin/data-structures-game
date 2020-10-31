@@ -191,13 +191,13 @@ class AVLTree():
                 self.getAdjList_helper(root.right, adj)
                 adj['node' + str(root.nid)].append('node' + str(root.left.nid))
                 adj['node' + str(root.nid)].append('node' + str(root.right.nid))
-            else:
-                return
+            # else:
+            #     return
 
             return adj
 
-        else:
-            return
+        # else:
+        #     return
 
     # DEPRECATED METHOD - USE ADJACENCY LIST
     def getNewick(self, root):
@@ -260,7 +260,7 @@ class AVLTree():
 
     def printKeys(self, currPtr, indent, last):
         """ Debug print key values """
-        if currPtr != None:
+        if currPtr is not None:
             sys.stdout.write(indent)
             if last:
                 sys.stdout.write("R----")
@@ -274,7 +274,7 @@ class AVLTree():
 
     def printIds(self, currPtr, indent, last):
         """ Debug print id values """
-        if currPtr != None:
+        if currPtr is not None:
             sys.stdout.write(indent)
             if last:
                 sys.stdout.write("R----")
