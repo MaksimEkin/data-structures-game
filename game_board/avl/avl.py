@@ -6,7 +6,8 @@ Game for CMSC 447, Fall 2020. The code was adapted from: https://www.programiz.c
 
 import sys
 
-class TreeNode(object):
+class TreeNode():
+    """ data structure for AVL nodes """
     def __init__(self, key, nid):
         self.key = key
         self.left = None
@@ -15,7 +16,9 @@ class TreeNode(object):
         self.nid = nid
 
 
-class AVLTree(object):
+class AVLTree():
+    """ AVL tree implementation for Data Structures Game """
+
     def insert_node(self, root, key, nid, balance=True):
         """ recursively insert new node
 
@@ -35,7 +38,7 @@ class AVLTree(object):
                               self.getHeight(root.right))
 
         if balance:
-            return (self.rebalance(root))
+            return self.rebalance(root)
         else:
             return root
 
@@ -75,7 +78,7 @@ class AVLTree(object):
 
         # Update the balance factor and balance the tree
         if balance:
-            return (self.rebalance(root))
+            return self.rebalance(root)
         else:
             return root
 
@@ -122,7 +125,7 @@ class AVLTree(object):
 
         # Update the balance factor and balance the tree
         if balance:
-            return (self.rebalance(root))
+            return self.rebalance(root)
         else:
             return root
 
