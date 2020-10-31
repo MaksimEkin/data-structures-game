@@ -55,7 +55,7 @@ def check_heights(root):
     """
 
     if root:
-        return (root.height == get_height(root))
+        return root.height == get_height(root)
         check_height(root.left)
         check_height(root.right)
     return True
@@ -159,7 +159,7 @@ class AVLNewGeneration(TestCase):
         failures = 0
         iterations = NUM_CALLS
 
-        for i in range(iterations):
+        for _ in range(iterations):
 
             handler = self.new_handler()
             ret = check_golden(handler)
@@ -173,7 +173,8 @@ class AVLNewGeneration(TestCase):
             print('\n=================================================\n')
 
         self.assertEqual(failures, 0,
-                         msg=f'{BColors.FAIL}\n\t[-]\tFrom scratch: Failed to correctly generate golden node! {failures}/{iterations} failures! {BColors.ENDC}')
+                         msg=f'{BColors.FAIL}\n\t[-]\tFrom scratch: Failed to correctly generate golden node! ' +
+                             f'{failures}/{iterations} failures! {BColors.ENDC}')
         print(
             f"{BColors.OKGREEN}\t[+]\tFrom scratch: Validated correct golden node generation in {successes} trees.{BColors.ENDC}")
 
@@ -183,7 +184,7 @@ class AVLNewGeneration(TestCase):
         failures = 0
         iterations = NUM_CALLS
 
-        for i in range(iterations):
+        for _ in range(iterations):
 
             handler = self.new_handler()
             ret = check_heights(handler.root)
@@ -193,7 +194,8 @@ class AVLNewGeneration(TestCase):
                 failures += 1
 
         self.assertEqual(failures, 0,
-                         msg=f'{BColors.FAIL}\n\t[-]\tFrom scratch: Failed to correctly generate heights! {failures}/{iterations} failures! {BColors.ENDC}')
+                         msg=f'{BColors.FAIL}\n\t[-]\tFrom scratch: Failed to correctly generate heights! ' +
+                             f'{failures}/{iterations} failures! {BColors.ENDC}')
         print(
             f"{BColors.OKGREEN}\t[+]\tFrom scratch: Validated correct height for all nodes in {successes} trees.{BColors.ENDC}")
 
@@ -203,7 +205,7 @@ class AVLNewGeneration(TestCase):
         failures = 0
         iterations = NUM_CALLS
 
-        for i in range(iterations):
+        for _ in range(iterations):
 
             handler = self.new_handler()
             ret = check_balance(handler.root)
@@ -217,7 +219,8 @@ class AVLNewGeneration(TestCase):
             print('\n=================================================\n')
 
         self.assertEqual(failures, 0,
-                         msg=f'{BColors.FAIL}\n\t[-]\tFrom scratch: Failed to always generate balanced trees! {failures}/{iterations} failures! {BColors.ENDC}')
+                         msg=f'{BColors.FAIL}\n\t[-]\tFrom scratch: Failed to always generate balanced trees! ' +
+                             f'{failures}/{iterations} failures! {BColors.ENDC}')
         print(
             f"{BColors.OKGREEN}\t[+]\tFrom scratch: Validated that all trees all balanced upon generation in {successes} trees.{BColors.ENDC}")
 
@@ -240,7 +243,7 @@ class AVLOldGeneration(TestCase):
         failures = 0
         iterations = NUM_CALLS
 
-        for i in range(iterations):
+        for _ in range(iterations):
 
             handler = self.new_handler()
             ret = check_golden(handler)
@@ -254,7 +257,8 @@ class AVLOldGeneration(TestCase):
             print('\n=================================================\n')
 
         self.assertEqual(failures, 0,
-                         msg=f'{BColors.FAIL}\n\t[-]\tFrom state:   Failed to correctly generate golden node! {failures}/{iterations} failures! {BColors.ENDC}')
+                         msg=f'{BColors.FAIL}\n\t[-]\tFrom state:   Failed to correctly generate golden node! ' +
+                             f'{failures}/{iterations} failures! {BColors.ENDC}')
         print(
             f"{BColors.OKGREEN}\t[+]\tFrom state:   Validated correct golden node generation in {successes} trees.{BColors.ENDC}")
 
@@ -264,7 +268,7 @@ class AVLOldGeneration(TestCase):
         failures = 0
         iterations = NUM_CALLS
 
-        for i in range(iterations):
+        for _ in range(iterations):
 
             handler = self.new_handler()
             ret = check_heights(handler.root)
@@ -274,7 +278,8 @@ class AVLOldGeneration(TestCase):
                 failures += 1
 
         self.assertEqual(failures, 0,
-                         msg=f'{BColors.FAIL}\n\t[-]\tFrom state:   Failed to correctly generate heights! {failures}/{iterations} failures! {BColors.ENDC}')
+                         msg=f'{BColors.FAIL}\n\t[-]\tFrom state:   Failed to correctly generate heights! ' +
+                             f'{failures}/{iterations} failures! {BColors.ENDC}')
         print(
             f"{BColors.OKGREEN}\t[+]\tFrom state:   Validated correct height for all nodes in {successes} trees.{BColors.ENDC}")
 
@@ -284,7 +289,7 @@ class AVLOldGeneration(TestCase):
         failures = 0
         iterations = NUM_CALLS
 
-        for i in range(iterations):
+        for _ in range(iterations):
 
             handler = self.new_handler()
             ret = check_balance(handler.root)
@@ -298,7 +303,8 @@ class AVLOldGeneration(TestCase):
             print('\n=================================================\n')
 
         self.assertEqual(failures, 0,
-                         msg=f'{BColors.FAIL}\n\t[-]\tFrom state:   Failed to always generate balanced trees! {failures}/{iterations} failures! {BColors.ENDC}')
+                         msg=f'{BColors.FAIL}\n\t[-]\tFrom state:   Failed to always generate balanced trees! ' +
+                             f'{failures}/{iterations} failures! {BColors.ENDC}')
         print(
             f"{BColors.OKGREEN}\t[+]\tFrom state:   Validated that all trees all balanced upon generation in {successes} trees.{BColors.ENDC}")
 
@@ -315,10 +321,10 @@ class AVLModification(TestCase):
         num_adds = randint(1, height)  # add (1, height) nodes
         num_dels = randint(1, height)  # del (1, height) nodes
 
-        for i in range(num_adds):
+        for _ in range(num_adds):
             key = randint(1, 100)
             handler.addNewNode(key, b=False)
-        for i in range(num_dels):
+        for _ in range(num_dels):
             nid = randint(0, handler.uid)
             handler.delNodeByID(nid, b=False)
 
@@ -330,7 +336,7 @@ class AVLModification(TestCase):
         failures = 0
         iterations = NUM_CALLS
 
-        for i in range(iterations):
+        for _ in range(iterations):
 
             handler = self.new_handler()
             ret = check_golden(handler, False)  # dont care if root is golden
@@ -344,7 +350,8 @@ class AVLModification(TestCase):
             print('\n=================================================\n')
 
         self.assertEqual(failures, 0,
-                         msg=f'{BColors.FAIL}\n\t[-]\tModification: Failed to keep golden node! {failures}/{iterations} failures! {BColors.ENDC}')
+                         msg=f'{BColors.FAIL}\n\t[-]\tModification: Failed to keep golden node! ' +
+                             f'{failures}/{iterations} failures! {BColors.ENDC}')
         print(f"{BColors.OKGREEN}\t[+]\tModification: Validated golden node in {successes} trees.{BColors.ENDC}")
 
     def test_height_mod(self):
@@ -353,7 +360,7 @@ class AVLModification(TestCase):
         failures = 0
         iterations = NUM_CALLS
 
-        for i in range(iterations):
+        for _ in range(iterations):
 
             handler = self.new_handler()
             ret = check_heights(handler.root)
@@ -363,7 +370,8 @@ class AVLModification(TestCase):
                 failures += 1
 
         self.assertEqual(failures, 0,
-                         msg=f'{BColors.FAIL}\n\t[-]\tModification: Failed to correctly modify heights! {failures}/{iterations} failures! {BColors.ENDC}')
+                         msg=f'{BColors.FAIL}\n\t[-]\tModification: Failed to correctly modify heights! ' +
+                             f'{failures}/{iterations} failures! {BColors.ENDC}')
         print(
             f"{BColors.OKGREEN}\t[+]\tModification: Validated height adjustment for all nodes in {successes} trees.{BColors.ENDC}")
 
@@ -373,7 +381,7 @@ class AVLModification(TestCase):
         failures = 0
         iterations = NUM_CALLS
 
-        for i in range(iterations):
+        for _ in range(iterations):
 
             handler = self.new_handler()
             ret = check_balance(handler.root)
@@ -387,7 +395,8 @@ class AVLModification(TestCase):
             print('\n=================================================\n')
 
         self.assertEqual(failures, 0,
-                         msg=f'{BColors.FAIL}\n\t[-]\tModification: Failed to modify balance factor correctly! {failures}/{iterations} failures! {BColors.ENDC}')
+                         msg=f'{BColors.FAIL}\n\t[-]\tModification: Failed to modify balance factor correctly! ' +
+                             f'{failures}/{iterations} failures! {BColors.ENDC}')
         print(
             f"{BColors.OKGREEN}\t[+]\tModification: Validated that balance bool is updated in {successes} trees.{BColors.ENDC}")
 
@@ -398,7 +407,7 @@ class AVLModification(TestCase):
         failures = 0
         iterations = NUM_CALLS
 
-        for i in range(iterations):
+        for _ in range(iterations):
 
             handler = self.new_handler()
             state = handler.get_gamestate()
@@ -410,7 +419,8 @@ class AVLModification(TestCase):
                 failures += 1
 
         self.assertEqual(failures, 0,
-                         msg=f'{BColors.FAIL}\n\t[-]\tModification: Failed to correctly rebalance deserialized tree! {failures}/{iterations} failures! {BColors.ENDC}')
+                         msg=f'{BColors.FAIL}\n\t[-]\tModification: Failed to correctly rebalance deserialized tree! '
+                             f'{failures}/{iterations} failures! {BColors.ENDC}')
         print(
             f"{BColors.OKGREEN}\t[+]\tModification: Validated deserialization rebalancing in {successes} trees.{BColors.ENDC}")
 
@@ -421,7 +431,7 @@ class AVLModification(TestCase):
         failures = 0
         iterations = NUM_CALLS
 
-        for i in range(iterations):
+        for _ in range(iterations):
 
             handler = self.new_handler()
             state = handler.get_gamestate()
@@ -432,6 +442,7 @@ class AVLModification(TestCase):
                 failures += 1
 
         self.assertEqual(failures, 0,
-                         msg=f'{BColors.FAIL}\n\t[-]\tModification: Failed to correctly generate adjacency list! {failures}/{iterations} failures! {BColors.ENDC}')
+                         msg=f'{BColors.FAIL}\n\t[-]\tModification: Failed to correctly generate adjacency list! ' +
+                             f'{failures}/{iterations} failures! {BColors.ENDC}')
         print(
             f"{BColors.OKGREEN}\t[+]\tModification: Validated adjacency list generation in {successes} trees.{BColors.ENDC}")
