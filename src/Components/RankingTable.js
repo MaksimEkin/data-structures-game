@@ -8,14 +8,14 @@ export const RankingTable = () => {
 	const columns = useMemo(() => COLUMNS, [])
 	const data = useMemo(() => MOCK_DATA, [])
 
-	const {
+	const {  // set up table instance
 		getTableProps,
 		getTableBodyProps,
 		headerGroups,
 		footerGroups, 
 		rows,
 		prepareRow,
-	} = useTable({
+	} = useTable({  // define initial sort of data (highest score first on default)
 		columns,
 		data,
 		initialState: {
@@ -27,13 +27,13 @@ export const RankingTable = () => {
 	return (
 		<table {...getTableProps()}>
 			<thead>
-				{headerGroups.map((headerGroup) => (
+				{headerGroups.map((headerGroup) => ( /* render the header */
 					<tr {...headerGroup.getHeaderGroupProps()}>
 						{headerGroup.headers.map((column) => (
-							<th {...column.getHeaderProps(column.getSortByToggleProps())}>
+							<th {...column.getHeaderProps(column.getSortByToggleProps())}> 
 							  {column.render('Header')}
-							  <span>
-								  {column.isSorted ? (column.isSortedDesc ? ' ⬇️' : ' ⬆️') : ''}
+							  <span /* make sorting */> 
+								  {column.isSorted ? (column.isSortedDesc ? ' ⬇️' : ' ⬆️') : ''} 
 							  </span>
 							</th>
 						))}
