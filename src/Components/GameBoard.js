@@ -434,11 +434,22 @@ class GameBoard extends Component {
 
   //for playing first card (one displayed on far left)
   playCard = (card) => {
-    const cookies = new Cookies();
-    cookies.set('selectedCard', card, { path: '/' });
+    const cookies = new Cookies()
+    cookies.set('selectedCard', card, { path: '/' })
     this.apiCall()
+
+    //check if game is over
+    this.checkGameStatus()
   }
 
+  //check if game is over (ie: is golden node at the root of the tree?)
+  checkGameStatus = () => {
+    if (this.state.board['graph']['gold_node'] === this.state.board['graph']['root_node']){
+      this.setState({game_over: true})
+    }
+  }
+
+  //modularize the api call for playing card
   apiCall = async () => {
     const cookies = new Cookies();
     let selectedCard = cookies.get('selectedCard');
