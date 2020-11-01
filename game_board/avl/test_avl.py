@@ -10,7 +10,7 @@ from django.test import TestCase
 from game_board.avl.avl_handler import AVLHandler
 
 ### TEST CONSTANTS ###
-NUM_CALLS = 500
+NUM_CALLS = 100
 HEIGHT = [3, 12]  # test trees with 9 - 2049 nodes
 POINT_CAP = 100
 
