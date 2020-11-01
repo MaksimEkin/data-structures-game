@@ -560,7 +560,6 @@ class AVLModification(TestCase):
 
             for val in new_ids:
                 handler.delNodeByID(val)
-                true_bal = check_balance(handler.root)
                 if handler.balanced is False:
                     failures += 1
                     failure_callback = True
