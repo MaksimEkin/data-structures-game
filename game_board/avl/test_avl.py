@@ -10,7 +10,7 @@ from django.test import TestCase
 from game_board.avl.avl_handler import AVLHandler
 
 ### TEST CONSTANTS ###
-NUM_CALLS = 100
+NUM_CALLS = 500
 HEIGHT = [3, 12]  # test trees with 9 - 2049 nodes
 POINT_CAP = 100
 
@@ -303,7 +303,7 @@ class AVLModification(TestCase):
     """ Test the AVL tree after modifying it """
 
     @staticmethod
-    def new_handler():
+    def new_handler(balance = False):
         """ create new handler to test, modify it a little """
         seed(datetime.now())  # im so random
         height = randint(HEIGHT[0], HEIGHT[1])
@@ -314,10 +314,10 @@ class AVLModification(TestCase):
 
         for _ in range(num_adds):
             key = randint(1, POINT_CAP)
-            handler.addNewNode(key, b=False)
+            handler.addNewNode(key, b=balance)
         for _ in range(num_dels):
             nid = randint(0, handler.uid)
-            handler.delNodeByID(nid, b=False)
+            handler.delNodeByID(nid, b=balance)
 
         return handler
 
@@ -475,11 +475,12 @@ class AVLModification(TestCase):
         for _ in range(iterations):
 
             failure_callback = False
-            handler = self.new_handler()
+            handler = self.new_handler(balance=True)
             new_vals = [randint(1, POINT_CAP) for _ in range(randint(HEIGHT[0], HEIGHT[1]))]
             for val in new_vals:
                 handler.addNewNode(val, b=True)
                 if handler.balanced is False:
+                    handler.debug_wrapper()
                     failures += 1
                     failure_callback = True
                     break
@@ -499,3 +500,83 @@ class AVLModification(TestCase):
                              f'{failures}/{iterations} failures! {BColors.ENDC}')
         print(
             f"{BColors.OKGREEN}\t[+]\tModification: Validated adding nodes in balancing mode in {successes} trees.{BColors.ENDC}")
+
+    def test_imbalanced_removal(self):
+        """ validate removing nodes in non-balancing mode """
+        successes = 0
+        failures = 0
+        iterations = NUM_CALLS
+
+        for _ in range(iterations):
+
+            failure_callback = False
+            handler = self.new_handler()
+            new_ids = [randint(0, handler.uid) for _ in range(randint(HEIGHT[0], handler.expected_height))]
+            new_ids = list(set(new_ids))  # make sure there are no duplicates
+            try:
+                new_ids.remove(handler.golden_id)  # remove golden id from removal if it was randomly selected
+            except ValueError:
+                pass
+
+            for val in new_ids:
+                handler.delNodeByID(val)
+                true_bal = check_balance(handler.root)
+                if handler.balanced is not true_bal:
+                    failures += 1
+                    failure_callback = True
+                    break
+
+            if failure_callback:
+                break
+            state = handler.get_gamestate()
+            for val in new_ids:
+                if 'node' + str(val) in state['node_points']:
+                    failures += 1
+                    break
+
+            successes += 1
+
+        self.assertEqual(failures, 0,
+                         msg=f'{BColors.FAIL}\n\t[-]\tModification: Failed to correctly remove nodes (non-balancing addition) ' +
+                             f'{failures}/{iterations} failures! {BColors.ENDC}')
+        print(f"{BColors.OKGREEN}\t[+]\tModification: Validated removing nodes in non-balancing mode in {successes} trees.{BColors.ENDC}")
+
+    def test_balanced_removal(self):
+        """ validate removing nodes in balancing mode """
+        successes = 0
+        failures = 0
+        iterations = NUM_CALLS
+
+        for _ in range(iterations):
+
+            failure_callback = False
+            handler = self.new_handler(balance=True)
+            new_ids = [randint(0, handler.uid) for _ in range(randint(HEIGHT[0], handler.expected_height))]
+            new_ids = list(set(new_ids))  # make sure there are no duplicates
+            try:
+                new_ids.remove(handler.golden_id)  # remove golden id from removal if it was randomly selected
+            except ValueError:
+                pass
+
+            for val in new_ids:
+                handler.delNodeByID(val)
+                true_bal = check_balance(handler.root)
+                if handler.balanced is False:
+                    failures += 1
+                    failure_callback = True
+                    break
+
+            if failure_callback:
+                break
+            state = handler.get_gamestate()
+            for val in new_ids:
+                if 'node' + str(val) in state['node_points']:
+                    failures += 1
+                    break
+
+            successes += 1
+
+        self.assertEqual(failures, 0,
+                         msg=f'{BColors.FAIL}\n\t[-]\tModification: Failed to correctly remove nodes (balancing addition) ' +
+                             f'{failures}/{iterations} failures! {BColors.ENDC}')
+        print(f"{BColors.OKGREEN}\t[+]\tModification: Validated removing nodes in balancing mode in {successes} trees.{BColors.ENDC}")
