@@ -19,4 +19,8 @@ jobs:
         pip install pylint
     - name: Analysing the code with pylint
       run: |
+<<<<<<< HEAD
         find . -type f -name "*.py" | xargs pylint --disable=import-error,no-name-in-module,no-member,too-few-public-methods,invalid-name
+=======
+        find . -type f -name "*.py" | xargs pylint --disable=import-error,no-name-in-module,no-member,too-few-public-methods,too-few-public-methods,broad-except,unused-argument,redefined-outer-name,invalid-name,import-outside-toplevel,duplicate-code, --max-line-length=150
+>>>>>>> 0b20a34dcc1cbe07f29d463a646ca9edc8ee8c45
