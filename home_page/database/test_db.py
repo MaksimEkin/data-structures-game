@@ -7,7 +7,7 @@ from home_page.database import home_page_db as mongo
 from profile_page.database import profile_page_db as mongo2
 
 class BColors:
-    # Colors for printing
+    """ Testing colors for prints """
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
     OKCYAN = '\033[96m'
@@ -19,7 +19,11 @@ class BColors:
     UNDERLINE = '\033[4m'
 
 class DBRankings( TestCase ):
+    """ Test for homepage rankings """
+
     def setUp( self ):
+        """ The data needed for homepage tests  """
+
         self.user = {"user_id":"5f7d1b1d8fd2b816c48c148b","badges":[31,24,83],
         "current_story_level":9,"email":"ryanb777@umbc.edu",
         "friends":["Kulsoom2","Nick2","Maksim2","Naomi2"],
@@ -44,4 +48,6 @@ class DBRankings( TestCase ):
         print( f"{BColors.OKGREEN}\t[+]\tPass homepage get rankings.{BColors.ENDC}" )
 
     def tearDown( self ):
+        """ The data needed for homepage tests is removed -- no residual data """
+
         mongo2.remove_user(self.user["user_id"])

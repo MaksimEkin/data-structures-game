@@ -10,7 +10,7 @@ def where():
     return " -- test on line "+str(sys._getframe(1).f_lineno)
 
 class BColors:
-    # Colors for printing
+    """ Colors for printing """
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
     OKCYAN = '\033[96m'
@@ -22,6 +22,8 @@ class BColors:
     UNDERLINE = '\033[4m'
 
 class DBCreateUserProfile( TestCase ):
+    """ Test for user profile creation """
+
     def setUp( self ):
         """ creates user data needed for tests """
 
@@ -94,6 +96,8 @@ class DBCreateUserProfile( TestCase ):
         mongo.remove_user(self.user2["user_id"])
 
 class DBReadUserProfile( TestCase ):
+    """ Test for reading profile """
+
     def setUp( self ):
         """ creates user data needed for tests """
 
@@ -147,6 +151,8 @@ class DBReadUserProfile( TestCase ):
         mongo.remove_user(self.user["user_id"])
 
 class DBUpdateUserProfile( TestCase ):
+    """ Test for updating all profile data """
+
     def setUp( self ):
         """ creates user data needed for tests """
 
@@ -188,6 +194,8 @@ class DBUpdateUserProfile( TestCase ):
         mongo.remove_user(self.user["user_id"])
 
 class DBUpdateUserGame( TestCase ):
+    """ Test for updating a user game in the profile """
+
     def setUp( self ):
         """ creates user data needed for tests """
 
@@ -255,6 +263,8 @@ class DBUpdateUserGame( TestCase ):
         mongo.remove_user(self.user["user_id"])
 
 class DBDeleteUser( TestCase ):
+    """ Test for deleting a user profile """
+
     def setUp( self ):
         """ creates user data needed for tests """
 
@@ -297,6 +307,8 @@ class DBDeleteUser( TestCase ):
             {BColors.ENDC}")
 
 class DBDeleteGames( TestCase ):
+    """ Test for deleting a game in the user profile """
+
     def setUp( self ):
         """ creates user data needed for tests """
 
@@ -339,6 +351,8 @@ class DBDeleteGames( TestCase ):
             {BColors.ENDC}")
 
 class DBList( TestCase ):
+    """ Test for listing games in a user profile """
+
     def setUp( self ):
         """ creates user data needed for tests """
 
@@ -389,6 +403,8 @@ class DBList( TestCase ):
         mongo.remove_user(self.user["user_id"])
 
 class DBSaveUserGames( TestCase ):
+    """ Test for saving a game in a user profile """
+
     def setUp( self ):
         """ creates user data needed for tests """
 
@@ -448,6 +464,8 @@ class DBSaveUserGames( TestCase ):
             {BColors.ENDC}")
 
 class DBReadUserGames( TestCase ):
+    """ Test for reading a game in a user profile """
+
     def setUp( self ):
         """ creates user data needed for tests """
 
@@ -492,6 +510,8 @@ class DBReadUserGames( TestCase ):
         mongo.remove_user( self.user["user_id"] )
 
 class DBUserAuthentication( TestCase ):
+    """ Test for user profile authentication """
+
     def setUp( self ):
         """ creates user data needed for tests """
 
@@ -614,6 +634,8 @@ class DBUserAuthentication( TestCase ):
         mongo.remove_user( self.user["user_id"] )
 
 class DBUserProfileGeneral( TestCase ):
+    """ Test for user misc. profile functions """
+
     def setUp( self ):
         """ creates user data needed for tests """
 

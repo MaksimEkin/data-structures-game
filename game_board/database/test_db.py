@@ -2,10 +2,12 @@
 python manage.py test game_board.database.test_db
 """
 
-from game_board.database import game_board_db as mongo
 from django.test import TestCase
+from game_board.database import game_board_db as mongo
 
 class BColors:
+    """ Main test colors """
+
     # Colors for printing
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
@@ -18,6 +20,7 @@ class BColors:
     UNDERLINE = '\033[4m'
 
 class DBCreate(TestCase):
+    """ Main test for board create """
     def setUp(self):
         """ creates game data needed for tests """
 
@@ -61,6 +64,7 @@ class DBCreate(TestCase):
         mongo.remove_game(self.board["game_id"])
 
 class DBRead(TestCase):
+    """ Main test for board read """
     def setUp(self):
         """ creates game data needed for tests """
 
@@ -104,6 +108,7 @@ class DBRead(TestCase):
         mongo.remove_game(self.board["game_id"])
 
 class DBUpdate(TestCase):
+    """ Main test for board read """
     def setUp(self):
         """ creates game data needed for tests """
 
@@ -160,6 +165,7 @@ class DBUpdate(TestCase):
         mongo.remove_game(self.board2["game_id"])
 
 class DBDelete(TestCase):
+    """ Main test for board delete """
     def setUp(self):
         """ creates game data needed for tests """
 
@@ -196,8 +202,8 @@ class DBDelete(TestCase):
             msg=f'{BColors.FAIL}\t[-]\tIncorrect return for non-existant game!{BColors.ENDC}')
         print(f"{BColors.OKGREEN}\t[+]\tPass gameboard database delete nonexistant.{BColors.ENDC}")
 
-
 class DBList(TestCase):
+    """ Main test for board list """
     def setUp(self):
         """ creates game data needed for tests """
 
