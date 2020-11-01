@@ -5,8 +5,8 @@ import { COLUMNS } from './Columns'
 
 export const RankingTable = () => {
 
-	const columns = useMemo(() => COLUMNS, [])
-	const data = useMemo(() => MOCK_DATA, [])
+	const columns = useMemo(() => COLUMNS, []) /* get columns from columns file */
+	const data = useMemo(() => MOCK_DATA, []) /* get (mock) data */
 
 	const {  // set up table instance
 		getTableProps,
@@ -32,7 +32,7 @@ export const RankingTable = () => {
 						{headerGroup.headers.map((column) => (
 							<th {...column.getHeaderProps(column.getSortByToggleProps())}> 
 							  {column.render('Header')}
-							  <span /* make sorting */> 
+							  <span /* allow user to sort ranking table*/> 
 								  {column.isSorted ? (column.isSortedDesc ? ' ⬇️' : ' ⬆️') : ''} 
 							  </span>
 							</th>
@@ -45,7 +45,7 @@ export const RankingTable = () => {
 					prepareRow(row)
 					return (
 						<tr {...row.getRowProps()}>
-							{row.cells.map((cell) => {
+							{row.cells.map((cell) => { /* display table data */
 								return <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
 							})}
 						</tr>
@@ -55,7 +55,7 @@ export const RankingTable = () => {
 			<tfoot>
 				{footerGroups.map(footerGroup => (
 					<tr {...footerGroup.getFooterGroupProps()}>
-						{footerGroup.headers.map((column) => (
+						{footerGroup.headers.map((column) => ( /*render footer at the bottom of the page */
 							<td {...column.getFooterProps}> {column.render('Footer')}</td>
 						))}
 					</tr>
