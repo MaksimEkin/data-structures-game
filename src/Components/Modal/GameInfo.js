@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import {Button, Grid, TextField} from '@material-ui/core';
 import Cookies from 'universal-cookie';
-
+import {Link} from "react-router-dom";
 //set the construct by sharing/setting the constructor states between
 // Home and GameInfo & bind the state value's to the input change that happens
 class GameInfo extends React.Component {
     constructor(props) {
         super(props);
         this.customNodeRef = React.createRef();
-        //hard coded defaults 
+        //hard coded defaults
         this.state = {level:'Easy', playerList:'player1,player2', gameDS:'AVL'};
         this.handleInput = this.handleInput.bind(this);
         this.submitDSG = this.handleInput.bind(this)
@@ -48,7 +48,7 @@ render(){
         <label for='game'>Tree Type  </label>
                 <select type='text' id="game" value={this.state.gameDS} onInput={this.handleInput} name='gameDS' label='DSgame' style={{ marginBottom: '1em' }}  >
                     <option value="AVL">AVL</option>
-                    
+
                  </select>
         </div>
                 <TextField
@@ -61,8 +61,14 @@ render(){
                     style={{ marginBottom: '1em' }}
                 />
 
-                <button type="submit">Sign In</button>
-             </form>
+                <ul>
+                <li>
+                    <Link className="text-blue-500 py-3 border-t border-b block" to="/game_board" name="start_game">
+                        Start Game</Link>
+                    </li>
+                </ul>
+                </form>
+
              </span>
 
     );
