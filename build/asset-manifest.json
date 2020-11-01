@@ -1,42 +1,22 @@
 {
   "files": {
     "main.css": "/static/css/main.e24d44d6.chunk.css",
-<<<<<<< HEAD
-    "main.js": "/static/js/main.3db2768f.chunk.js",
-    "main.js.map": "/static/js/main.3db2768f.chunk.js.map",
+    "main.js": "/static/js/main.18b0f808.chunk.js",
+    "main.js.map": "/static/js/main.18b0f808.chunk.js.map",
     "runtime-main.js": "/static/js/runtime-main.c8a21426.js",
     "runtime-main.js.map": "/static/js/runtime-main.c8a21426.js.map",
-    "static/js/2.34b8dda4.chunk.js": "/static/js/2.34b8dda4.chunk.js",
-    "static/js/2.34b8dda4.chunk.js.map": "/static/js/2.34b8dda4.chunk.js.map",
+    "static/js/2.ad98726a.chunk.js": "/static/js/2.ad98726a.chunk.js",
+    "static/js/2.ad98726a.chunk.js.map": "/static/js/2.ad98726a.chunk.js.map",
     "index.html": "/index.html",
-    "precache-manifest.bb5502e76878bca71c5267645204d466.js": "/precache-manifest.bb5502e76878bca71c5267645204d466.js",
+    "precache-manifest.0e265baadecd4b170d7b8a9f6bb4cda5.js": "/precache-manifest.0e265baadecd4b170d7b8a9f6bb4cda5.js",
     "service-worker.js": "/service-worker.js",
     "static/css/main.e24d44d6.chunk.css.map": "/static/css/main.e24d44d6.chunk.css.map",
-    "static/js/2.34b8dda4.chunk.js.LICENSE.txt": "/static/js/2.34b8dda4.chunk.js.LICENSE.txt"
+    "static/js/2.ad98726a.chunk.js.LICENSE.txt": "/static/js/2.ad98726a.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
     "static/js/runtime-main.c8a21426.js",
-    "static/js/2.34b8dda4.chunk.js",
+    "static/js/2.ad98726a.chunk.js",
     "static/css/main.e24d44d6.chunk.css",
-    "static/js/main.3db2768f.chunk.js"
-=======
-    "main.js": "/static/js/main.8a9f6666.chunk.js",
-    "main.js.map": "/static/js/main.8a9f6666.chunk.js.map",
-    "runtime-main.js": "/static/js/runtime-main.c8a21426.js",
-    "runtime-main.js.map": "/static/js/runtime-main.c8a21426.js.map",
-    "static/js/2.b5da52d5.chunk.js": "/static/js/2.b5da52d5.chunk.js",
-    "static/js/2.b5da52d5.chunk.js.map": "/static/js/2.b5da52d5.chunk.js.map",
-    "index.html": "/index.html",
-    "precache-manifest.6361c356e41be384654c6c42d86b8233.js": "/precache-manifest.6361c356e41be384654c6c42d86b8233.js",
-    "service-worker.js": "/service-worker.js",
-    "static/css/main.e24d44d6.chunk.css.map": "/static/css/main.e24d44d6.chunk.css.map",
-    "static/js/2.b5da52d5.chunk.js.LICENSE.txt": "/static/js/2.b5da52d5.chunk.js.LICENSE.txt"
-  },
-  "entrypoints": [
-    "static/js/runtime-main.c8a21426.js",
-    "static/js/2.b5da52d5.chunk.js",
-    "static/css/main.e24d44d6.chunk.css",
-    "static/js/main.8a9f6666.chunk.js"
->>>>>>> removed code that may be stopping my fetch request
+    "static/js/main.18b0f808.chunk.js"
   ]
 }
