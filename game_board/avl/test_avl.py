@@ -3,23 +3,20 @@ Run: python3 manage.py test game_board.avl.test_avl
 Reference: https://docs.djangoproject.com/en/3.1/topics/testing/overview/
 """
 
-from django.test import TestCase
-from game_board.avl.avl_handler import AVLHandler
-from game_board.avl.avl_handler import avlNew
-from game_board.avl.avl_handler import avlAction
-from game_board.avl.avl_handler import avlRebalance
 from datetime import datetime
 from random import randint
 from random import seed
+from django.test import TestCase
+from game_board.avl.avl_handler import AVLHandler
 
 ### TEST CONSTANTS ###
-NUM_CALLS = 750
+NUM_CALLS = 75
 HEIGHT = [3, 12]  # test trees with 9 - 2049 nodes
 POINT_CAP = 100
 
 
 class BColors:
-    # Colors for printing
+    """ Colors for printing """
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
     OKCYAN = '\033[96m'
@@ -41,11 +38,7 @@ def check_golden(handler, checkRoot=True):
     if checkRoot and handler.root.nid == handler.golden_id:
         return False
 
-    if gold in nodes:
-        return True
-    else:
-        return False
-
+    return gold in nodes
 
 def check_heights(root):
     """ Traverses tree in preorder and verifies height of each node
@@ -55,9 +48,9 @@ def check_heights(root):
     """
 
     if root:
+        check_heights(root.left)
+        check_heights(root.right)
         return root.height == get_height(root)
-        check_height(root.left)
-        check_height(root.right)
     return True
 
 
@@ -125,9 +118,9 @@ def check_adjacency_list(root, adjacency_list):
         root_id = key.nid
 
         adj_key = 'node' + str(root_id)
-        if adj_key in adjacency_list and adjacency_list[adj_key] == elem[key]:
-            continue
-        else:
+        if (adj_key not in adjacency_list or
+            adjacency_list[adj_key] != elem[key] or
+            len(adjacency_list[adj_key]) > 2):
             return False
     return True
 
@@ -146,7 +139,8 @@ def get_height(root):
 class AVLNewGeneration(TestCase):
     """ Test the state of the AVL tree upon generation from scratch"""
 
-    def new_handler(self):
+    @staticmethod
+    def new_handler():
         """ create new handler to test """
         seed(datetime.now())  # im so random
         height = randint(HEIGHT[0], HEIGHT[1])
@@ -228,7 +222,8 @@ class AVLNewGeneration(TestCase):
 class AVLOldGeneration(TestCase):
     """ Test the state of the AVL tree upon generation from deserialization"""
 
-    def new_handler(self):
+    @staticmethod
+    def new_handler():
         """ create new handler to test """
         seed(datetime.now())  # im so random
         height = randint(HEIGHT[0], HEIGHT[1])
@@ -312,7 +307,8 @@ class AVLOldGeneration(TestCase):
 class AVLModification(TestCase):
     """ Test the AVL tree after modifying it """
 
-    def new_handler(self):
+    @staticmethod
+    def new_handler():
         """ create new handler to test, modify it a little """
         seed(datetime.now())  # im so random
         height = randint(HEIGHT[0], HEIGHT[1])
@@ -413,7 +409,7 @@ class AVLModification(TestCase):
             state = handler.get_gamestate()
             rebal_handler = AVLHandler.from_graph(state)
             ret = check_balance(rebal_handler.root)
-            if (ret == True and ret == rebal_handler.balanced):
+            if ret and ret == rebal_handler.balanced:
                 successes += 1
             else:
                 failures += 1
@@ -436,7 +432,7 @@ class AVLModification(TestCase):
             handler = self.new_handler()
             state = handler.get_gamestate()
             ret = check_adjacency_list(handler.root, state['adjacency_list'])
-            if (ret == True):
+            if ret:
                 successes += 1
             else:
                 failures += 1
