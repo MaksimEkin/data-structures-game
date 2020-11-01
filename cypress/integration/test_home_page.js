@@ -33,9 +33,9 @@ context('Home Page Testing', () => {
 
     //test selecting levels
     it('Level correct?', () => {
-        cy.get('#level_select').select('Easy').should('have.value', 'Easy')
-        cy.get('#level_select').select('Medium').should('have.value', 'Medium')
-        cy.get('#level_select').select('Hard').should('have.value', 'Hard')
+        cy.get('#difficulty-level').select('Easy').should('have.value', 'Easy')
+        cy.get('#difficulty-level').select('Medium').should('have.value', 'Medium')
+        cy.get('#difficulty-level').select('Hard').should('have.value', 'Hard')
     })
 
 })
