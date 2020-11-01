@@ -9,6 +9,7 @@ function NavMenu(){
     
     const [showMenu, setShowMenu] = useState(false)
     //MENU initialized to null
+    //MENUMASK toggles the menu to appear and disappear when the menu button is clicked on
     let menu
     let menuMask
     if(showMenu){
