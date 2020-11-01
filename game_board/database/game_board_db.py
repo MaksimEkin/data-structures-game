@@ -1,5 +1,5 @@
 """
-Allows the game data to be stored, and interacted with through the Pandamic game API 
+Allows the game data to be stored, and interacted with through the Pandamic game API
 """
 
 import os

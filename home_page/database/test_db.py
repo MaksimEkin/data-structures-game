@@ -6,7 +6,6 @@ from django.test import TestCase
 from home_page.database import home_page_db as mongo
 from profile_page.database import profile_page_db as mongo2
 
-
 class BColors:
     # Colors for printing
     HEADER = '\033[95m'

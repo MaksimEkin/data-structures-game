@@ -25,6 +25,7 @@ jobs:
       run: |
         # Game Board API
         python manage.py test game_board.api.tests_api
+        python manage.py test profile_page.api.tests_api
 
         # Database
         python manage.py test game_board.database.test_db
