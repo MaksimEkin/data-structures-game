@@ -7,6 +7,7 @@ from django.test import TestCase
 from profile_page.database import profile_page_db as mongo
 
 def where():
+    """ Prints line location of the calling test function """
     return " -- test on line "+str(sys._getframe(1).f_lineno)
 
 class BColors:
@@ -248,7 +249,6 @@ class DBUpdateUserGame( TestCase ):
 
     def test_update_game_nonexist( self ):
         """ The user document should not be updated from the database """
-        original_user = self.user
         updated_user = mongo.update_user_game( self.user["user_id"],
             "This name should really not exist in the database, and if it does, YEESH!",
             self.board2)
@@ -489,7 +489,6 @@ class DBReadUserGames( TestCase ):
 
     def test_load_board( self ):
         """ The user game document was found """
-        found = False
         user_game = mongo.load_board( self.user["user_id"], self.user['save_games'][0]["game_id"] )
 
         self.assertEqual( user_game, self.user["save_games"][0], msg=f'{BColors.FAIL}\
