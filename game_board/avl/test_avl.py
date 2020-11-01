@@ -10,7 +10,7 @@ from django.test import TestCase
 from game_board.avl.avl_handler import AVLHandler
 
 ### TEST CONSTANTS ###
-NUM_CALLS = 75
+NUM_CALLS = 100
 HEIGHT = [3, 12]  # test trees with 9 - 2049 nodes
 POINT_CAP = 100
 
@@ -39,6 +39,7 @@ def check_golden(handler, checkRoot=True):
         return False
 
     return gold in nodes
+
 
 def check_heights(root):
     """ Traverses tree in preorder and verifies height of each node
@@ -119,8 +120,8 @@ def check_adjacency_list(root, adjacency_list):
 
         adj_key = 'node' + str(root_id)
         if (adj_key not in adjacency_list or
-            adjacency_list[adj_key] != elem[key] or
-            len(adjacency_list[adj_key]) > 2):
+                adjacency_list[adj_key] != elem[key] or
+                len(adjacency_list[adj_key]) > 2):
             return False
     return True
 
@@ -169,8 +170,7 @@ class AVLNewGeneration(TestCase):
         self.assertEqual(failures, 0,
                          msg=f'{BColors.FAIL}\n\t[-]\tFrom scratch: Failed to correctly generate golden node! ' +
                              f'{failures}/{iterations} failures! {BColors.ENDC}')
-        print(
-            f"{BColors.OKGREEN}\t[+]\tFrom scratch: Validated correct golden node generation in {successes} trees.{BColors.ENDC}")
+        print(f"{BColors.OKGREEN}\t[+]\tFrom scratch: Validated correct golden node generation in {successes} trees.{BColors.ENDC}")
 
     def test_height_new(self):
         """ make sure nodes are generated with correct heights in new trees """
@@ -190,8 +190,7 @@ class AVLNewGeneration(TestCase):
         self.assertEqual(failures, 0,
                          msg=f'{BColors.FAIL}\n\t[-]\tFrom scratch: Failed to correctly generate heights! ' +
                              f'{failures}/{iterations} failures! {BColors.ENDC}')
-        print(
-            f"{BColors.OKGREEN}\t[+]\tFrom scratch: Validated correct height for all nodes in {successes} trees.{BColors.ENDC}")
+        print(f"{BColors.OKGREEN}\t[+]\tFrom scratch: Validated correct height for all nodes in {successes} trees.{BColors.ENDC}")
 
     def test_balance_new(self):
         """ make sure new tree balanced upon generation """
@@ -215,8 +214,7 @@ class AVLNewGeneration(TestCase):
         self.assertEqual(failures, 0,
                          msg=f'{BColors.FAIL}\n\t[-]\tFrom scratch: Failed to always generate balanced trees! ' +
                              f'{failures}/{iterations} failures! {BColors.ENDC}')
-        print(
-            f"{BColors.OKGREEN}\t[+]\tFrom scratch: Validated that all trees all balanced upon generation in {successes} trees.{BColors.ENDC}")
+        print(f"{BColors.OKGREEN}\t[+]\tFrom scratch: Validated that all trees all balanced upon generation in {successes} trees.{BColors.ENDC}")
 
 
 class AVLOldGeneration(TestCase):
@@ -254,8 +252,7 @@ class AVLOldGeneration(TestCase):
         self.assertEqual(failures, 0,
                          msg=f'{BColors.FAIL}\n\t[-]\tFrom state:   Failed to correctly generate golden node! ' +
                              f'{failures}/{iterations} failures! {BColors.ENDC}')
-        print(
-            f"{BColors.OKGREEN}\t[+]\tFrom state:   Validated correct golden node generation in {successes} trees.{BColors.ENDC}")
+        print(f"{BColors.OKGREEN}\t[+]\tFrom state:   Validated correct golden node generation in {successes} trees.{BColors.ENDC}")
 
     def test_height_old(self):
         """ make sure nodes are generated with correct heights in new trees """
@@ -275,8 +272,7 @@ class AVLOldGeneration(TestCase):
         self.assertEqual(failures, 0,
                          msg=f'{BColors.FAIL}\n\t[-]\tFrom state:   Failed to correctly generate heights! ' +
                              f'{failures}/{iterations} failures! {BColors.ENDC}')
-        print(
-            f"{BColors.OKGREEN}\t[+]\tFrom state:   Validated correct height for all nodes in {successes} trees.{BColors.ENDC}")
+        print(f"{BColors.OKGREEN}\t[+]\tFrom state:   Validated correct height for all nodes in {successes} trees.{BColors.ENDC}")
 
     def test_balance_old(self):
         """ make sure new tree balanced upon generation """
@@ -300,8 +296,7 @@ class AVLOldGeneration(TestCase):
         self.assertEqual(failures, 0,
                          msg=f'{BColors.FAIL}\n\t[-]\tFrom state:   Failed to always generate balanced trees! ' +
                              f'{failures}/{iterations} failures! {BColors.ENDC}')
-        print(
-            f"{BColors.OKGREEN}\t[+]\tFrom state:   Validated that all trees all balanced upon generation in {successes} trees.{BColors.ENDC}")
+        print(f"{BColors.OKGREEN}\t[+]\tFrom state:   Validated that all trees all balanced upon generation in {successes} trees.{BColors.ENDC}")
 
 
 class AVLModification(TestCase):
@@ -318,7 +313,7 @@ class AVLModification(TestCase):
         num_dels = randint(1, height)  # del (1, height) nodes
 
         for _ in range(num_adds):
-            key = randint(1, 100)
+            key = randint(1, POINT_CAP)
             handler.addNewNode(key, b=False)
         for _ in range(num_dels):
             nid = randint(0, handler.uid)
@@ -368,8 +363,7 @@ class AVLModification(TestCase):
         self.assertEqual(failures, 0,
                          msg=f'{BColors.FAIL}\n\t[-]\tModification: Failed to correctly modify heights! ' +
                              f'{failures}/{iterations} failures! {BColors.ENDC}')
-        print(
-            f"{BColors.OKGREEN}\t[+]\tModification: Validated height adjustment for all nodes in {successes} trees.{BColors.ENDC}")
+        print(f"{BColors.OKGREEN}\t[+]\tModification: Validated height adjustment for all nodes in {successes} trees.{BColors.ENDC}")
 
     def test_balance_mod(self):
         """ make sure balance stored in state is updated with changes correctly """
@@ -393,9 +387,7 @@ class AVLModification(TestCase):
         self.assertEqual(failures, 0,
                          msg=f'{BColors.FAIL}\n\t[-]\tModification: Failed to modify balance factor correctly! ' +
                              f'{failures}/{iterations} failures! {BColors.ENDC}')
-        print(
-            f"{BColors.OKGREEN}\t[+]\tModification: Validated that balance bool is updated in {successes} trees.{BColors.ENDC}")
-
+        print(f"{BColors.OKGREEN}\t[+]\tModification: Validated that balance bool is updated in {successes} trees.{BColors.ENDC}")
 
     def test_rebalance(self):
         """ make sure tree will rebalance when built from graph """
@@ -409,7 +401,7 @@ class AVLModification(TestCase):
             state = handler.get_gamestate()
             rebal_handler = AVLHandler.from_graph(state)
             ret = check_balance(rebal_handler.root)
-            if ret and ret == rebal_handler.balanced:
+            if ret and rebal_handler.balanced:
                 successes += 1
             else:
                 failures += 1
@@ -417,9 +409,7 @@ class AVLModification(TestCase):
         self.assertEqual(failures, 0,
                          msg=f'{BColors.FAIL}\n\t[-]\tModification: Failed to correctly rebalance deserialized tree! '
                              f'{failures}/{iterations} failures! {BColors.ENDC}')
-        print(
-            f"{BColors.OKGREEN}\t[+]\tModification: Validated deserialization rebalancing in {successes} trees.{BColors.ENDC}")
-
+        print(f"{BColors.OKGREEN}\t[+]\tModification: Validated deserialization rebalancing in {successes} trees.{BColors.ENDC}")
 
     def test_adjacency(self):
         """ make sure tree will rebalance when built from graph """
@@ -440,5 +430,72 @@ class AVLModification(TestCase):
         self.assertEqual(failures, 0,
                          msg=f'{BColors.FAIL}\n\t[-]\tModification: Failed to correctly generate adjacency list! ' +
                              f'{failures}/{iterations} failures! {BColors.ENDC}')
+        print(f"{BColors.OKGREEN}\t[+]\tModification: Validated adjacency list generation in {successes} trees.{BColors.ENDC}")
+
+    def test_imbalanced_addition(self):
+        """ validate adding nodes in non-balancing mode """
+        successes = 0
+        failures = 0
+        iterations = NUM_CALLS
+
+        for _ in range(iterations):
+
+            failure_callback = False
+            handler = self.new_handler()
+            new_vals = [randint(1, POINT_CAP) for _ in range(randint(HEIGHT[0], HEIGHT[1]))]
+            for val in new_vals:
+                handler.addNewNode(val, b=False)
+                true_bal = check_balance(handler.root)
+                if handler.balanced is not true_bal:
+                    failures += 1
+                    failure_callback = True
+                    break
+
+            if failure_callback:
+                break
+            state = handler.get_gamestate()
+            for val in new_vals:
+                if val not in state['node_points'].values():
+                    failures += 1
+                    break
+
+            successes += 1
+
+        self.assertEqual(failures, 0,
+                         msg=f'{BColors.FAIL}\n\t[-]\tModification: Failed to correctly add new nodes (non-balancing addition) ' +
+                             f'{failures}/{iterations} failures! {BColors.ENDC}')
+        print(f"{BColors.OKGREEN}\t[+]\tModification: Validated adding nodes in non-balancing mode in {successes} trees.{BColors.ENDC}")
+
+    def test_balanced_addition(self):
+        """ validate adding nodes in balancing mode """
+        successes = 0
+        failures = 0
+        iterations = NUM_CALLS
+
+        for _ in range(iterations):
+
+            failure_callback = False
+            handler = self.new_handler()
+            new_vals = [randint(1, POINT_CAP) for _ in range(randint(HEIGHT[0], HEIGHT[1]))]
+            for val in new_vals:
+                handler.addNewNode(val, b=True)
+                if handler.balanced is False:
+                    failures += 1
+                    failure_callback = True
+                    break
+
+            if failure_callback:
+                break
+            state = handler.get_gamestate()
+            for val in new_vals:
+                if val not in state['node_points'].values():
+                    failures += 1
+                    break
+
+            successes += 1
+
+        self.assertEqual(failures, 0,
+                         msg=f'{BColors.FAIL}\n\t[-]\tModification: Failed to correctly add new nodes (balancing addition) ' +
+                             f'{failures}/{iterations} failures! {BColors.ENDC}')
         print(
-            f"{BColors.OKGREEN}\t[+]\tModification: Validated adjacency list generation in {successes} trees.{BColors.ENDC}")
+            f"{BColors.OKGREEN}\t[+]\tModification: Validated adding nodes in balancing mode in {successes} trees.{BColors.ENDC}")
