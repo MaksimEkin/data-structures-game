@@ -35,7 +35,7 @@ const reactLocal = "http://localhost:3000/"
 const remote = "https://data-structures-game.herokuapp.com/";
 
 //can also be const url = local; or const url = reactLocal;
-const url = remote;
+const url = local;
 
 const sample = {
   edges: [{}],
@@ -69,7 +69,9 @@ class GameBoard extends Component {
       playerBalanceAttempt: null,
       difficulty:null,
       players:null,
-      data_structure:null
+      data_structure:null,
+
+      game_over: false
     };
   }
   // Initialize component objects by setting state and props of the gameboard
@@ -106,6 +108,7 @@ class GameBoard extends Component {
         //set the made_graph state
        let made_graph = create_graph(this.state.board['graph'])
        this.setState({ graph: made_graph});
+
     }
 
     //from imported digraph folder
@@ -485,18 +488,8 @@ class GameBoard extends Component {
     let card_2 = null;
     let card_3 = null;
 
-    //TODO: FOR TESTING PURPOSES ONLY - NEED TO CHANGE LATER
-    let game_over = true;
-    if (game_over){
-      return <WinModal/>
-    }
-
     //if loading is completed, statically store cards
     if (!this.state.loading) {
-
-
-      // get the value of api json return index 0,1,2
-
       // here staticly getting the cards so change, plus it would have to be updateding as we play
       card_1 = this.state.board['cards'][this.state.board['turn']][0]
       card_2 = this.state.board['cards'][this.state.board['turn']][1]
@@ -514,6 +507,12 @@ class GameBoard extends Component {
         <div style={{height: "10rem"}}>
           <div className="text-center text-6xl font-bold"> It's {this.state.turn }'s turn! </div>
 
+          <div className = "text-center text-2xl font-bold w-1/5  py-3 bg-blue-200" >
+              <button onClick={ () => this.setState({game_over: true})} > Click here to test view win modal</button>
+              {this.state.game_over ? <WinModal /> : <div> </div>}
+
+            </div>
+
           <div className="bg-gray-200 flex items-center bg-gray-200 h-10">
 
             <div className="flex-1 text-gray-700 text-center bg-gray-400 px-4 py-2 m-2">
@@ -527,6 +526,7 @@ class GameBoard extends Component {
             <div className="flex-1 text-gray-700 text-center bg-gray-400 px-4 py-2 m-2">
               <button onClick={() => this.playCard(card_3)}>{card_3}</button>
             </div>
+
           </div>
 
         {/*from react digraph library to format graph */}
