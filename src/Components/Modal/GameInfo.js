@@ -8,7 +8,7 @@ class GameInfo extends React.Component {
     constructor(props) {
         super(props);
         this.customNodeRef = React.createRef();
-        //hard coded defaults 
+        //hard coded defaults
         this.state = {level:'Easy', playerList:'player1,player2', gameDS:'AVL'};
         this.handleInput = this.handleInput.bind(this);
         this.submitDSG = this.handleInput.bind(this)
@@ -48,7 +48,7 @@ render(){
         <label for='game'>Tree Type  </label>
                 <select type='text' id="game" value={this.state.gameDS} onInput={this.handleInput} name='gameDS' label='DSgame' style={{ marginBottom: '1em' }}  >
                     <option value="AVL">AVL</option>
-                    
+
                  </select>
         </div>
                 <TextField
