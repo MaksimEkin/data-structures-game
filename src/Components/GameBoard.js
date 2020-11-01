@@ -425,14 +425,16 @@ class GameBoard extends Component {
   };
 
   /* Define custom graph editing methods here */
+
+  //checks if the current board is balanced and returns true or false
   checkRebalance = () => {
-    
-    let fetch_url = url+"game_board/api/board/" + this.state.gameID + '/'
-    
     let isBalanced = this.state.board.graph.balanced
     return isBalanced
 
   }
+  //called if checkRebalance returns false
+  //post request to get correct/balanced game board and sets gameboard to 
+  //return balanced board
   rebalance = async () =>{
     let fetch_url = url+"game_board/api/rebalance/" + this.state.gameID + '/'
     this.setState({ loading: true});
@@ -465,6 +467,7 @@ class GameBoard extends Component {
     let response = await fetch(fetch_url);
     let newBoard = await response.json();
     this.setState({ board: newBoard, loading: false, turn: newBoard['turn']});
+    //check if board is balanced then rebalance tree if fxn returned false
     if(!this.checkRebalance()){
       this.rebalance()
     }
