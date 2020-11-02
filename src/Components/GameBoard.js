@@ -1,8 +1,9 @@
 import React, { Component } from "react";
 import ReactDOM from "react-dom";
-//import { Button, Grid, Typography, Card, CardHeader, CardActions, CardActionArea, CardContent, Chip } from '@material-ui/core';
+import { Button, Grid, Typography, Card, CardHeader, CardActions, CardActionArea, CardContent, Chip } from '@material-ui/core';
 import {create_adjacency, create_graph} from './CreateGraphAdj.js';
 import Cookies from 'universal-cookie';
+import WinModal from './Modal/WinModal.js';
 
 
 //Uber's digraph react folder
@@ -34,7 +35,6 @@ const reactLocal = "http://localhost:3000/"
 const remote = "https://data-structures-game.herokuapp.com/";
 
 //can also be const url = local; or const url = reactLocal;
-//const url = remote;
 const url = remote;
 
 const sample = {
@@ -65,12 +65,13 @@ class GameBoard extends Component {
       board: null,
       gameID: null,
       turn: null,
-      playerPointVal: null,
       playerCardChoice: null,
       playerBalanceAttempt: null,
       difficulty:null,
       players:null,
-      data_structure:null
+      data_structure:null,
+
+      game_over: false
     };
   }
   // Initialize component objects by setting state and props of the gameboard
@@ -87,7 +88,6 @@ class GameBoard extends Component {
 
        //get cookie variables from state and insert into url
        let createGameURL = url+"game_board/api/start_game/" + difficulty + "/" + players + "/" + ds
-       
        let getGameURL = url+"game_board/api/board/";
     
        let response = await fetch(createGameURL);
@@ -104,12 +104,12 @@ class GameBoard extends Component {
        let board_ = await response.json();
        //set the state values with respect to the dynamic json response
        this.setState({ board: board_, loading: false, turn: board_['turn']});
-       this.setState({playerPointVal: board_['player_points'][this.state.turn]})
 
         //pass the new board state into create_graph function and 
         //set the made_graph state
        let made_graph = create_graph(this.state.board['graph'])
        this.setState({ graph: made_graph});
+
     }
 
     //from imported digraph folder
@@ -461,11 +461,22 @@ class GameBoard extends Component {
 
   //for playing first card (one displayed on far left)
   playCard = (card) => {
-    const cookies = new Cookies();
-    cookies.set('selectedCard', card, { path: '/' });
+    const cookies = new Cookies()
+    cookies.set('selectedCard', card, { path: '/' })
     this.apiCall()
+
+    //check if game is over
+    this.checkGameStatus()
   }
 
+  //check if game is over (ie: is golden node at the root of the tree?)
+  checkGameStatus = () => {
+    if (this.state.board['end_game']){
+      this.setState({game_over: true})
+    }
+  }
+
+  //modularize the api call for playing card
   apiCall = async () => {
     const cookies = new Cookies();
     let selectedCard = cookies.get('selectedCard');
@@ -478,6 +489,7 @@ class GameBoard extends Component {
     let response = await fetch(fetch_url);
     let newBoard = await response.json();
 
+
     this.setState({ board: newBoard, turn: newBoard['turn']});
     this.setState({playerPointVal: newBoard['player_points'][this.state.turn]})
     //check if board is balanced then rebalance tree if fxn returned false
@@ -486,7 +498,6 @@ class GameBoard extends Component {
     }
     this.setState({loading: false,})
     
-
 
     let made_graph = create_graph(this.state.board['graph'])
     this.setState({ graph: made_graph});
@@ -526,10 +537,6 @@ class GameBoard extends Component {
 
     //if loading is completed, statically store cards
     if (!this.state.loading) {
-
-
-      // get the value of api json return index 0,1,2
-
       // here staticly getting the cards so change, plus it would have to be updateding as we play
       card_1 = this.state.board['cards'][this.state.board['turn']][0]
       card_2 = this.state.board['cards'][this.state.board['turn']][1]
@@ -545,7 +552,13 @@ class GameBoard extends Component {
         <div> {this.state.difficulty}</div>
 
         <div style={{height: "10rem"}}>
-          <div className="text-center text-6xl font-bold"> It's {this.state.turn }'s turn! They have {this.state.playerPointVal } points. </div>
+          <div className="text-center text-6xl font-bold"> It's {this.state.turn }'s turn! </div>
+
+          <div className = "text-center text-2xl font-bold w-1/5  py-3 bg-blue-200" >
+              <button onClick={ () => this.setState({game_over: true})} > Click here to test view win modal</button>
+              {this.state.game_over ? <WinModal winner={this.state.turn} win_board={this.state.board}/> : <div> </div>}
+
+            </div>
 
           <div className="bg-gray-200 flex items-center bg-gray-200 h-10">
 
@@ -560,6 +573,7 @@ class GameBoard extends Component {
             <div className="flex-1 text-gray-700 text-center bg-gray-400 px-4 py-2 m-2">
               <button onClick={() => this.playCard(card_3)}>{card_3}</button>
             </div>
+
           </div>
 
         {/*from react digraph library to format graph */}
