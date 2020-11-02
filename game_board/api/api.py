@@ -165,7 +165,8 @@ def action(request, card, game_id):
                         status=status.HTTP_400_BAD_REQUEST)
 
     # Give the points
-    if card in config.GAIN_TIMES[board['curr_data_structure']]:
+    print(config.GAIN_TIMES[board['curr_data_structure']])
+    if card.split(' ')[0] in config.GAIN_TIMES[board['curr_data_structure']]:
         point = board['graph']['node_points'][card.split()[1]]
         board['player_points'][board['turn']] += point
 
