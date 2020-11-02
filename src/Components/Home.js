@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import "./styles.css";
 import Particles from 'react-particles-js';
-import { Button, Grid, Typography, Card, CardHeader, CardActions, CardActionArea, CardContent, Chip } from '@material-ui/core';
+import { Button} from '@material-ui/core';
 import GameInfo from './Modal/GameInfo.js'
 import { RankingTable } from './RankingTable'
 //this function is called from App.js to start the interface of the game
@@ -49,9 +49,11 @@ class Home extends Component{
         gameDS={this.state.data_structure}
         />
     </Button>
+
     <div className='Rankings'>
           <RankingTable />
       </div>
+
     </div>
     )
 }

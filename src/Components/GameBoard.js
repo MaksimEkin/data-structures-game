@@ -89,17 +89,18 @@ class GameBoard extends Component {
        //get cookie variables from state and insert into url
        let createGameURL = url+"game_board/api/start_game/" + difficulty + "/" + players + "/" + ds
        let getGameURL = url+"game_board/api/board/";
-
-       //get request to get game id
+    
        let response = await fetch(createGameURL);
        let game_id = await response.json();
+
       //save the get request response to state
        this.setState({ gameID: game_id['game_id']});
        cookies.set('game_id', game_id['game_id'], { path: '/' });
-
+      
        //get request to api and include the dynamic game_id
 
        response = await fetch(getGameURL + game_id['game_id']);
+       
        let board_ = await response.json();
        //set the state values with respect to the dynamic json response
        this.setState({ board: board_, loading: false, turn: board_['turn']});
@@ -428,6 +429,32 @@ class GameBoard extends Component {
 
   /* Define custom graph editing methods here */
 
+  //checks if the current board is balanced and returns true or false
+  checkRebalance = () => {
+    let isBalanced = this.state.board.graph.balanced
+    console.log("balanced: ",this.state.board.graph.balanced)
+    return isBalanced
+
+  }
+  //called if checkRebalance returns false
+  //post request to get correct/balanced game board and sets gameboard to 
+  //return balanced board
+  rebalance = async () =>{
+    let fetch_url = url+"game_board/api/rebalance/" + this.state.gameID 
+   let balance_attempt={'adjacency_list':{'node2':['node0'],'node0':['node5','node3'],'node5':[],'node3':[]}}
+    let requestOptions = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(balance_attempt)
+  };
+  console.log("request option parameters: ", requestOptions)
+    let response = await fetch(fetch_url, requestOptions);
+    let newBoard = await response.json();
+    //player might lose points when re-balance occurs
+    this.setState({playerPointVal: newBoard['player_points'][this.state.turn]})
+    this.setState({ board: newBoard});
+
+  }
   // arg: card chosen
   // call action api which returns new board
   // sets the new board
@@ -461,7 +488,16 @@ class GameBoard extends Component {
 
     let response = await fetch(fetch_url);
     let newBoard = await response.json();
-    this.setState({ board: newBoard, loading: false, turn: newBoard['turn']});
+
+
+    this.setState({ board: newBoard, turn: newBoard['turn']});
+    this.setState({playerPointVal: newBoard['player_points'][this.state.turn]})
+    //check if board is balanced then rebalance tree if fxn returned false
+    if(!this.checkRebalance()){
+      this.rebalance()
+    }
+    this.setState({loading: false,})
+    
 
     let made_graph = create_graph(this.state.board['graph'])
     this.setState({ graph: made_graph});
