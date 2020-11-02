@@ -1,13 +1,13 @@
 import {
   default as nodeConfig,
-  EMPTY_EDGE_TYPE,
+  //EMPTY_EDGE_TYPE,
   CUSTOM_EMPTY_TYPE,
-  NODE_KEY,
-  POLY_TYPE,
-  SPECIAL_CHILD_SUBTYPE,
+ // NODE_KEY,
+  //POLY_TYPE,
+  //SPECIAL_CHILD_SUBTYPE,
   SPECIAL_EDGE_TYPE,
   SPECIAL_TYPE,
-  SKINNY_TYPE,
+ // SKINNY_TYPE,
 	GOLD_NODE
 } from "./config";
 
@@ -38,7 +38,8 @@ function create_graph(graph){
 
     // Create the node with appropriate type and label
 		node = { id: adjacency_keys[i],
-				 title: node_points[adjacency_keys[i]] + " POINTS " + adjacency_keys[i],
+				 points: node_points[adjacency_keys[i]],
+			     node_id: adjacency_keys[i],
 				 type: type
 		};
 

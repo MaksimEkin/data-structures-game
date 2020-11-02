@@ -3,6 +3,8 @@ import ReactDOM from "react-dom";
 import { Button, Grid, Typography, Card, CardHeader, CardActions, CardActionArea, CardContent, Chip } from '@material-ui/core';
 import {create_adjacency, create_graph} from './CreateGraphAdj.js';
 import Cookies from 'universal-cookie';
+import WinModal from './Modal/WinModal.js';
+
 
 //Uber's digraph react folder
 
@@ -34,9 +36,10 @@ const remote = "https://data-structures-game.herokuapp.com/";
 
 //can also be const url = local; or const url = reactLocal;
 const url = remote;
+
 const sample = {
   edges: [{}],
-  nodes: [{ id: "start1", title: "Start (0)", type: GOLD_NODE },]
+  nodes: [{ id: "start1", title: "Start (0)", type: GOLD_NODE,  node_id:"", points:0 },]
 };
 
 //Gameboard Component
@@ -62,11 +65,14 @@ class GameBoard extends Component {
       board: null,
       gameID: null,
       turn: null,
+      playerPointVal: null,
       playerCardChoice: null,
       playerBalanceAttempt: null,
       difficulty:null,
       players:null,
-      data_structure:null
+      data_structure:null,
+
+      game_over: false
     };
   }
   // Initialize component objects by setting state and props of the gameboard
@@ -84,24 +90,28 @@ class GameBoard extends Component {
        //get cookie variables from state and insert into url
        let createGameURL = url+"game_board/api/start_game/" + difficulty + "/" + players + "/" + ds
        let getGameURL = url+"game_board/api/board/";
-
-       //get request to get game id
+    
        let response = await fetch(createGameURL);
        let game_id = await response.json();
+
       //save the get request response to state
        this.setState({ gameID: game_id['game_id']});
-
+       cookies.set('game_id', game_id['game_id'], { path: '/' });
+      
        //get request to api and include the dynamic game_id
 
        response = await fetch(getGameURL + game_id['game_id']);
+       
        let board_ = await response.json();
        //set the state values with respect to the dynamic json response
        this.setState({ board: board_, loading: false, turn: board_['turn']});
+       this.setState({playerPointVal: board_['player_points'][this.state.turn]})
 
         //pass the new board state into create_graph function and 
         //set the made_graph state
        let made_graph = create_graph(this.state.board['graph'])
        this.setState({ graph: made_graph});
+
     }
 
     //from imported digraph folder
@@ -278,6 +288,8 @@ class GameBoard extends Component {
     const viewNode = {
       id: Date.now(),
       title: "",
+      node_id:"",
+      points:0,
       type,
       x,
       y
@@ -419,39 +431,93 @@ class GameBoard extends Component {
 
   /* Define custom graph editing methods here */
 
+  //checks if the current board is balanced and returns true or false
+  checkRebalance = () => {
+    let isBalanced = this.state.board.graph.balanced
+    console.log("balanced: ",this.state.board.graph.balanced)
+    return isBalanced
+
+  }
+  //called if checkRebalance returns false
+  //post request to get correct/balanced game board and sets gameboard to 
+  //return balanced board
+  rebalance = async () =>{
+    let fetch_url = url+"game_board/api/rebalance/" + this.state.gameID 
+   let balance_attempt={'adjacency_list':{'node2':['node0'],'node0':['node5','node3'],'node5':[],'node3':[]}}
+    let requestOptions = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(balance_attempt)
+  };
+  console.log("request option parameters: ", requestOptions)
+    let response = await fetch(fetch_url, requestOptions);
+    let newBoard = await response.json();
+    //player might lose points when re-balance occurs
+    this.setState({playerPointVal: newBoard['player_points'][this.state.turn]})
+    this.setState({ board: newBoard});
+
+  }
   // arg: card chosen
   // call action api which returns new board
   // sets the new board
 
   //for playing first card (one displayed on far left)
   playCard = (card) => {
-    const cookies = new Cookies();
-    cookies.set('selectedCard', card, { path: '/' });
+    const cookies = new Cookies()
+    cookies.set('selectedCard', card, { path: '/' })
     this.apiCall()
+
+    //check if game is over
+    this.checkGameStatus()
   }
 
+  //check if game is over (ie: is golden node at the root of the tree?)
+  checkGameStatus = () => {
+    if (this.state.board['end_game']){
+      this.setState({game_over: true})
+    }
+  }
+
+  //modularize the api call for playing card
   apiCall = async () => {
     const cookies = new Cookies();
     let selectedCard = cookies.get('selectedCard');
-    console.log(selectedCard);
     let fetch_url = url+"game_board/api/action/" + selectedCard + '/'
 
     fetch_url = fetch_url + this.state.board['game_id']
-    console.log(fetch_url)
 
     this.setState({ loading: true});
 
     let response = await fetch(fetch_url);
     let newBoard = await response.json();
-    this.setState({ board: newBoard, loading: false, turn: newBoard['turn']});
+
+
+    this.setState({ board: newBoard, turn: newBoard['turn']});
+    this.setState({playerPointVal: newBoard['player_points'][this.state.turn]})
+    //check if board is balanced then rebalance tree if fxn returned false
+    if(!this.checkRebalance()){
+      this.rebalance()
+    }
+    this.setState({loading: false,})
+    
 
     let made_graph = create_graph(this.state.board['graph'])
-    console.log(made_graph);
     this.setState({ graph: made_graph});
 
-
-    console.log(newBoard)
   }
+
+  // Create custom text content for the nodes: Node point and Node ID
+  renderNodeText = (data) => {
+    console.log(data);
+    return (
+      <foreignObject x='-20' y='-30' width='200' height='50'>
+        <div className="graph_node">
+          <p className="node_points_text">{data.points}</p>
+          <p className="node_id_text">{data.node_id}</p>
+        </div>
+      </foreignObject>
+    );
+  };
 
 
   //in react life cycle, code that is rendered occurs after constructor initialization
@@ -473,10 +539,6 @@ class GameBoard extends Component {
 
     //if loading is completed, statically store cards
     if (!this.state.loading) {
-
-
-      // get the value of api json return index 0,1,2
-
       // here staticly getting the cards so change, plus it would have to be updateding as we play
       card_1 = this.state.board['cards'][this.state.board['turn']][0]
       card_2 = this.state.board['cards'][this.state.board['turn']][1]
@@ -486,12 +548,20 @@ class GameBoard extends Component {
     //html returned to display page. When each card is played, the appropriate function is called, which in turn makes an API call
 
     return (
+
       //format code to display the 3 cards in flex boxes
       <div>
         <div> {this.state.difficulty}</div>
-        
+
         <div style={{height: "10rem"}}>
-          <div className="text-center text-6xl font-bold"> It's {this.state.turn }'s turn! </div>
+          <div className="text-center text-6xl font-bold"> It's {this.state.turn }'s turn! They have {this.state.playerPointVal } points. </div>
+
+          {/* <div className = "text-center text-2xl font-bold w-1/5  py-3 bg-blue-200" > */}
+          <div>
+              {/* <button onClick={ () => this.setState({game_over: true})} > Click here to test view win modal</button> */}
+              {this.state.game_over ? <WinModal winner={this.state.turn} win_board={this.state.board}/> : <div> </div>}
+
+            </div>
 
           <div className="bg-gray-200 flex items-center bg-gray-200 h-10">
 
@@ -506,6 +576,7 @@ class GameBoard extends Component {
             <div className="flex-1 text-gray-700 text-center bg-gray-400 px-4 py-2 m-2">
               <button onClick={() => this.playCard(card_3)}>{card_3}</button>
             </div>
+
           </div>
 
         {/*from react digraph library to format graph */}
@@ -514,7 +585,7 @@ class GameBoard extends Component {
           showGraphControls={true}
           gridSize="100rem"
           gridDotSize={1}
-          renderNodeText={false}
+          renderNodeText={this.renderNodeText}
           ref="GraphView"
           nodeKey={NODE_KEY}
           nodes={nodes}

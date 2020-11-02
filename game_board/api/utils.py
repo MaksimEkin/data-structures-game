@@ -1,14 +1,15 @@
+"""
+    Helper functions for the Game Board API.
+"""
+import random
+import uuid
+import json
+from datetime import datetime
+from bson import json_util
 from game_board import config
 from game_board import rules
 from game_board.database import game_board_db as db
 from game_board.avl import avl_handler as avl
-
-from datetime import datetime
-from bson import json_util, ObjectId
-
-import random
-import uuid
-import json
 
 
 def create_board_db(new_board):
@@ -24,12 +25,17 @@ def create_board_db(new_board):
 
     try:
         game_id = db.create_game(new_board)
+
+        if game_id == "nah bro idk about it":
+            result['error'] = True
+            result['reason'] = "Game Already Exist!"
+            return result
+
         result['game_id'] = json.loads(json_util.dumps(game_id))
 
-    except Exception as e:
-        error = True
+    except Exception as err:
         result['error'] = True
-        result['reason'] = str(e)
+        result['reason'] = str(err)
         return result
 
     return result
@@ -57,21 +63,22 @@ def update_board_db(board):
 
         # Game continues
         else:
-            _ = db.update_game(board['game_id'], board)
-
-            # hide the UID used by data structure backend from user
-            del board['graph']['uid']
 
             # Next player's turn
             next_player_index = (board['player_ids'].index(board['turn']) + 1) % len(board['player_ids'])
             board['turn'] = board['player_ids'][next_player_index]
 
+            _ = db.update_game(board['game_id'], board)
+
+            # hide the UID used by data structure backend from user
+            del board['graph']['uid']
+
             # Update
             result['game_board'] = board
 
-    except Exception as e:
+    except Exception as err:
         result['error'] = True
-        result['reason'] = str(e)
+        result['reason'] = str(err)
         return result
 
     return result
@@ -89,6 +96,7 @@ def load_board_db(game_id):
     try:
         game_board = db.read_game(str(game_id))
         if game_board == "nah bro idk about it":
+            result['error'] = True
             result['reason'] = "Game Not Found!"
             return result
 
@@ -99,9 +107,9 @@ def load_board_db(game_id):
         # Remove the database entry ID from user's view
         del game_board['_id']
 
-    except Exception as e:
+    except Exception as err:
         result['error'] = True
-        result['reason'] = str(e)
+        result['reason'] = str(err)
         return result
 
     return result
@@ -201,7 +209,7 @@ def distribute_cards(player_ids, nodes, data_structure, difficulty, gold_node):
 
     # generate the deck of cards
     cards = list()
-    for ii in range(len(player_ids) * config.CARDS_PER_PLAYER):
+    for _ in range(len(player_ids) * config.CARDS_PER_PLAYER):
 
         # can not pick node dependent action anymore (run out of all nodes)
         if len(nodes) == 0:
@@ -232,7 +240,7 @@ def distribute_cards(player_ids, nodes, data_structure, difficulty, gold_node):
 
         # assign the cards to the player
         player_cards = list()
-        for ii in range(config.CARDS_PER_PLAYER):
+        for _ in range(config.CARDS_PER_PLAYER):
             player_cards.append(cards.pop())
 
         board_cards[str(player)] = player_cards
@@ -260,7 +268,7 @@ def pick_a_card(game_board):
     nodes.remove(game_board['graph']['gold_node'])
 
     # Remove the existing node specific action cards from the deck
-    for player, hand in game_board['cards'].items():
+    for _, hand in game_board['cards'].items():
         for curr_card in hand:
             if 'node' in curr_card:
                 node = curr_card.split(' ')
