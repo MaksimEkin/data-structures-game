@@ -35,7 +35,7 @@ const reactLocal = "http://localhost:3000/"
 const remote = "https://data-structures-game.herokuapp.com/";
 
 //can also be const url = local; or const url = reactLocal;
-const url = remote;
+const url = local;
 
 const sample = {
   edges: [{}],
@@ -444,7 +444,7 @@ class GameBoard extends Component {
 
   //check if game is over (ie: is golden node at the root of the tree?)
   checkGameStatus = () => {
-    if (this.state.board['graph']['gold_node'] === this.state.board['graph']['root_node']){
+    if (this.state.board['end_game']){
       this.setState({game_over: true})
     }
   }
@@ -520,7 +520,7 @@ class GameBoard extends Component {
 
           <div className = "text-center text-2xl font-bold w-1/5  py-3 bg-blue-200" >
               <button onClick={ () => this.setState({game_over: true})} > Click here to test view win modal</button>
-              {this.state.game_over ? <WinModal /> : <div> </div>}
+              {this.state.game_over ? <WinModal winner={this.state.turn} win_board={this.state.board}/> : <div> </div>}
 
             </div>
 
