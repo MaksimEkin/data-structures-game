@@ -65,6 +65,7 @@ class GameBoard extends Component {
       board: null,
       gameID: null,
       turn: null,
+      playerPointVal: null,
       playerCardChoice: null,
       playerBalanceAttempt: null,
       difficulty:null,
@@ -104,6 +105,7 @@ class GameBoard extends Component {
        let board_ = await response.json();
        //set the state values with respect to the dynamic json response
        this.setState({ board: board_, loading: false, turn: board_['turn']});
+       this.setState({playerPointVal: board_['player_points'][this.state.turn]})
 
         //pass the new board state into create_graph function and 
         //set the made_graph state
@@ -552,10 +554,11 @@ class GameBoard extends Component {
         <div> {this.state.difficulty}</div>
 
         <div style={{height: "10rem"}}>
-          <div className="text-center text-6xl font-bold"> It's {this.state.turn }'s turn! </div>
+          <div className="text-center text-6xl font-bold"> It's {this.state.turn }'s turn! They have {this.state.playerPointVal } points. </div>
 
-          <div className = "text-center text-2xl font-bold w-1/5  py-3 bg-blue-200" >
-              <button onClick={ () => this.setState({game_over: true})} > Click here to test view win modal</button>
+          {/* <div className = "text-center text-2xl font-bold w-1/5  py-3 bg-blue-200" > */}
+          <div>
+              {/* <button onClick={ () => this.setState({game_over: true})} > Click here to test view win modal</button> */}
               {this.state.game_over ? <WinModal winner={this.state.turn} win_board={this.state.board}/> : <div> </div>}
 
             </div>
