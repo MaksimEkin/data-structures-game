@@ -1,3 +1,7 @@
+"""
+    This document defines the game settings.
+"""
+
 # ========================================================================
 # General
 #   DIFFICULTY_LEVELS: Game difficulty. Establishes the number of nodes in
@@ -70,4 +74,3 @@ GAIN_TIMES  = {
     'AVL'  : ['Delete'],
     'STACK': ['Pop']
 }
-

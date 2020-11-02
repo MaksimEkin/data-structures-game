@@ -1,5 +1,9 @@
-from pymongo import MongoClient
+"""
+Allows the game data to be stored, and interacted with through the Pandamic game API
+"""
+
 import os
+from pymongo import MongoClient
 
 # Gets database & it's authorization from the environment
 DATABASE_URL1 = os.environ.get('DATABASE_URL1')
@@ -22,21 +26,17 @@ def create_game(board):
     game_id = board["game_id"]
     user_list = board["player_ids"]
 
-    Game_collection = client.InitialDB.Active_Games
-    Lobby_collection = client.InitialDB.Lobby
-
-    returned_data = Game_collection.find_one({"game_id": game_id})
+    returned_data = client.InitialDB.Active_Games.find_one({"game_id": game_id})
     if returned_data is None:
 
         #Remove the players from the lobby
-        for id in user_list:
-            Lobby_collection.find_one_and_delete({"user_id": id})
-            #What happens when the player is being added to the game but not in the Lobby?
+        for curr_id in user_list:
+            client.InitialDB.Lobby.find_one_and_delete({"user_id": curr_id})
 
-        Game_collection.insert_one(board)
+        client.InitialDB.Active_Games.insert_one(board)
         return game_id
-    else:
-        return 'nah bro idk about it'
+
+    return 'nah bro idk about it'
 
 def update_game(game_id: str, board):
     """
@@ -54,8 +54,10 @@ def update_game(game_id: str, board):
         str: friendly response to infrom of an error
     """
     value_returned = client.InitialDB.Active_Games.find_one_and_replace({"game_id": game_id}, board)
-    if value_returned == None:
+
+    if value_returned is None:
         return 'nah bro idk about it'
+
     return value_returned
 
 def read_game(game_id: str):
@@ -73,8 +75,10 @@ def read_game(game_id: str):
     """
 
     value_returned = client.InitialDB.Active_Games.find_one({"game_id": game_id})
-    if value_returned == None:
+
+    if value_returned is None:
         return 'nah bro idk about it'
+
     return value_returned
 
 def remove_game(game_id: str):
@@ -91,8 +95,10 @@ def remove_game(game_id: str):
         str: friendly response to inform of an error
     """
     value_returned = client.InitialDB.Active_Games.delete_one({"game_id": game_id}).deleted_count
+
     if value_returned == 0:
         return 'nah bro idk about it'
+
     return value_returned
 
 def list_games():
@@ -101,7 +107,7 @@ def list_games():
 
     Parameters:
     None
-    
+
     Returns:
         cursor: to iterate game ids
     """

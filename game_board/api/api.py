@@ -1,18 +1,16 @@
+"""
+    API for Game Board that allows interaction with boards.
+"""
+import json
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-# Status codes documentation: https://www.django-rest-framework.org/api-guide/status-codes/
 from rest_framework import status
 from rest_framework.throttling import AnonRateThrottle
 from rest_framework.throttling import UserRateThrottle
 from rest_framework.decorators import throttle_classes
-
-from django.http import HttpResponse
-
 from game_board.api import utils
 from game_board.avl import avl_handler as avl
 from .. import config
-
-import json
 
 
 @api_view(['GET'])
@@ -102,8 +100,8 @@ def rebalance(request, game_id):
     post_request = json.loads(request.body)
     try:
         adjacency_list = post_request['adjacency_list']
-    except Exception as e:
-        return Response({'error': str(e)},
+    except Exception as err:
+        return Response({'error': str(err)},
                         status=status.HTTP_400_BAD_REQUEST)
 
     # Load the game board from database
@@ -131,19 +129,15 @@ def rebalance(request, game_id):
     if board['graph']['adjacency_list'] != adjacency_list:
         board['player_points'][board['turn']] -= config.LOSS[str(board['difficulty'])]
 
-    # Change turn to next player
-    next_player_index = (board['player_ids'].index(board['turn']) + 1) % len(board['player_ids'])
-    board['turn'] = board['player_ids'][next_player_index]
-
     # Update board
     response_status = utils.update_board_db(board)
     if response_status['error']:
         return Response({'error': response_status['reason']},
                         status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    board = response_status['game_board']
+    board_response = response_status['game_board']
 
-    return Response(board)
+    return Response(board_response)
 
 
 @api_view(['GET'])
@@ -171,7 +165,7 @@ def action(request, card, game_id):
                         status=status.HTTP_400_BAD_REQUEST)
 
     # Give the points
-    if card in config.GAIN_TIMES[board['curr_data_structure']]:
+    if card.split(' ')[0] in config.GAIN_TIMES[board['curr_data_structure']]:
         point = board['graph']['node_points'][card.split()[1]]
         board['player_points'][board['turn']] += point
 
@@ -195,6 +189,6 @@ def action(request, card, game_id):
         return Response({'error': response_status['reason']},
                         status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    board = response_status['game_board']
+    board_response = response_status['game_board']
 
-    return Response(board)
+    return Response(board_response)

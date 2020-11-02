@@ -1,3 +1,6 @@
+"""
+    URL's for the Game Board app.
+"""
 from django.urls import path
 from game_board.api import api
 from . import views
