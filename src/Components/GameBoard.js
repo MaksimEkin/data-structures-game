@@ -34,7 +34,7 @@ const reactLocal = "http://localhost:3000/"
 const remote = "https://data-structures-game.herokuapp.com/";
 
 //can also be const url = local; or const url = reactLocal;
-const url = remote;
+const url = local;
 
 const sample = {
   edges: [{}],
@@ -429,6 +429,7 @@ class GameBoard extends Component {
   //checks if the current board is balanced and returns true or false
   checkRebalance = () => {
     let isBalanced = this.state.board.graph.balanced
+    console.log("balanced: ",this.state.board.graph.balanced)
     return isBalanced
 
   }
@@ -436,12 +437,19 @@ class GameBoard extends Component {
   //post request to get correct/balanced game board and sets gameboard to 
   //return balanced board
   rebalance = async () =>{
-    let fetch_url = url+"game_board/api/rebalance/" + this.state.gameID + '/'
-    this.setState({ loading: true});
-
-    let response = await fetch(fetch_url);
+    let fetch_url = url+"game_board/api/rebalance/" + this.state.gameID 
+   let balance_attempt={'adjacency_list':{'node2':['node0'],'node0':['node5','node3'],'node5':[],'node3':[]}}
+    let requestOptions = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(balance_attempt)
+  };
+  console.log("request option parameters: ", requestOptions)
+    let response = await fetch(fetch_url, requestOptions);
     let newBoard = await response.json();
-    this.setState({ board: newBoard, loading: false});
+
+    console.log(newBoard)
+    this.setState({ board: newBoard});
 
   }
   // arg: card chosen
@@ -466,11 +474,12 @@ class GameBoard extends Component {
 
     let response = await fetch(fetch_url);
     let newBoard = await response.json();
-    this.setState({ board: newBoard, loading: false, turn: newBoard['turn']});
+    this.setState({ board: newBoard, turn: newBoard['turn']});
     //check if board is balanced then rebalance tree if fxn returned false
     if(!this.checkRebalance()){
       this.rebalance()
     }
+    this.setState({loading: false,})
     let made_graph = create_graph(this.state.board['graph'])
     this.setState({ graph: made_graph});
 
