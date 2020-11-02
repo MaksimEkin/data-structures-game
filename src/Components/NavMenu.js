@@ -6,10 +6,11 @@ import { faBars } from '@fortawesome/free-solid-svg-icons'
 function NavMenu(){
     //react hook to click and expand/minimize menu
     //conditional rendering:show html only when state is true
-    
+
     const [showMenu, setShowMenu] = useState(false)
+
     //MENU initialized to null
-    //MENUMASK toggles the menu to appear and disappear when the menu button is clicked on
+    //MASKMENU toggles the menu to visible/invisible when menu button is clicked
     let menu
     let menuMask
     if(showMenu){

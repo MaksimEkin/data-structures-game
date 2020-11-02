@@ -173,11 +173,11 @@ class PlayGame(TestCase):
     """Simulates game plays."""
 
     def setUp(self):
-        # create a new game
+        """create a new game"""
         self.game = self.client.get('/game_board/api/start_game/Easy/ID1,ID2,ID3/AVL').data
 
     def tearDown(self):
-        # remove the created game
+        """remove the created game"""
         db.remove_game(self.game['game_id'])
 
     def test_game_simulation(self):
