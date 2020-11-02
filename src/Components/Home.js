@@ -41,19 +41,17 @@ class Home extends Component{
             }}
           />
 
-        <h1 className="font-bold text-2xl"> Home</h1>
+        <h1 >Enter Game Info</h1>
         <Button>
         <GameInfo
         level = {this.state.difficulty}
         playerList={this.state.players}
         gameDS={this.state.data_structure}
         />
-       </Button>
-
-      <div className='Rankings'>
+    </Button>
+    <div className='Rankings'>
           <RankingTable />
       </div>
-
     </div>
     )
 }

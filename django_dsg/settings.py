@@ -44,8 +44,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-
-    # The Data Structure Game Apps
     'home_page',
     'game_board',
     'profile_page'
