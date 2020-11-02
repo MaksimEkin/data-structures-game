@@ -3,6 +3,7 @@ import "./styles.css";
 import Particles from 'react-particles-js';
 import { Button, Grid, Typography, Card, CardHeader, CardActions, CardActionArea, CardContent, Chip } from '@material-ui/core';
 import GameInfo from './Modal/GameInfo.js'
+import { RankingTable } from './RankingTable'
 //this function is called from App.js to start the interface of the game
 //calls the GameInfo modal to get the new game's information
 class Home extends Component{
@@ -40,7 +41,7 @@ class Home extends Component{
             }}
           />
 
-        <h1 className="font-bold text-2xl"> Home</h1>
+        <h1 >Enter Game Info</h1>
         <Button>
         <GameInfo
         level = {this.state.difficulty}
@@ -48,6 +49,9 @@ class Home extends Component{
         gameDS={this.state.data_structure}
         />
     </Button>
+    <div className='Rankings'>
+          <RankingTable />
+      </div>
     </div>
     )
 }
