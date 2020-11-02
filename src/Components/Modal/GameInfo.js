@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import {Button, Grid, TextField} from '@material-ui/core';
+import React from 'react';
+import {TextField} from '@material-ui/core';
 import Cookies from 'universal-cookie';
 import {Link} from "react-router-dom";
 //set the construct by sharing/setting the constructor states between
@@ -35,7 +35,7 @@ render(){
         // each value input changes handleInput and is rebinded to the state value
         //that is changed and resets the cookies
         <span class="border border-secondary">
-        <form>
+        <form onSubmit={this.handleSubmit}>
         <div class="form-group">
         <label for='difficulty-level'>Difficulty Level</label>
                 <select type='text' id='difficulty-level' value={this.state.level} name='level' onChange={this.handleInput} label='Difficulty Level' style={{ marginBottom: '1em' }}  >
