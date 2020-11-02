@@ -34,7 +34,7 @@ const reactLocal = "http://localhost:3000/"
 const remote = "https://data-structures-game.herokuapp.com/";
 
 //can also be const url = local; or const url = reactLocal;
-const url = remote;
+const url = local;
 
 const sample = {
   edges: [{}],
@@ -100,7 +100,8 @@ class GameBoard extends Component {
        response = await fetch(getGameURL + game_id['game_id']);
        let board_ = await response.json();
        //set the state values with respect to the dynamic json response
-       this.setState({ board: board_, loading: false, turn: board_['turn'], playerPointVal: board_['player_points'][board_['turn']]});
+       this.setState({ board: board_, loading: false, turn: board_['turn']});
+       this.setState({playerPointVal: board_['player_points'][this.state.turn]})
 
         //pass the new board state into create_graph function and 
         //set the made_graph state
@@ -447,7 +448,8 @@ class GameBoard extends Component {
 
     let response = await fetch(fetch_url);
     let newBoard = await response.json();
-    this.setState({ board: newBoard, loading: false, turn: newBoard['turn'], playerPointVal: newBoard['player_points'][newBoard['turn']]});
+    this.setState({ board: newBoard, loading: false, turn: newBoard['turn']});
+    this.setState({playerPointVal: newBoard['player_points'][this.state.turn]})
 
     let made_graph = create_graph(this.state.board['graph'])
     this.setState({ graph: made_graph});
