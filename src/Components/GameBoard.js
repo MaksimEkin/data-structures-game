@@ -65,6 +65,7 @@ class GameBoard extends Component {
       board: null,
       gameID: null,
       turn: null,
+      playerPointVal: null,
       playerCardChoice: null,
       playerBalanceAttempt: null,
       difficulty:null,
@@ -102,6 +103,7 @@ class GameBoard extends Component {
        let board_ = await response.json();
        //set the state values with respect to the dynamic json response
        this.setState({ board: board_, loading: false, turn: board_['turn']});
+       this.setState({playerPointVal: board_['player_points'][this.state.turn]})
 
         //pass the new board state into create_graph function and 
         //set the made_graph state
@@ -449,6 +451,7 @@ class GameBoard extends Component {
     let response = await fetch(fetch_url);
     let newBoard = await response.json();
     this.setState({ board: newBoard, loading: false, turn: newBoard['turn']});
+    this.setState({playerPointVal: newBoard['player_points'][this.state.turn]})
 
     let made_graph = create_graph(this.state.board['graph'])
     this.setState({ graph: made_graph});
@@ -507,7 +510,7 @@ class GameBoard extends Component {
         <div> {this.state.difficulty}</div>
 
         <div style={{height: "10rem"}}>
-          <div className="text-center text-6xl font-bold"> It's {this.state.turn }'s turn! </div>
+          <div className="text-center text-6xl font-bold"> It's {this.state.turn }'s turn! They have {this.state.playerPointVal } points. </div>
 
           <div className="bg-gray-200 flex items-center bg-gray-200 h-10">
 
