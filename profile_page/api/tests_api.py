@@ -227,6 +227,46 @@ class Logout(TestCase):
         print(f"{BColors.OKGREEN}\t[+]\tUser does not have the token after log-out.{BColors.ENDC}")
 
 
+class Delete(TestCase):
+    """Tests the API calls that is related to deleting user account."""
+
+    def setUp(self):
+        """Create an account."""
+        sleep(1)
+
+        # temporary user name
+        self.user_info = str(uuid.uuid1()).split('-')[0]
+
+        post_data = {'user_name': self.user_info,
+                     'password1': 'pineapple',
+                     'password2': 'pineapple',
+                     'email': self.user_info}
+        response = self.client.post('/profile_page/api/register', post_data)
+        self.assertEqual(response.status_code, 200,
+                          msg=f'{BColors.FAIL}\t[-]\tFailed creating an account!{BColors.ENDC}')
+        print(f"{BColors.OKGREEN}\t[+]\tPass creating a user.{BColors.ENDC}")
+
+        # Authentication token
+        self.token = response.data['token']
+
+    def test_delete(self):
+        """Tests account deleting by checking if it is still in the database."""
+
+        # delete account
+        post_data = {'user_id': self.user_info,
+                     'token': self.token}
+
+        response = self.client.post('/profile_page/api/delete', post_data)
+        self.assertEqual(response.status_code, 200,
+                         msg=f'{BColors.FAIL}\t[-]\tFailed deleting the account!{BColors.ENDC}')
+        print(f"{BColors.OKGREEN}\t[+]\tPass deleting the account.{BColors.ENDC}")
+
+        # check if user the user does not exist after it got deleted
+        self.assertEqual(profile_db.read_one_user(self.user_info), False,
+                         msg=f'{BColors.FAIL}\t[-]\tUser still exist after the account deleted!{BColors.ENDC}')
+        print(f"{BColors.OKGREEN}\t[+]\tUser is no longer in the database after got removed.{BColors.ENDC}")
+
+
 class SaveBoard(TestCase):
     """Tests the API calls that is related to saving a game board."""
 

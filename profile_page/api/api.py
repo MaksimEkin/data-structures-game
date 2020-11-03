@@ -138,7 +138,7 @@ def logout(request):
     user_id: unique user identifier (same as username).
     token: authentication token that allow access to the user's account.
 
-    :param self: POST request with fields 'user_id', 'token'.
+    :param request: POST request with fields 'user_id', 'token'.
     :return: success message, else error status.
     """
     # user_name == user_id
@@ -158,6 +158,39 @@ def logout(request):
     # Here let db know we are logging out by removing user's token
     if not db.remove_token(data['user_id']):
         return Response({'error': str('Error when logging out!')}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    return Response({'status': 'success'})
+
+
+@api_view(['POST'])
+def delete(request):
+    """
+    If the username has the given token, user's account is deleted.
+    Else, UNAUTHORIZED error is returned.
+
+    user_id: unique user identifier (same as username).
+    token: authentication token that allow access to the user's account.
+
+    :param request: POST request with fields 'user_id', 'token'.
+    :return: success message, else error status.
+    """
+    # user_name == user_id
+    required_fields = ['user_id', 'token']
+
+    # Check if the post request contain the required fields
+    if set(required_fields) != set(list(request.data.keys())):
+        return Response({'error': str('Missing required fields!')}, status=status.HTTP_400_BAD_REQUEST)
+
+    # POST Request content
+    data = request.data
+
+    # Here check if user_id matches the token with the database
+    if not db.check_user(data['user_id'], data['token']):
+        return Response({'error': str('UNAUTHORIZED')}, status=status.HTTP_401_UNAUTHORIZED)
+
+    # Here remove the user's account from the database
+    if not db.remove_user(data['user_id']):
+        return Response({'error': str('Error when removing the user account!')}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     return Response({'status': 'success'})
 
