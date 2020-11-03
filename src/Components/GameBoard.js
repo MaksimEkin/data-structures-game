@@ -35,7 +35,7 @@ const reactLocal = "http://localhost:3000/"
 const remote = "https://data-structures-game.herokuapp.com/";
 
 //can also be const url = local; or const url = reactLocal;
-const url = remote;
+const url = local;
 
 const sample = {
   edges: [{}],
@@ -471,13 +471,6 @@ class GameBoard extends Component {
     this.checkGameStatus()
   }
 
-  //check if game is over (ie: is golden node at the root of the tree?)
-  checkGameStatus = () => {
-    if (this.state.board['end_game']){
-      this.setState({game_over: true})
-    }
-  }
-
   //modularize the api call for playing card
   apiCall = async () => {
     const cookies = new Cookies();
@@ -491,14 +484,13 @@ class GameBoard extends Component {
     let response = await fetch(fetch_url);
     let newBoard = await response.json();
 
-
     this.setState({ board: newBoard, turn: newBoard['turn']});
     this.setState({playerPointVal: newBoard['player_points'][this.state.turn]})
     //check if board is balanced then rebalance tree if fxn returned false
     if(!this.checkRebalance()){
       this.rebalance()
     }
-    this.setState({loading: false,})
+    this.setState({loading: false})
     
 
     let made_graph = create_graph(this.state.board['graph'])
@@ -506,9 +498,30 @@ class GameBoard extends Component {
 
   }
 
+  //check if game is over (ie: is golden node at the root of the tree/does API end_game == true?)
+  checkGameStatus = async () => {
+    console.log("In CheckGameStatus: ", this.state.board);
+    this.setState({loading: true})
+    setTimeout(this.temp_api_call, 200)
+    //this.temp_api_call()
+    if (this.state.board['end_game']){
+      this.setState({game_over: true})
+    }
+  }
+  temp_api_call = async () => {
+    let temp_url = url+"game_board/api/board/" + this.state.board['game_id']
+    let resp = await fetch(temp_url);
+    let temp_board = await resp.json();
+    if (temp_board["error"] == "Game Not Found!") {
+      console.log("Detected error")
+      this.setState({game_over: true})
+    }
+    console.log("temp board: ", temp_board)
+    this.setState({loading: false})
+  }
+
   // Create custom text content for the nodes: Node point and Node ID
   renderNodeText = (data) => {
-    console.log(data);
     return (
       <foreignObject x='-20' y='-30' width='200' height='50'>
         <div className="graph_node">
