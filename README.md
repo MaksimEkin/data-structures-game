@@ -13,7 +13,7 @@ The Data Structures Game is a competitive online game. The goal of this game is 
 1. [Install Anaconda](https://docs.anaconda.com/anaconda/install/)
 2. Create a minimal-empty Python environment:
 - ```conda create --name dsg python=3.8.5```
-- ```source activate dsg```. Note that ```dsg``` is just a name. You may choose differently. The rest of the documentation assumes you named the environment ```dsg```.
+- ```source activate dsg``` (or ```conda activate dsg```). Note that ```dsg``` is just a name. You may choose differently. The rest of the documentation assumes you named the environment ```dsg```.
 3. Install [NodeJS](https://anaconda.org/conda-forge/nodejs) for React (make sure you are in ```dsg```):
 - ```conda install nodejs```
 4. Add the local environment variables to your path. The environment variables include the secret keys needed to run the software. **Contact the development team**
