@@ -52,6 +52,12 @@ Cross-origins calls are blocked due to a header that is in place to protect agai
 - **Game Board Database**
     - Located at [game_board/database/test_db.py](https://github.com/MaksimEkin/data-structures-game/tree/master/game_board/database/test_db.py)
     - Run from the root directory of the project with ```python manage.py test game_board.database.test_db```
+- **User Profile Database**
+    - Located at [profile_page/database/test_db.py](https://github.com/MaksimEkin/data-structures-game/tree/master/profile_page/database/test_db.py)
+    - Run from the root directory of the project with ```python manage.py test profile_page.database.test_db```
+- **Home Page Database**
+    - Located at [home_page/database/test_db.py](https://github.com/MaksimEkin/data-structures-game/tree/master/home_page/database/test_db.py)
+    - Run from the root directory of the project with ```python manage.py test home_page.database.test_db```
 - **AVL Data Structure**
     - Located at [game_board/avl/test_avl.py](https://github.com/MaksimEkin/data-structures-game/blob/master/game_board/avl/test_avl.py)
     - Run from the root directory of the project with ```python manage.py test game_board.avl.test_avl```
