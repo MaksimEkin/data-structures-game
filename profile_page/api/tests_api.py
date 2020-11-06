@@ -33,6 +33,59 @@ class APIOverview(TestCase):
         print(f"{BColors.OKGREEN}\t[+]\tPass return code api_overview.{BColors.ENDC}")
 
 
+class Profile(TestCase):
+    """Tests the API calls that is related to getting the all user profile."""
+
+    def setUp(self):
+        """Create an account."""
+        sleep(1)
+
+        # temporary user name
+        self.user_info = str(uuid.uuid1()).split('-')[0]
+
+        post_data = {'user_name':  self.user_info,
+                     'password1': 'smith1',
+                     'password2': 'smith1',
+                     'email':  self.user_info}
+        response = self.client.post('/profile_page/api/register', post_data)
+        self.assertEqual(response.status_code, 200,
+                          msg=f'{BColors.FAIL}\t[-]\tFailed creating an account!{BColors.ENDC}')
+        print(f"{BColors.OKGREEN}\t[+]\tPass creating a user.{BColors.ENDC}")
+
+        # Authentication token
+        self.token = response.data['token']
+
+    def tearDown(self):
+        """Removes the testing user from the database."""
+        profile_db.remove_user(self.user_info)
+
+    def test_profile(self):
+        """Tests user profile by checking if it contains all fields."""
+
+        # logout
+        post_data = {'user_id': self.user_info,
+                     'token': self.token}
+
+        response = self.client.post('/profile_page/api/profile', post_data)
+        self.assertEqual(response.status_code, 200,
+                         msg=f'{BColors.FAIL}\t[-]\tFailed getting profile information!{BColors.ENDC}')
+        print(f"{BColors.OKGREEN}\t[+]\tPass getting profile information.{BColors.ENDC}")
+
+        # check that user profile has all the information required
+        profile_data_points = list(response.data['user_profile'].keys())
+        expected_points = ['user_name', 'badges', 'current_story_level', 'friends',
+                           'points', 'rank', 'saved_games']
+
+        self.assertEqual(profile_data_points, expected_points,
+                         msg=f'{BColors.FAIL}\t[-]\tUser profile missing information!{BColors.ENDC}')
+        print(f"{BColors.OKGREEN}\t[+]\tUser profile contains all the information needed.{BColors.ENDC}")
+
+        # check that user profile information is for the correct user
+        self.assertEqual(response.data['user_profile']['user_name'], self.user_info,
+                         msg=f'{BColors.FAIL}\t[-]\tUser profile is for the wrong user!{BColors.ENDC}')
+        print(f"{BColors.OKGREEN}\t[+]\tUser profile information for the correct user.{BColors.ENDC}")
+
+
 class Register(TestCase):
     """Tests the API calls that is related to user registration."""
 
@@ -214,7 +267,7 @@ class Logout(TestCase):
 
         # logout
         post_data = {'user_id': self.user_info,
-                    'token': self.token}
+                     'token': self.token}
 
         response = self.client.post('/profile_page/api/logout', post_data)
         self.assertEqual(response.status_code, 200,

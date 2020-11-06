@@ -54,6 +54,12 @@ def start_game(request, difficulty, player_ids, data_structures):
     player_ids = player_ids.split(',')
     data_structures = data_structures.split(',')
 
+    # Check if the number of players request is valid
+    if len(player_ids) > config.MAX_NUM_PLAYERS:
+        return Response({'error': 'Too many players requested!',
+                         'options': config.MAX_NUM_PLAYERS},
+                        status=status.HTTP_400_BAD_REQUEST)
+
     # Create new game board JSON (dict), and store it in the database
     new_board = utils.new_board(difficulty, player_ids, data_structures)
     response_status = utils.create_board_db(new_board)
