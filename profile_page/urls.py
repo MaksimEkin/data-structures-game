@@ -10,6 +10,7 @@ urlpatterns = [
     path('api/register', api.register, name='profile-page-register'),
     path('api/login', api.login, name='profile-page-login'),
     path('api/logout', api.logout, name='profile-page-logout'),
+    path('api/delete', api.delete, name='profile-page-delete'),
 
     # Get all profile information
     path('api/profile', api.profile, name='profile-page-profile'),

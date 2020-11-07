@@ -41,15 +41,56 @@ def api_overview(request):
     return Response(api_urls)
 
 
-@api_view(['GET'])
+@api_view(['POST'])
 def profile(request):
     """
-    TODO: This API call is not implemented yet.
+    POST request API call.
+    Returns all of the user's profile information if the user is authenticated.
+    Else, UNAUTHORIZED error is returned.
 
-    :param request:
-    :return:
+    :param request: POST request with fields 'user_id', 'token'.
+    :return: success message, else error status.
     """
-    Response({'status': 'TODO'})
+    # user_name == user_id
+    required_fields = ['user_id', 'token']
+
+    # Check if the post request contain the required fields
+    if set(required_fields) != set(list(request.data.keys())):
+        return Response({'error': str('Missing required fields!')}, status=status.HTTP_400_BAD_REQUEST)
+
+    # POST Request content
+    data = request.data
+
+    # Here check if user_id matches the token with the database
+    if not db.check_user(data['user_id'], data['token']):
+        return Response({'error': str('UNAUTHORIZED')}, status=status.HTTP_401_UNAUTHORIZED)
+
+    # Get the user profile data
+    user_profile_data = db.read_one_user(data['user_id'])
+
+    # Extract the game board information needed to list user's saved games
+    saved_game_boards = user_profile_data['save_games']
+    game_board_info = list()
+    for game in saved_game_boards:
+        temp = {
+            'game_id': game['game_id'],
+            'difficulty': game['difficulty'],
+            'curr_data_structure': game['curr_data_structure']
+        }
+        game_board_info.append(temp)
+
+    # Form the response data
+    response_data = {
+        'user_name': user_profile_data['user_id'],
+        'badges': user_profile_data['badges'],
+        'current_story_level': user_profile_data['current_story_level'],
+        'friends': user_profile_data['friends'],
+        'points': user_profile_data['points'],
+        'rank': user_profile_data['rank'],
+        'saved_games': game_board_info
+    }
+
+    return Response({'user_profile': response_data})
 
 
 @api_view(['POST'])
@@ -138,7 +179,7 @@ def logout(request):
     user_id: unique user identifier (same as username).
     token: authentication token that allow access to the user's account.
 
-    :param self: POST request with fields 'user_id', 'token'.
+    :param request: POST request with fields 'user_id', 'token'.
     :return: success message, else error status.
     """
     # user_name == user_id
@@ -158,6 +199,39 @@ def logout(request):
     # Here let db know we are logging out by removing user's token
     if not db.remove_token(data['user_id']):
         return Response({'error': str('Error when logging out!')}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    return Response({'status': 'success'})
+
+
+@api_view(['POST'])
+def delete(request):
+    """
+    If the username has the given token, user's account is deleted.
+    Else, UNAUTHORIZED error is returned.
+
+    user_id: unique user identifier (same as username).
+    token: authentication token that allow access to the user's account.
+
+    :param request: POST request with fields 'user_id', 'token'.
+    :return: success message, else error status.
+    """
+    # user_name == user_id
+    required_fields = ['user_id', 'token']
+
+    # Check if the post request contain the required fields
+    if set(required_fields) != set(list(request.data.keys())):
+        return Response({'error': str('Missing required fields!')}, status=status.HTTP_400_BAD_REQUEST)
+
+    # POST Request content
+    data = request.data
+
+    # Here check if user_id matches the token with the database
+    if not db.check_user(data['user_id'], data['token']):
+        return Response({'error': str('UNAUTHORIZED')}, status=status.HTTP_401_UNAUTHORIZED)
+
+    # Here remove the user's account from the database
+    if not db.remove_user(data['user_id']):
+        return Response({'error': str('Error when removing the user account!')}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     return Response({'status': 'success'})
 

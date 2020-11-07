@@ -52,6 +52,14 @@ class StartGame(TestCase):
                          msg=f'{BColors.FAIL}\t[-]\tInvalid difficulty level got accepted!{BColors.ENDC}')
         print(f"{BColors.OKGREEN}\t[+]\tPass not accepting invalid difficulty level.{BColors.ENDC}")
 
+        # Test requesting too many users
+        response2 = self.client.get('/game_board/api/start_game/Easy/ID1,ID2,ID3,ID4,ID5,ID6/AVL')
+
+        self.assertEqual(response2.data, {'error': 'Too many players requested!',
+                                          'options': config.MAX_NUM_PLAYERS},
+                         msg=f'{BColors.FAIL}\t[-]\tAccepted a game with too many players!{BColors.ENDC}')
+        print(f"{BColors.OKGREEN}\t[+]\tPass not accepting too many players.{BColors.ENDC}")
+
     def test_start_game(self):
         """Tests starting new games"""
         random.seed(42)
