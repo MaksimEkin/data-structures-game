@@ -72,7 +72,7 @@ class GameBoard extends Component {
       //used in conjunction with the API's end_game returned in the JSON
       game_over: false
     };
-    //set intial cookie values in constructor for game info
+    
     
   }
 
