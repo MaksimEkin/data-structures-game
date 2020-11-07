@@ -11,6 +11,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from game_board.api import utils as game_utils
 from profile_page.database import profile_page_db as db
+from profile_page.api import mock as mock_db
 
 
 @api_view(['GET'])
@@ -91,6 +92,124 @@ def profile(request):
     }
 
     return Response({'user_profile': response_data})
+
+
+@api_view(['POST'])
+def add_friend(request):
+    """
+    POST request API call.
+    Sends a friend request to the destination user if the source user is authenticated.
+    Else, UNAUTHORIZED error is returned.
+
+    source_user_id: user who is adding a friend.
+    dest_user_id: friend who is being added.
+    token: authentication token that allow access to the user's account.
+
+    :param request: POST request with fields 'source_user_id', 'dest_user_id', 'token'
+    :return: success message or error status.
+    """
+    required_fields = ['source_user_id', 'dest_user_id', 'token']
+
+    # Check if the post request contain the required fields
+    if set(required_fields) != set(list(request.data.keys())):
+        return Response({'error': str('Missing required fields!')}, status=status.HTTP_400_BAD_REQUEST)
+
+    # POST Request content
+    data = request.data
+
+    # Here check if user_id matches the token with the database
+    if not db.check_user(data['source_user_id'], data['token']):
+        return Response({'error': str('UNAUTHORIZED')}, status=status.HTTP_401_UNAUTHORIZED)
+
+    # Send friend request
+    if not mock_db.add_friend(data['source_user_id'], data['dest_user_id']):
+        return Response({'error': str('Error when adding friend!')},
+                        status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    return Response({'status': 'success'})
+
+
+@api_view(['POST'])
+def accept_decline_friend(request):
+    """
+    POST request API call.
+    Accepts the friend request if the source user is authenticated.
+    Else, UNAUTHORIZED error is returned.
+
+    source_user_id: user who recieved the friend request.
+    dest_user_id: user who initiated friend request.
+    accept: indicate acceptence or decline of the request.
+    token: authentication token that allow access to the user's account.
+
+    :param request: POST request with fields 'source_user_id', 'dest_user_id', 'accept', 'token'
+    :return: success message or error status.
+    """
+    required_fields = ['source_user_id', 'dest_user_id', 'accept', 'token']
+
+    # Check if the post request contain the required fields
+    if set(required_fields) != set(list(request.data.keys())):
+        return Response({'error': str('Missing required fields!')}, status=status.HTTP_400_BAD_REQUEST)
+
+    # POST Request content
+    data = request.data
+
+    # Here check if user_id matches the token with the database
+    if not db.check_user(data['source_user_id'], data['token']):
+        return Response({'error': str('UNAUTHORIZED')}, status=status.HTTP_401_UNAUTHORIZED)
+
+    # if friend request is being accepted
+    if data['accept'] == "yes":
+        if not mock_db.accept_friend(data['source_user_id'], data['dest_user_id']):
+            return Response({'error': str('Error when accepting friend request!')},
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    # if friend request is not accepted
+    elif data['accept'] == "no":
+        if not mock_db.cancel_friend_request(data['source_user_id'], data['dest_user_id']):
+            return Response({'error': str('Error when declining friend request!')},
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    # bad request
+    else:
+        return Response({'error': str('Invalid request. Use yes/no in accept field.')},
+                        status=status.HTTP_400_BAD_REQUEST)
+
+    return Response({'status': 'success'})
+
+
+@api_view(['POST'])
+def remove_friend(request):
+    """
+    POST request API call.
+    Removes the friend from user's profile if the source user is authenticated.
+    Else, UNAUTHORIZED error is returned.
+
+    source_user_id: user who is deleting a friend.
+    dest_user_id: friend that is being deleted.
+    token: authentication token that allow access to the user's account.
+
+    :param request: POST request with fields 'source_user_id', 'dest_user_id', 'token'
+    :return: success message or error status.
+    """
+    required_fields = ['source_user_id', 'dest_user_id', 'token']
+
+    # Check if the post request contain the required fields
+    if set(required_fields) != set(list(request.data.keys())):
+        return Response({'error': str('Missing required fields!')}, status=status.HTTP_400_BAD_REQUEST)
+
+    # POST Request content
+    data = request.data
+
+    # Here check if user_id matches the token with the database
+    if not db.check_user(data['source_user_id'], data['token']):
+        return Response({'error': str('UNAUTHORIZED')}, status=status.HTTP_401_UNAUTHORIZED)
+
+    # delete friend from user profile
+    if not mock_db.remove_friend(data['source_user_id'], data['dest_user_id']):
+        return Response({'error': str('Error when removing friend from the profile!')},
+                        status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    return Response({'status': 'success'})
 
 
 @api_view(['POST'])
