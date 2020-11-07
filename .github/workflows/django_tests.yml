@@ -13,21 +13,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    
-    - name: Set up Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node-version }}
-
-    - name: Cache dependencies
-      uses: actions/cache@v2
-      with:
-        path: |
-          **/node_modules
-        key: ${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
-
-    - name: Install dependencies
-      run: npm install
       
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
@@ -36,6 +21,8 @@ jobs:
     
     - name: Install Dependencies
       run: |
+        mkdir build
+        touch build/index.html
         python -m pip install --upgrade pip
         pip install -r requirements.txt
     - name: Run Tests
