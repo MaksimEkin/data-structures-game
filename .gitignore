@@ -5,14 +5,13 @@ __pycache__/
 .DS_Store
 .idea/
 
-build/
-
 # C extensions
 *.so
 
 # Distribution / packaging
 .Python
-#build/
+build/
+build/*
 node_modules
 develop-eggs/
 dist/
