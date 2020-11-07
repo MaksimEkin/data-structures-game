@@ -15,6 +15,11 @@ urlpatterns = [
     # Get all profile information
     path('api/profile', api.profile, name='profile-page-profile'),
 
+    # Adding, removing, and accepting friend
+    path('api/add_friend', api.add_friend, name='profile-page-add_friend'),
+    path('api/accept_decline_friend', api.accept_decline_friend, name='profile-page-accept_friend'),
+    path('api/remove_friend', api.remove_friend, name='profile-page-remove_friend'),
+
     # Game Board Import/Export API calls
     path('api/save_board', api.save_board, name='profile-save_board'),
     path('api/delete_board', api.delete_board, name='profile-delete_board'),
