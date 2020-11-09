@@ -36,8 +36,15 @@ class WinModal extends Component {
         Swal.fire({
             title: "Congrats! You are the Data Structures Wizard!",
             text: "Winner is: " + this.state.winner + " with " + this.state.board["player_points"][this.state.winner] + " points!",
-            imageUrl: Party_Face
-        });
+            imageUrl: Party_Face,
+            confirmButtonText: "Return to Home Page"
+        }).then((result) => {
+
+            //if player clicks "Return to Home Page" button, redirect there
+            if (result.isConfirmed) {
+                window.location.href = "/"
+            }
+        })
         return (<div> </div>)
     }
 }
