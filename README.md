@@ -13,7 +13,7 @@ The Data Structures Game is a competitive online game. The goal of this game is 
 1. [Install Anaconda](https://docs.anaconda.com/anaconda/install/)
 2. Create a minimal-empty Python environment:
 - ```conda create --name dsg python=3.8.5```
-- ```source activate dsg```. Note that ```dsg``` is just a name. You may choose differently. The rest of the documentation assumes you named the environment ```dsg```.
+- ```source activate dsg``` (or ```conda activate dsg```). Note that ```dsg``` is just a name. You may choose differently. The rest of the documentation assumes you named the environment ```dsg```.
 3. Install [NodeJS](https://anaconda.org/conda-forge/nodejs) for React (make sure you are in ```dsg```):
 - ```conda install nodejs```
 4. Add the local environment variables to your path. The environment variables include the secret keys needed to run the software. **Contact the development team**
@@ -52,6 +52,12 @@ Cross-origins calls are blocked due to a header that is in place to protect agai
 - **Game Board Database**
     - Located at [game_board/database/test_db.py](https://github.com/MaksimEkin/data-structures-game/tree/master/game_board/database/test_db.py)
     - Run from the root directory of the project with ```python manage.py test game_board.database.test_db```
+- **User Profile Database**
+    - Located at [profile_page/database/test_db.py](https://github.com/MaksimEkin/data-structures-game/tree/master/profile_page/database/test_db.py)
+    - Run from the root directory of the project with ```python manage.py test profile_page.database.test_db```
+- **Home Page Database**
+    - Located at [home_page/database/test_db.py](https://github.com/MaksimEkin/data-structures-game/tree/master/home_page/database/test_db.py)
+    - Run from the root directory of the project with ```python manage.py test home_page.database.test_db```
 - **AVL Data Structure**
     - Located at [game_board/avl/test_avl.py](https://github.com/MaksimEkin/data-structures-game/blob/master/game_board/avl/test_avl.py)
     - Run from the root directory of the project with ```python manage.py test game_board.avl.test_avl```
