@@ -17,12 +17,40 @@ class WinModal extends Component {
     }
 
     render() {
-        /*var i
+
+        var i
+        let players = []
+        let playerScores = ""
+        for (i = 0; i < this.state.board["num_players"]; i++){
+            if (!(this.state.board["player_ids"][i] == this.state.winner)){
+                let curPlayer =  this.state.board["player_ids"][i]
+                playerScores += curPlayer
+                playerScores += " with " + this.state.board.player_points[curPlayer] + " points, \n"
+            }
+        }
+        console.log("PlayerScores: ", playerScores)
+        /*console.log("In Win Modal, printing board", this.state.board)
+        var i
         let players = []
         for (i = 0; i < this.state.board["num_players"]; i++) {
-            players.push(this.state.board["player_ids"][i])
+            console.log(this.state.board["player_ids"][i])
+            console.log("winner", this.state.winner)
+            if (!(this.state.board["player_ids"][i] == this.state.winner)) {
+                console.log("In if")
+                players.push(this.state.board["player_ids"][i])
+            }
         }
 
+        var j
+        let playerList = ""
+        for (j = 0; j < players.length; j++){
+            playerList += players[j] + "\n"
+        }
+
+        console.log("PlayerList, ", playerList)
+
+        console.log("Player points", this.state.board.player_points[players[0]]);
+/*
         let testing = ""
         for (i = 0; i < this.state.board["num_players"]; i++){
             testing += players[i]
@@ -34,8 +62,9 @@ class WinModal extends Component {
 
         //Display win message
         Swal.fire({
-            title: "Congrats! You are the Data Structures Wizard!",
-            text: "Winner is: " + this.state.winner + " with " + this.state.board["player_points"][this.state.winner] + " points!",
+            title: "Congrats " + this.state.winner + "! You are a Data Structures Wizard, with "
+                + this.state.board["player_points"][this.state.winner] + " points!",
+            text: "Other all-stars: " + playerScores,
             imageUrl: Party_Face,
             confirmButtonText: "Return to Home Page"
         }).then((result) => {
