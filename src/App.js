@@ -2,6 +2,7 @@
 import React from "react";
 import GameBoard from './Components/GameBoard'
 import Home from './Components/Home'
+import Profile from './Components/Profile'
 import Header from './Components/Header';
 import {Route, Switch} from "react-router-dom";
 import { BrowserRouter as Router } from 'react-router-dom'
