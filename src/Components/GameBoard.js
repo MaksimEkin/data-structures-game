@@ -34,7 +34,7 @@ const reactLocal = "http://localhost:3000/"
 const remote = "https://data-structures-game.herokuapp.com/";
 
 //can also be const url = local; or const url = reactLocal;
-const url = remote;
+const url = local;
 
 //define sample node
 const sample = {
@@ -54,6 +54,8 @@ class GameBoard extends Component {
       graph: sample,
       selected: {},
       layoutEngineType: 'VerticalTree',
+
+      read_only:true,
 
       //waiting on API call?
       loading: true,
@@ -97,7 +99,7 @@ class GameBoard extends Component {
        //save the get request response to state
        this.setState({ gameID: game_id['game_id']});
        cookies.set('game_id', game_id['game_id'], { path: '/' });
-      
+
        //get request to api and include the dynamic game_id
        response = await fetch(getGameURL + game_id['game_id']);
        let board_ = await response.json();
@@ -393,7 +395,7 @@ class GameBoard extends Component {
       copiedNode: { ...this.state.selected, x, y }
     });
   };
- 
+
   //from imported digraph folder
   onPasteSelected = () => {
     if (!this.state.copiedNode) {
@@ -433,7 +435,7 @@ class GameBoard extends Component {
   }
 
   //called if checkRebalance returns false
-  //post request to get correct/balanced game board and sets gameboard to 
+  //post request to get correct/balanced game board and sets gameboard to
   //return balanced board
   rebalance = async () => {
     let fetch_url = url+"game_board/api/rebalance/" + this.state.gameID
@@ -575,21 +577,40 @@ class GameBoard extends Component {
 
           {this.state.game_over ? <WinModal winner={this.state.turn} win_board={this.state.board}/> : <div> </div>}
 
-          <div className="bg-gray-200 flex items-center bg-gray-200 h-10">
+          <div className="bg-blue-800 flex items-center bg-gray-200 h-11">
 
-            <div className="flex-1 text-gray-700 text-center bg-gray-400 px-4 py-2 m-2">
-              <button onClick={() => this.playCard(card_1)}>{card_1}</button>
+            <div className="flex-1 text-gray-900 text-center items-center bg-gray-200 px-4 py-2 m-2 rounded-lg">
+              <div class="bg-blue-300 border-blue-350 border-opacity-50 rounded-lg shadow-lg flex-1 m-1 py-1">
+                <button onClick={() => this.playCard(card_1)}>{card_1}</button>
+              </div>
             </div>
 
-            <div className="flex-1 text-gray-700 text-center bg-gray-400 px-4 py-2 m-2">
-              <button onClick={() => this.playCard(card_2)}>{card_2}</button>
+            <div className="flex-1 text-gray-1000 text-center items-center bg-gray-200 px-4 py-2 m-2 rounded-lg">
+              <div class="bg-blue-300 border-blue-350 border-opacity-50 rounded-lg shadow-lg flex-1 m-1 py-1">
+                <button onClick={() => this.playCard(card_2)}>{card_2}</button>
+              </div>
             </div>
 
-            <div className="flex-1 text-gray-700 text-center bg-gray-400 px-4 py-2 m-2">
-              <button onClick={() => this.playCard(card_3)}>{card_3}</button>
+            <div className="flex-1 text-gray-1000 text-center items-center bg-gray-200 px-4 py-2 m-2 rounded-lg">
+              <div class="bg-blue-300 border-blue-350 border-opacity-50 rounded-lg shadow-lg flex-1 m-1 py-1">
+                <button onClick={() => this.playCard(card_3)}>{card_3}</button>
+              </div>
             </div>
 
+          <div className="flex-1 text-gray-1000 text-center items-center bg-gray-200 px-4 py-2 m-2 rounded-lg">
+            <div class="bg-yellow-300 border-yellow-350 border-opacity-50 rounded-lg shadow-lg flex-1 m-1 py-1">
+              <button onClick={() =>null}>Reposition Nodes</button>
+            </div>
           </div>
+
+          <div className="flex-1 text-gray-1000 text-center items-center bg-gray-200 px-4 py-2 m-2 rounded-lg">
+            <div class="bg-yellow-300 border-yellow-350 border-opacity-50 rounded-lg shadow-lg flex-1 m-1 py-1">
+              <button onClick={() =>null}>Check Nodes</button>
+            </div>
+          </div>
+
+        </div>
+
 
         {/*from react digraph library to format graph */}
         <div id = "graph" style={{ height: "60rem"}}>
@@ -614,13 +635,13 @@ class GameBoard extends Component {
           onCreateEdge={this.onCreateEdge}
           onSwapEdge={this.onSwapEdge}
           onDeleteEdge={this.onDeleteEdge}
-          readOnly={false}
+          readOnly={this.state.read_only}
           dark={true}
           layoutEngineType={this.state.layoutEngineType}
         />
         </div>
 
-      </div>
+        </div>
       </div>
     );
   }
