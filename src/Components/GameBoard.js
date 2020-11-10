@@ -73,10 +73,7 @@ class GameBoard extends Component {
       game_over: false
     };
     //set intial cookie values in constructor for game info
-    const cookies = new Cookies();
-    cookies.set('level', 'Easy', { path: '/' });
-    cookies.set('playerList','player1,player2', { path: '/' });
-    cookies.set('gameDS','AVL', { path: '/' });
+    
   }
 
   // Initialize component objects by setting state and props of the gameboard

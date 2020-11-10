@@ -13,6 +13,12 @@ class GameInfo extends React.Component {
         this.state = {level:'Easy', playerList:'player1,player2', gameDS:'AVL'};
         this.handleInput = this.handleInput.bind(this);
         this.submitDSG = this.handleInput.bind(this)
+        //defined cookie in constructor with initial values 
+        const cookies = new Cookies();
+        cookies.set('level', this.state.level, { path: '/' });
+        cookies.set('playerList', this.state.playerList, { path: '/' });
+        cookies.set('gameDS', this.state.gameDS, { path: '/' });
+        
     }
 
     //this handls the change in input and is later binded to state values
@@ -21,10 +27,10 @@ class GameInfo extends React.Component {
         await this.setState({ [e.target.name]: e.target.value });
         console.log(this.state)
 
-        const cookies = new Cookies();
-        cookies.set('level', this.state.level, { path: '/' });
-        cookies.set('playerList', this.state.playerList, { path: '/' });
-        cookies.set('gameDS', this.state.gameDS, { path: '/' });
+        
+        this.cookies.set('level', this.state.level, { path: '/' });
+        this.cookies.set('playerList', this.state.playerList, { path: '/' });
+        this.cookies.set('gameDS', this.state.gameDS, { path: '/' });
     };
 
 render(){
