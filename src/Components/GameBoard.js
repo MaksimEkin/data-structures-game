@@ -34,7 +34,7 @@ const reactLocal = "http://localhost:3000/"
 const remote = "https://data-structures-game.herokuapp.com/";
 
 //can also be const url = local; or const url = reactLocal;
-const url = remote;
+const url = local;
 
 //define sample node
 const sample = {
@@ -540,6 +540,20 @@ class GameBoard extends Component {
     );
   };
 
+  repositionNodes = () =>{
+    this.setState({
+      layoutEngineType: 'SnapToGrid',
+      read_only: false
+    })
+  }
+
+  checkNodes = () => {
+    this.setState({
+      layoutEngineType: 'VerticalTree',
+      read_only: true
+    })
+  }
+
 
   //in react life cycle, code that is rendered occurs after constructor initialization
   //and component mounting and then reflects the change in state/prop values
@@ -599,13 +613,13 @@ class GameBoard extends Component {
 
           <div className="flex-1 text-gray-1000 text-center items-center bg-gray-200 px-4 py-2 m-2 rounded-lg">
             <div class="bg-yellow-300 border-yellow-350 border-opacity-50 rounded-lg shadow-lg flex-1 m-1 py-1">
-              <button onClick={() =>null}>Reposition Nodes</button>
+              <button onClick={() =>this.repositionNodes()}>Reposition Nodes</button>
             </div>
           </div>
 
           <div className="flex-1 text-gray-1000 text-center items-center bg-gray-200 px-4 py-2 m-2 rounded-lg">
             <div class="bg-yellow-300 border-yellow-350 border-opacity-50 rounded-lg shadow-lg flex-1 m-1 py-1">
-              <button onClick={() =>null}>Check Nodes</button>
+              <button onClick={() =>this.checkNodes()}>Check Nodes</button>
             </div>
           </div>
 
