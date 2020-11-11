@@ -11,3 +11,4 @@ def profile_page(request):
 
     # Change this to the actual React frontend for game board when ready.
     return render(request, 'index.html')
+
