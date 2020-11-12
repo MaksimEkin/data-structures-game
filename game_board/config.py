@@ -11,6 +11,7 @@
 #   MAX_NUM_PLAYERS  : Maximum number of players in the game.
 # ========================================================================
 DIFFICULTY_LEVELS = ['Hard', 'Medium', 'Easy']
+CARDS_IN_DECk = 54
 CARDS_PER_PLAYER = 3
 MAX_NUM_PLAYERS = 5
 

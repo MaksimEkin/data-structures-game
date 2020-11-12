@@ -13,14 +13,14 @@ from game_board.avl import avl_handler as avl
 
 
 def create_board_db(new_board):
-    '''
+    """
     Creates a new game board instance in the database.
     Returns the error information if fails, or the game board ID.
     If
 
     :param new_board: dictionary for that represents the game board state.
     :return result, {'error': bool, 'reason': string, 'game_id': string}:
-    '''
+    """
     result = {'error': False, 'reason': '', 'game_id': ''}
 
     try:
@@ -42,7 +42,7 @@ def create_board_db(new_board):
 
 
 def update_board_db(board):
-    '''
+    """
     Update the game board in the database with the new state.
     Returns the board itself unless the game ended.
     If the game ended, then it changes the <end_game> field,
@@ -51,7 +51,7 @@ def update_board_db(board):
 
     :param board:
     :return result, {'error': bool, 'reason': string, 'game_board': dict}:
-    '''
+    """
     result = {'error': False, 'reason': '', 'game_board': board}
 
     try:
@@ -85,12 +85,12 @@ def update_board_db(board):
 
 
 def load_board_db(game_id):
-    '''
+    """
     Loads the game board state from the database by its ID.
 
     :param game_id: board's ID
     :return: game board
-    '''
+    """
     result =  {'error': False, 'reason':'', 'game_board': {}}
 
     try:
@@ -116,14 +116,14 @@ def load_board_db(game_id):
 
 
 def new_board(difficulty, player_ids, data_structures):
-    '''
+    """
     Forms the JSON format for the game board state.
 
     :param difficulty: difficulty of the game
     :param player_ids: list of player ids
     :param data_structures: list of data structures
     :return: game board dict
-    '''
+    """
 
     # if it is an AVL
     if data_structures[0] == 'AVL':
@@ -139,11 +139,10 @@ def new_board(difficulty, player_ids, data_structures):
         'player_names': [''],
         'player_points': {str(id): 0 for id in player_ids},
         'turn': random.choice(player_ids),
-        'cards': distribute_cards(player_ids,
-                                  list(graph['node_points'].keys()),
-                                  data_structures[0],
-                                  difficulty,
-                                  graph['gold_node']),
+        'deck': create_card_deck(list(graph['node_points'].keys()),
+                                 data_structures[0],
+                                 difficulty,
+                                 graph['gold_node']),
         'difficulty': difficulty,
         'num_players': len(player_ids),
         'curr_data_structure': data_structures[0],
@@ -155,19 +154,19 @@ def new_board(difficulty, player_ids, data_structures):
         # 'seconds_until_next_ds': 60,
         'online': False
     }
-
+    board['cards'] = distribute_cards(player_ids, board['deck'])
     return board
 
 
 def cheat_check(game_board, card=-1, rebalance=False):
-    '''
+    """
     Validates the attempted action by the rules defined in rules.py
 
     :param game_board: game board JSON (dict), game state
     :param card: string that represents the action that is attempted to play
     :param rebalance: True if check is being done for re-balance attempt
     :return: {'cheat': bool, 'reason': string}
-    '''
+    """
     # General game rules
     check = rules.general(game_board, card)
     if check['cheat']:
@@ -183,19 +182,15 @@ def cheat_check(game_board, card=-1, rebalance=False):
     return {'cheat': False}
 
 
-def distribute_cards(player_ids, nodes, data_structure, difficulty, gold_node):
-    '''
-    Simulates the distribution of deck of cards to the players.
+def create_card_deck(nodes, data_structure, difficulty, gold_node):
+    """ Creates a deck of cards that will be drawn from for the duration of the game.
 
-    :param player_ids: list of players in the game by their ID
     :param nodes: nodes in the data structure
     :param data_structure: type of data structure
     :param difficulty: difficulty level of the game
     :param gold_node: which node is the golden node
-    :return: dictionary of cards assigned to each player
-    '''
-    board_cards = dict()
-
+    :return: list of cards that can be played in the current game
+    """
     # Minimum and maximum possible node value
     min_point = config.POINTS[str(difficulty)]['min']
     max_point = config.POINTS[str(difficulty)]['max']
@@ -206,6 +201,45 @@ def distribute_cards(player_ids, nodes, data_structure, difficulty, gold_node):
     # Remove the golden node from node options so it doesn't get deleted
     nodes.remove(gold_node)
 
+    # generate the deck of cards
+    cards = list()
+    for _ in range(config.CARDS_IN_DECk):
+
+        # can not pick node dependent action anymore (run out of all nodes)
+        if len(nodes) == 0:
+            card_types = [action for action in card_types if "node#" not in action]
+
+        # pick a new card
+        picked_card = random.choice(card_types)
+
+        # node specific action (For example: Delete node#)
+        if 'node#' in picked_card:
+
+            # choose from existing nodes
+            node_choice = str(random.choice(nodes))
+            cards.append(picked_card.replace('node#', node_choice))
+
+            # remove the node from options
+            nodes.remove(node_choice)
+
+        # point dependent action (For example: Insert #)
+        else:
+            cards.append(picked_card.replace('#', str(random.randint(min_point, max_point))))
+
+    # Shuffle the deck of cards
+    random.shuffle(cards)
+    return cards
+
+
+def distribute_cards(player_ids, deck):
+    """
+    Simulates the distribution of deck of cards to the players.
+
+    :param player_ids: list of players in the game by their ID
+    :param decK: the deck of available cards
+    :return: dictionary of cards assigned to each player
+    """
+    board_cards = dict()
 
     # generate the deck of cards
     cards = list()
@@ -248,46 +282,28 @@ def distribute_cards(player_ids, nodes, data_structure, difficulty, gold_node):
     return board_cards
 
 
-def pick_a_card(game_board):
-    '''
-    Simulate picking a single card from the deck.
+def pick_a_card(deck, hand, card):
+    """ Simulate picking a single card from the deck.
 
-    :param game_board: dictionary for the game board state
+    :param deck: current game board deck of cards
+    :param hand: some player's current hand
+    :param card: the card that was just played
     :return: picked card
-    '''
-    # Minimum and maximum possible node value
-    min_point = config.POINTS[str(game_board['difficulty'])]['min']
-    max_point = config.POINTS[str(game_board['difficulty'])]['max']
+    """
 
-    # Card types for the DS
-    card_types = config.CARDS[str(game_board['curr_data_structure'])]
+    # end game condition, should prob be checked somewhere prior
+    if len(hand) == 0:
+        return
 
-    nodes = list(game_board['graph']['node_points'].keys())
+    # no more cards left to draw
+    if len(deck) == 0:
+        return hand
 
-    # Remove the golden node from options
-    nodes.remove(game_board['graph']['gold_node'])
+    # card could not have been used because it was not available
+    if card not in hand:
+        return
 
-    # Remove the existing node specific action cards from the deck
-    for _, hand in game_board['cards'].items():
-        for curr_card in hand:
-            if 'node' in curr_card:
-                node = curr_card.split(' ')
-                nodes.remove(node[1])
-
-        # no available nodes left for the node based action cards
-        if len(nodes) == 0:
-            card_types = [action for action in card_types if "node#" not in action]
-            break
-
-    # Pick a card
-    card = random.choice(card_types)
-
-    # node specific action (For example: Delete node#)
-    if 'node#' in card:
-        picked_card = card.replace('node#', str(random.choice(nodes)))
-
-    # point dependent action (For example: Insert #)
-    else:
-        picked_card = card.replace('#', str(random.randint(min_point, max_point)))
-
-    return picked_card
+    hand.remove(card)  # first, remove the played card
+    picked_card = random.choice(deck)  # pick new card
+    hand.append(picked_card)
+    return hand

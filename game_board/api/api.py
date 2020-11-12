@@ -184,10 +184,15 @@ def action(request, card, game_id):
 
     # Update the graph with the new graph state
     board['graph'] = graph
-    # Remove the played card
-    board['cards'][board['turn']].remove(card)
+    # Remove the played card, update win condition
+    board['deck'].remove(card)
+    if len(board['deck']) == 0:  # for now this checks deck so everyone always has 3 cards.
+                                 # Could check hand but not sure how that will affect frontend
+        board['end_game'] = True
+
     # Pick a new card
-    board['cards'][board['turn']].append(utils.pick_a_card(board))
+    else:
+        board['cards'][board['turn']] = utils.pick_a_card(board['deck'], board['cards'], card)
 
     # Update the board on database
     response_status = utils.update_board_db(board)
@@ -196,5 +201,4 @@ def action(request, card, game_id):
                         status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     board_response = response_status['game_board']
-
     return Response(board_response)
