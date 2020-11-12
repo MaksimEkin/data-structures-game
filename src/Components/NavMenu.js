@@ -27,7 +27,7 @@ function NavMenu(){
             <a className="text-gray-100 py-3 border-t border-b block" href='/game_board'>Game</a>
         </li>
         <li>
-            <a className="text-gray-100 py-3 border-t border-b block" href='/profile'>Profile & Login</a>
+            <a className="text-gray-100 py-3 border-t border-b block" href='/profile_page'>Profile & Login</a>
         </li>
   </ul>
 </div>

@@ -20,6 +20,6 @@ urlpatterns = [
     # path('admin/', admin.site.urls),
     path('', include('home_page.urls')),
     path('game_board/', include('game_board.urls')),
-    path('profile/', include('profile_page.urls')),
+    path('profile_page/', include('profile_page.urls')),
 
 ]
