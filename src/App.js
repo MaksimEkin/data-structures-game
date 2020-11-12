@@ -3,7 +3,6 @@ import React from "react";
 import GameBoard from './Components/GameBoard'
 import Home from './Components/Home'
 import Profile from './Components/Profile'
-import Login from './Components/Login'
 import Header from './Components/Header';
 import {Route, Switch} from "react-router-dom";
 import { BrowserRouter as Router } from 'react-router-dom'
@@ -21,8 +20,8 @@ function App(){
         <Route exact path="/game_board">
           <GameBoard/>
         </Route>
-        <Route exact path="/login">
-          <Login/>
+        <Route exact path="/profile_page">
+          <Profile/>
         </Route>
       </Switch>
     </Router>      
