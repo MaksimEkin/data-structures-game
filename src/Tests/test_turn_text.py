@@ -1,9 +1,7 @@
 """
 This script is a unit test that uses Selenium to verify
-the content of the nodes in the graph.
-More specifically, it checks the node IDs and their
-corresponding node points with what is expected using
-the Game Board API.
+the content of the visual in Gameboard that displays
+whose turn it is and how many points that user have.
 
 To run this test, make the below changes first:
     1- Safari --> Allow Remote Automation
@@ -11,7 +9,7 @@ To run this test, make the below changes first:
 
 How to run:
     1) Run Django: python manage.py runserver
-    2) Run the test: python -m unittest test_node_text.py
+    2) Run the test: python -m unittest test_turn_text.py
 """
 import json
 import unittest
@@ -49,20 +47,9 @@ class TestStringMethods(unittest.TestCase):
         # Let game load
         sleep(5)
 
-        # Collect node points and ids
-        node_points = self.driver.find_elements(By.XPATH, '//div[@id="root"]//div[@id="graph"]//div[@class="view-wrapper"]\
-        /*[name()="svg"]//*[@class="view"]//*[@class="entities"]//*[name()="g"]//*[@class="graph_node"]//*[@class="node_points_text"]')
-        node_ids = self.driver.find_elements(By.XPATH, '//div[@id="root"]//div[@id="graph"]//div[@class="view-wrapper"]\
-        /*[name()="svg"]//*[@class="view"]//*[@class="entities"]//*[name()="g"]//*[@class="graph_node"]//*[@class="node_id_text"]')
-
-        self.points = list()
-        self.ids = list()
-
-        # Extract each point and node ID from the website as text
-        for point in node_points:
-            self.points.append(int(point.text))
-        for id_ in node_ids:
-            self.ids.append(id_.text)
+        # Collect turn and points displayed in frontend
+        self.turn = self.driver.find_element_by_class_name("turn_display").text
+        self.points = int(self.driver.find_element_by_class_name("turn_points_display").text)
 
         # Get cookies
         cookies = self.driver.get_cookies()
@@ -75,18 +62,16 @@ class TestStringMethods(unittest.TestCase):
         url = 'http://127.0.0.1:8000/game_board/api/board/' + game_id
         response = requests.get(url)
         board = json.loads(response.text)
-        self.check = board['graph']['node_points']
+        self.check_turn = board['turn']
+        self.check_points = board['player_points'][self.check_turn]
 
         # End the test. Closes the browser.
         self.driver.close()
 
-    def test_node_contents(self):
-        """Tests the node contents."""
+    def test_turn(self):
+        """Tests if the displayed turn is correct."""
+        self.assertEqual(self.check_turn, self.turn)
 
-        # check if all nodes exist
-        for node in self.ids:
-            self.assertIn(node, list(self.check.keys()))
-
-        # check if point in the node match to what is expected
-        for ii, node in enumerate(self.ids):
-            self.assertEqual(self.check[node], self.points[ii])
+    def test_points(self):
+        """Tests if the displayed points is correct."""
+        self.assertEqual(self.check_points, self.points)

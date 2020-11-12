@@ -590,11 +590,11 @@ class GameBoard extends Component {
               </svg>
             </div>
             <div>
-              <p class="mb-2 text-xl font-medium text-gray-600 dark:text-gray-400">
-                {this.state.turn }
+              <p class="mb-2 text-xl font-medium text-gray-600 dark:text-gray-400" className="turn_display">
+                {this.state.turn}
               </p>
-              <p class="text-2xl font-semibold text-gray-800 dark:text-gray-200">
-                {this.state.playerPointVal }
+              <p class="text-2xl font-semibold text-gray-800 dark:text-gray-200" className="turn_points_display">
+                {this.state.playerPointVal}
               </p>
             </div>
           </div>
