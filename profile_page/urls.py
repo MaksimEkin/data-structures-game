@@ -3,8 +3,13 @@
 """
 from django.urls import path
 from profile_page.api import api
+from . import views
 
 urlpatterns = [
+
+    # Views
+    path('', views.profile_page, name='profile-page'),
+
     # Profile Page API Calls for Authentication
     path('api', api.api_overview, name='profile-page-api_overview'),
     path('api/register', api.register, name='profile-page-register'),

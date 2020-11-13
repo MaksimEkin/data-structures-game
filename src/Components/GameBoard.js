@@ -5,7 +5,6 @@ import {create_adjacency, create_graph} from './CreateGraphAdj.js';
 import Cookies from 'universal-cookie';
 import WinModal from './Modal/WinModal.js';
 
-
 //Uber's digraph react folder
 import {
   GraphView, // required
@@ -26,7 +25,6 @@ import {
 } from "./config";
 
 import "./styles.css";
-
 //Fix XSS security issues when developing locally
 //this allows us to test separately locally and on Heroku by changing just one line
 const local = "http://127.0.0.1:8000/";
@@ -54,6 +52,8 @@ class GameBoard extends Component {
       graph: sample,
       selected: {},
       layoutEngineType: 'VerticalTree',
+
+      read_only:true,
 
       //waiting on API call?
       loading: true,
@@ -97,7 +97,7 @@ class GameBoard extends Component {
        //save the get request response to state
        this.setState({ gameID: game_id['game_id']});
        cookies.set('game_id', game_id['game_id'], { path: '/' });
-      
+
        //get request to api and include the dynamic game_id
        response = await fetch(getGameURL + game_id['game_id']);
        let board_ = await response.json();
@@ -393,7 +393,7 @@ class GameBoard extends Component {
       copiedNode: { ...this.state.selected, x, y }
     });
   };
- 
+
   //from imported digraph folder
   onPasteSelected = () => {
     if (!this.state.copiedNode) {
@@ -433,7 +433,7 @@ class GameBoard extends Component {
   }
 
   //called if checkRebalance returns false
-  //post request to get correct/balanced game board and sets gameboard to 
+  //post request to get correct/balanced game board and sets gameboard to
   //return balanced board
   rebalance = async () => {
     let fetch_url = url+"game_board/api/rebalance/" + this.state.gameID
@@ -538,6 +538,20 @@ class GameBoard extends Component {
     );
   };
 
+  repositionNodes = () =>{
+    this.setState({
+      layoutEngineType: 'SnapToGrid',
+      read_only: false
+    })
+  }
+
+  checkNodes = () => {
+    this.setState({
+      layoutEngineType: 'VerticalTree',
+      read_only: true
+    })
+  }
+
 
   //in react life cycle, code that is rendered occurs after constructor initialization
   //and component mounting and then reflects the change in state/prop values
@@ -566,30 +580,63 @@ class GameBoard extends Component {
     //html returned to display page. When each card is played, the appropriate function is called, which in turn makes an API call
     return (
 
-      //format code to display the 3 cards in flex boxes
       <div>
-        <div> {this.state.difficulty}</div>
+
+        <div className="transition duration-500 ease-in-out transform hover:-translate-y-1 hover:scale-103 flex justify-center">
+          <div class="flex items-center p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800">
+            <div class="p-3 mr-4 text-orange-500 bg-orange-100 rounded-full dark:text-orange-100 dark:bg-orange-500">
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"></path>
+              </svg>
+            </div>
+            <div>
+              <p class="mb-2 text-xl font-medium text-gray-600 dark:text-gray-400" className="turn_display">
+                {this.state.turn}
+              </p>
+              <p class="text-2xl font-semibold text-gray-800 dark:text-gray-200" className="turn_points_display">
+                {this.state.playerPointVal}
+              </p>
+            </div>
+          </div>
+        </div>
+
 
         <div style={{height: "10rem"}}>
-          <div className="text-center text-6xl font-bold"> It's {this.state.turn }'s turn! They have {this.state.playerPointVal } points. </div>
 
           {this.state.game_over ? <WinModal winner={this.state.turn} win_board={this.state.board}/> : <div> </div>}
 
-          <div className="bg-gray-200 flex items-center bg-gray-200 h-10">
+          <div className="bg-blue-800 flex items-center bg-gray-200 h-11">
 
-            <div className="flex-1 text-gray-700 text-center bg-gray-400 px-4 py-2 m-2">
-              <button onClick={() => this.playCard(card_1)}>{card_1}</button>
+            <div className="flex-1 text-gray-1000 text-center items-center bg-gray-200 px-4 py-2 m-2 rounded-lg">
+              <div class="transition duration-500 ease-in-out bg-blue-500 hover:bg-red-500 transform hover:-translate-y-1 hover:scale-105 bg-blue-300 border-blue-350 border-opacity-50 rounded-lg shadow-lg flex-1 m-1 py-1">
+                <button onClick={() => this.playCard(card_1)}>{card_1}</button>
+              </div>
             </div>
 
-            <div className="flex-1 text-gray-700 text-center bg-gray-400 px-4 py-2 m-2">
-              <button onClick={() => this.playCard(card_2)}>{card_2}</button>
+            <div className="flex-1 text-gray-1000 text-center items-center bg-gray-200 px-4 py-2 m-2 rounded-lg">
+              <div class="transition duration-500 ease-in-out bg-blue-500 hover:bg-red-500 transform hover:-translate-y-1 hover:scale-105 bg-blue-300 border-blue-350 border-opacity-50 rounded-lg shadow-lg flex-1 m-1 py-1">
+                <button onClick={() => this.playCard(card_2)}>{card_2}</button>
+              </div>
             </div>
 
-            <div className="flex-1 text-gray-700 text-center bg-gray-400 px-4 py-2 m-2">
-              <button onClick={() => this.playCard(card_3)}>{card_3}</button>
+            <div className="flex-1 text-gray-1000 text-center items-center bg-gray-200 px-4 py-2 m-2 rounded-lg">
+              <div class="transition duration-500 ease-in-out bg-blue-500 hover:bg-red-500 transform hover:-translate-y-1 hover:scale-105 bg-blue-300 border-blue-350 border-opacity-50 rounded-lg shadow-lg flex-1 m-1 py-1">
+                <button onClick={() => this.playCard(card_3)}>{card_3}</button>
+              </div>
             </div>
 
+          <div className="flex-1 text-gray-1000 text-center items-center bg-gray-200 px-4 py-2 m-2 rounded-lg">
+            <div class="transition duration-500 ease-in-out bg-yellow-300 hover:bg-orange-500 transform hover:-translate-y-1 hover:scale-105 bg-yellow-300 border-yellow-350 border-opacity-50 rounded-lg shadow-lg flex-1 m-1 py-1">
+              <button onClick={() =>this.repositionNodes()}>Reposition Nodes</button>
+            </div>
           </div>
+
+          <div className="flex-1 text-gray-1000 text-center items-center bg-gray-200 px-4 py-2 m-2 rounded-lg">
+            <div class="transition duration-500 ease-in-out bg-yellow-300 hover:bg-orange-500 transform hover:-translate-y-1 hover:scale-105 bg-yellow-300 border-yellow-350 border-opacity-50 rounded-lg shadow-lg flex-1 m-1 py-1">
+              <button onClick={() =>this.checkNodes()}>Check Nodes</button>
+            </div>
+          </div>
+        </div>
 
         {/*from react digraph library to format graph */}
         <div id = "graph" style={{ height: "60rem"}}>
@@ -614,13 +661,13 @@ class GameBoard extends Component {
           onCreateEdge={this.onCreateEdge}
           onSwapEdge={this.onSwapEdge}
           onDeleteEdge={this.onDeleteEdge}
-          readOnly={false}
+          readOnly={this.state.read_only}
           dark={true}
           layoutEngineType={this.state.layoutEngineType}
         />
         </div>
 
-      </div>
+        </div>
       </div>
     );
   }

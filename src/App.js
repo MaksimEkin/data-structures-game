@@ -20,6 +20,9 @@ function App(){
         <Route exact path="/game_board">
           <GameBoard/>
         </Route>
+        <Route exact path="/profile_page">
+          <Profile/>
+        </Route>
       </Switch>
     </Router>      
     </div>      
