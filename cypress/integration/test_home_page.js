@@ -14,12 +14,6 @@ context('Home Page Testing', () => {
         cy.url().should('contain', '/game_board')
     })
 
-    //clicking "Home" should keep url the same
-    it('Testing Home URL', () => {
-        cy.contains('Home').click()
-        cy.url().should('eq', url)
-    })
-
     //test typing player names into the playerList DOM element
     it('Type text into Players correctly', () => {
         cy.get('input[name=playerList]')
