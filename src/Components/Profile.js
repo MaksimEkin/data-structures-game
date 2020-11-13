@@ -29,6 +29,12 @@ class Profile extends Component {
     //Note: api uses FormData for this call
     loginFxn = async () => {
 
+        //if either field is blank, prompt user for input
+        if (!this.state.username || !this.state.password){
+            Swal.fire("Please fill in both the username and password fields")
+            return
+        }
+
         //store user input in FormData format
         let user_and_pass = new FormData()
         user_and_pass.append("user_id", this.state.username)
