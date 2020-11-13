@@ -1,7 +1,6 @@
 import React, {Component} from 'react'
 import Swal from "sweetalert2"
 import Cookies from "universal-cookie"
-import sha256 from 'crypto-js/sha256'
 
 //Fix XSS security issues when developing locally
 //this allows us to test separately locally and on Heroku by changing just one line
@@ -70,6 +69,9 @@ class Profile extends Component {
             //store authentication token in a cookie
             const cookies = new Cookies()
             cookies.set('token', returned["token"], { path: '/' })
+            cookies.set('username', this.state.username, { path: '/'})
+            console.log("Token", cookies.get('token'))
+            console.log("Username", cookies.get('username'))
 
             //alert successful login
             Swal.fire({
