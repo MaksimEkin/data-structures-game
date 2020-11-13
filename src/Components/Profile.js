@@ -47,9 +47,22 @@ class Profile extends Component {
         let returned = await response.json();
 
         //if login attempt was successful
-        if (returned["status"] == "success"){
-            console.log("successfully logged in")
-            Swal.fire("Success!")
+        if (returned["status"] == "success") {
+
+            //alert successful login
+            Swal.fire({
+                title: 'Successfully logged in as ' + this.state.username + '!',
+                icon: 'success',
+                confirmButtonText: 'Return to Home Page'
+
+                //return to home page if click on button
+            }).then((result) => {
+
+                //if player clicks "Return to Home Page" button, redirect there
+                if (result.isConfirmed) {
+                    window.location.href = "/"
+                }
+            })
         }
     }
 
