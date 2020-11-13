@@ -27,7 +27,6 @@ import {
 } from "./config";
 
 import "./styles.css";
-
 //Fix XSS security issues when developing locally
 //this allows us to test separately locally and on Heroku by changing just one line
 const local = "http://127.0.0.1:8000/";
@@ -583,50 +582,64 @@ class GameBoard extends Component {
     //html returned to display page. When each card is played, the appropriate function is called, which in turn makes an API call
     return (
 
-      //format code to display the 3 cards in flex boxes
       <div>
-        <div> {this.state.difficulty}</div>
+
+        <div className="transition duration-500 ease-in-out transform hover:-translate-y-1 hover:scale-103 flex justify-center">
+          <div class="flex items-center p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800">
+            <div class="p-3 mr-4 text-orange-500 bg-orange-100 rounded-full dark:text-orange-100 dark:bg-orange-500">
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"></path>
+              </svg>
+            </div>
+            <div>
+              <p class="mb-2 text-xl font-medium text-gray-600 dark:text-gray-400" className="turn_display">
+                {this.state.turn}
+              </p>
+              <p class="text-2xl font-semibold text-gray-800 dark:text-gray-200" className="turn_points_display">
+                {this.state.playerPointVal}
+              </p>
+            </div>
+          </div>
+        </div>
+
 
         <div style={{height: "10rem"}}>
-          <div className="text-center text-6xl font-bold"> It's {this.state.turn }'s turn! They have {this.state.playerPointVal } points. </div>
 
           {this.state.game_over ? <WinModal winner={this.state.turn} win_board={this.state.board}/> : <div> </div>}
 
           <div className="bg-blue-800 flex items-center bg-gray-200 h-11">
 
-            <div className="flex-1 text-gray-900 text-center items-center bg-gray-200 px-4 py-2 m-2 rounded-lg">
-              <div class="bg-blue-300 border-blue-350 border-opacity-50 rounded-lg shadow-lg flex-1 m-1 py-1">
+            <div className="flex-1 text-gray-1000 text-center items-center bg-gray-200 px-4 py-2 m-2 rounded-lg">
+              <div class="transition duration-500 ease-in-out bg-blue-500 hover:bg-red-500 transform hover:-translate-y-1 hover:scale-105 bg-blue-300 border-blue-350 border-opacity-50 rounded-lg shadow-lg flex-1 m-1 py-1">
                 <button onClick={() => this.playCard(card_1)}>{card_1}</button>
                 <ReactTooltip />
               </div>
             </div>
 
             <div className="flex-1 text-gray-1000 text-center items-center bg-gray-200 px-4 py-2 m-2 rounded-lg">
-              <div class="bg-blue-300 border-blue-350 border-opacity-50 rounded-lg shadow-lg flex-1 m-1 py-1">
+              <div class="transition duration-500 ease-in-out bg-blue-500 hover:bg-red-500 transform hover:-translate-y-1 hover:scale-105 bg-blue-300 border-blue-350 border-opacity-50 rounded-lg shadow-lg flex-1 m-1 py-1">
                 <button onClick={() => this.playCard(card_2)}>{card_2}</button>
               </div>
             </div>
 
             <div className="flex-1 text-gray-1000 text-center items-center bg-gray-200 px-4 py-2 m-2 rounded-lg">
-              <div class="bg-blue-300 border-blue-350 border-opacity-50 rounded-lg shadow-lg flex-1 m-1 py-1">
+              <div class="transition duration-500 ease-in-out bg-blue-500 hover:bg-red-500 transform hover:-translate-y-1 hover:scale-105 bg-blue-300 border-blue-350 border-opacity-50 rounded-lg shadow-lg flex-1 m-1 py-1">
                 <button onClick={() => this.playCard(card_3)}>{card_3}</button>
               </div>
             </div>
 
           <div className="flex-1 text-gray-1000 text-center items-center bg-gray-200 px-4 py-2 m-2 rounded-lg">
-            <div class="bg-yellow-300 border-yellow-350 border-opacity-50 rounded-lg shadow-lg flex-1 m-1 py-1">
+            <div class="transition duration-500 ease-in-out bg-yellow-300 hover:bg-orange-500 transform hover:-translate-y-1 hover:scale-105 bg-yellow-300 border-yellow-350 border-opacity-50 rounded-lg shadow-lg flex-1 m-1 py-1">
               <button data-delay-show='500' data-place="bottom" data-tip='Shift click to make edges, press delete on the keyboard to remove a selected edge' onClick={() =>this.repositionNodes()}>Manually Rebalance</button>
             </div>
           </div>
 
           <div className="flex-1 text-gray-1000 text-center items-center bg-gray-200 px-4 py-2 m-2 rounded-lg">
-            <div class="bg-yellow-300 border-yellow-350 border-opacity-50 rounded-lg shadow-lg flex-1 m-1 py-1">
+            <div class="transition duration-500 ease-in-out bg-yellow-300 hover:bg-orange-500 transform hover:-translate-y-1 hover:scale-105 bg-yellow-300 border-yellow-350 border-opacity-50 rounded-lg shadow-lg flex-1 m-1 py-1">
               <button data-delay-show='500' data-place="bottom" data-tip="End's turn and determines rebalance correctness" onClick={() =>this.checkNodes()}>Check Nodes</button>
             </div>
           </div>
-
         </div>
-
 
         {/*from react digraph library to format graph */}
         <div id = "graph" style={{ height: "60rem"}}>
