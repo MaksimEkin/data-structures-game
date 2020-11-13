@@ -621,7 +621,7 @@ class GameBoard extends Component {
 
           <div className="flex-1 text-gray-1000 text-center items-center bg-gray-200 px-4 py-2 m-2 rounded-lg">
             <div class="bg-yellow-300 border-yellow-350 border-opacity-50 rounded-lg shadow-lg flex-1 m-1 py-1">
-              <button data-offset="{'top': 10, 'left': 10}"   data-delay-show='500' data-tip="End's turn and determines rebalance correctness" onClick={() =>this.checkNodes()}>Check Nodes</button>
+              <button data-delay-show='500' data-place="bottom" data-tip="End's turn and determines rebalance correctness" onClick={() =>this.checkNodes()}>Check Nodes</button>
             </div>
           </div>
 
