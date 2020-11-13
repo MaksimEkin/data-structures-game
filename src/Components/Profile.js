@@ -1,5 +1,14 @@
 import React, {Component} from 'react'
 
+//Fix XSS security issues when developing locally
+//this allows us to test separately locally and on Heroku by changing just one line
+const local = "http://127.0.0.1:8000/";
+const reactLocal = "http://localhost:3000/"
+const remote = "https://data-structures-game.herokuapp.com/";
+
+//can also be const url = local; or const url = reactLocal;
+const url = local;
+
 class Profile extends Component {
     constructor(props) {
         super(props);
@@ -10,8 +19,23 @@ class Profile extends Component {
         }
     }
 
-    loginFxn = () => {
+    loginFxn = async () => {
+        let user_and_pass = new FormData()
+        user_and_pass.append("user_id", "useruser")
+        user_and_pass.append("password", "pass1")
+        let requestOptions = {
+            method: 'POST',
+            body: user_and_pass,
+            redirect: 'follow'
+        };
 
+        let fetch_url = url + "profile_page/api/login"
+        let response = await fetch(fetch_url, requestOptions);
+        let returned = await response.json();
+
+        if (returned["status"] == "success"){
+            console.log("successfully logged in")
+        }
     }
 
     handleUserChange = (event) => {
