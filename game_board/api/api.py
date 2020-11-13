@@ -177,22 +177,21 @@ def action(request, card, game_id):
 
     # Perform the action on the data structure
     if board['curr_data_structure'] == 'AVL':
-        graph = avl.avlAction(card, board['graph'])
+        graph = avl.avlAction(card, board['graph'], balance=False)
     # Currently only AVL supported
     else:
-        graph = avl.avlAction(card, board['graph'])
+        graph = avl.avlAction(card, board['graph'], balance=False)
 
     # Update the graph with the new graph state
     board['graph'] = graph
-    # Remove the played card, update win condition
-    board['deck'].remove(card)
+    # Make sure deck is not empty
     if len(board['deck']) == 0:  # for now this checks deck so everyone always has 3 cards.
                                  # Could check hand but not sure how that will affect frontend
         board['end_game'] = True
 
     # Pick a new card
     else:
-        board['cards'][board['turn']] = utils.pick_a_card(board['deck'], board['cards'], card)
+        board['cards'][board['turn']], board['deck'] = utils.pick_a_card(board['deck'], board['cards'][board['turn']], card)
 
     # Update the board on database
     response_status = utils.update_board_db(board)

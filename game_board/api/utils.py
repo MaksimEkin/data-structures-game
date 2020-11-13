@@ -132,6 +132,9 @@ def new_board(difficulty, player_ids, data_structures):
     else:
         graph = avl.avlNew(config.HEIGHT[str(difficulty)], config.POINTS[str(difficulty)])
 
+    deck = create_card_deck(list(graph['node_points'].keys()), data_structures[0], difficulty, graph['gold_node'])
+    cards, deck = distribute_cards(player_ids, deck)
+
     board = {
         'game_id': str(uuid.uuid1()),
         'graph': graph,
@@ -139,10 +142,8 @@ def new_board(difficulty, player_ids, data_structures):
         'player_names': [''],
         'player_points': {str(id): 0 for id in player_ids},
         'turn': random.choice(player_ids),
-        'deck': create_card_deck(list(graph['node_points'].keys()),
-                                 data_structures[0],
-                                 difficulty,
-                                 graph['gold_node']),
+        'deck': deck,
+        'cards' : cards,
         'difficulty': difficulty,
         'num_players': len(player_ids),
         'curr_data_structure': data_structures[0],
@@ -154,7 +155,6 @@ def new_board(difficulty, player_ids, data_structures):
         # 'seconds_until_next_ds': 60,
         'online': False
     }
-    board['cards'] = distribute_cards(player_ids, board['deck'])
     return board
 
 
@@ -236,38 +236,12 @@ def distribute_cards(player_ids, deck):
     Simulates the distribution of deck of cards to the players.
 
     :param player_ids: list of players in the game by their ID
-    :param decK: the deck of available cards
+    :param deck: the deck of available cards
+
     :return: dictionary of cards assigned to each player
+    :return: updated deck
     """
     board_cards = dict()
-
-    # generate the deck of cards
-    cards = list()
-    for _ in range(len(player_ids) * config.CARDS_PER_PLAYER):
-
-        # can not pick node dependent action anymore (run out of all nodes)
-        if len(nodes) == 0:
-            card_types = [action for action in card_types if "node#" not in action]
-
-        # pick a new card
-        picked_card = random.choice(card_types)
-
-        # node specific action (For example: Delete node#)
-        if 'node#' in picked_card:
-
-            # choose from existing nodes
-            node_choice = str(random.choice(nodes))
-            cards.append(picked_card.replace('node#', node_choice))
-
-            # remove the node from options
-            nodes.remove(node_choice)
-
-        # point dependent action (For example: Insert #)
-        else:
-            cards.append(picked_card.replace('#', str(random.randint(min_point, max_point))))
-
-    # Shuffle the deck of cards
-    random.shuffle(cards)
 
     # pick cards for each player
     for player in player_ids:
@@ -275,11 +249,11 @@ def distribute_cards(player_ids, deck):
         # assign the cards to the player
         player_cards = list()
         for _ in range(config.CARDS_PER_PLAYER):
-            player_cards.append(cards.pop())
+            player_cards.append(deck.pop())
 
         board_cards[str(player)] = player_cards
 
-    return board_cards
+    return board_cards, deck
 
 
 def pick_a_card(deck, hand, card):
@@ -290,6 +264,10 @@ def pick_a_card(deck, hand, card):
     :param card: the card that was just played
     :return: picked card
     """
+
+    print(f'Card: {card}\n')
+    print(f'Hand: {hand}\n')
+    print(f'Deck: {deck}\n')
 
     # end game condition, should prob be checked somewhere prior
     if len(hand) == 0:
@@ -304,6 +282,6 @@ def pick_a_card(deck, hand, card):
         return
 
     hand.remove(card)  # first, remove the played card
-    picked_card = random.choice(deck)  # pick new card
+    picked_card = deck.pop()  # pick new card
     hand.append(picked_card)
-    return hand
+    return hand, deck
