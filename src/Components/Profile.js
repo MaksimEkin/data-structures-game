@@ -1,5 +1,7 @@
 import React, {Component} from 'react'
 import Swal from "sweetalert2"
+import Cookies from "universal-cookie"
+import sha256 from 'crypto-js/sha256'
 
 //Fix XSS security issues when developing locally
 //this allows us to test separately locally and on Heroku by changing just one line
@@ -35,10 +37,20 @@ class Profile extends Component {
             return
         }
 
+        //hash password
+        let CryptoJS = require("crypto-js")
+
+        //use username as salt for SHA-256 hash, so combine username and plaintext pw into one string
+        let toHash = this.state.username + this.state.password
+
+        //hash it and convert to string format
+        let hashed = CryptoJS.SHA256(toHash)
+        hashed = hashed.toString()
+
         //store user input in FormData format
         let user_and_pass = new FormData()
         user_and_pass.append("user_id", this.state.username)
-        user_and_pass.append("password", this.state.password)
+        user_and_pass.append("password", hashed)
 
         //api call parameters
         let requestOptions = {
@@ -54,6 +66,10 @@ class Profile extends Component {
 
         //if login attempt was successful
         if (returned["status"] == "success") {
+
+            //store authentication token in a cookie
+            const cookies = new Cookies()
+            cookies.set('token', returned["token"], { path: '/' })
 
             //alert successful login
             Swal.fire({
