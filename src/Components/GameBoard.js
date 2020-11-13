@@ -5,6 +5,7 @@ import {create_adjacency, create_graph} from './CreateGraphAdj.js';
 import Cookies from 'universal-cookie';
 import WinModal from './Modal/WinModal.js';
 
+import ReactTooltip from "react-tooltip";
 
 //Uber's digraph react folder
 import {
@@ -34,7 +35,7 @@ const reactLocal = "http://localhost:3000/"
 const remote = "https://data-structures-game.herokuapp.com/";
 
 //can also be const url = local; or const url = reactLocal;
-const url = remote;
+const url = local;
 
 //define sample node
 const sample = {
@@ -596,6 +597,7 @@ class GameBoard extends Component {
             <div className="flex-1 text-gray-900 text-center items-center bg-gray-200 px-4 py-2 m-2 rounded-lg">
               <div class="bg-blue-300 border-blue-350 border-opacity-50 rounded-lg shadow-lg flex-1 m-1 py-1">
                 <button onClick={() => this.playCard(card_1)}>{card_1}</button>
+                <ReactTooltip />
               </div>
             </div>
 
@@ -613,13 +615,13 @@ class GameBoard extends Component {
 
           <div className="flex-1 text-gray-1000 text-center items-center bg-gray-200 px-4 py-2 m-2 rounded-lg">
             <div class="bg-yellow-300 border-yellow-350 border-opacity-50 rounded-lg shadow-lg flex-1 m-1 py-1">
-              <button onClick={() =>this.repositionNodes()}>Reposition Nodes</button>
+              <button data-delay-show='500' data-place="bottom" data-tip='Shift click to make edges, press delete on the keyboard to remove a selected edge' onClick={() =>this.repositionNodes()}>Manually Rebalance</button>
             </div>
           </div>
 
           <div className="flex-1 text-gray-1000 text-center items-center bg-gray-200 px-4 py-2 m-2 rounded-lg">
             <div class="bg-yellow-300 border-yellow-350 border-opacity-50 rounded-lg shadow-lg flex-1 m-1 py-1">
-              <button onClick={() =>this.checkNodes()}>Check Nodes</button>
+              <button data-offset="{'top': 10, 'left': 10}"   data-delay-show='500' data-tip="End's turn and determines rebalance correctness" onClick={() =>this.checkNodes()}>Check Nodes</button>
             </div>
           </div>
 
@@ -660,6 +662,15 @@ class GameBoard extends Component {
     );
   }
 }
+
 export default GameBoard;
 const rootElement = document.getElementById("root");
+
+const node = ReactDOM.findDOMNode(this);
+if (node instanceof HTMLElement) {
+    const child = node.querySelector('.graph');
+    console.log("LOGGING THE CHILD NODE IN REACT");
+
+    console.log(child);
+}
 ReactDOM.render(<GameBoard />, rootElement);
