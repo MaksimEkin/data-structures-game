@@ -64,6 +64,17 @@ class Profile extends Component {
                 }
             })
         }
+
+        //if login did not succeed, show error message
+        else {
+            Swal.fire({
+                title: 'Login Failed',
+                icon: 'error',
+
+                //may add "Forgot password" option later
+                text: 'If you believe this is a mistake, please try authenticating again'
+            })
+        }
     }
 
     //update stored username when user types
