@@ -37,13 +37,25 @@ render(){
 
 
         <div className="w-full md:max-w-md mt-6">
+            <span>
             <div className="card bg-gray-200 shadow-2xl rounded-2xl px-4 py-4 mb-4 ">
 
             <div className="space-y-10 flex justify-center">
-              <h1 className="animate-bounce space-y-20 text-3xl text-center font-semibold text-gray-800 mb-2">Data Structures Game</h1>
+              <h1 className="space-y-20 text-3xl text-center font-semibold text-gray-800 mb-2">Data Structures Game</h1>
           </div>
 
         <form onSubmit={this.handleSubmit}  >
+
+        <div className="form-group" className="space-y-2">
+        <label className="text-xl text-center font-semibold text-gray-800 mb-2"
+               htmlFor='game'>Data Structure     </label>
+                <select type='text' id="game" value={this.state.gameDS} onInput={this.handleInput} name='gameDS'
+                        label='DSgame' style={{marginBottom: '1em'}}>
+                    <option value="AVL">AVL</option>
+
+                 </select>
+        </div>
+
         <div class="form-group" className="space-y-2">
         <label  className="text-xl text-center font-semibold text-gray-800 mb-2" for='difficulty-level'>Difficulty     </label>
                 <select type='text' id='difficulty-level' value={this.state.level} name='level' onChange={this.handleInput} label='Difficulty Level' style={{ marginBottom: '1em' }}  >
@@ -52,14 +64,7 @@ render(){
                     <option value="Hard">Hard</option>
                  </select>
         </div>
-        <div class="form-group" className="space-y-2">
-        <label className="text-xl text-center font-semibold text-gray-800 mb-2" for='game'>Data Structure     </label>
-                <select type='text' id="game" value={this.state.gameDS} onInput={this.handleInput} name='gameDS' label='DSgame' style={{ marginBottom: '1em' }}  >
-                    <option value="AVL">AVL</option>
 
-                 </select>
-        </div>
-            <div className="space-y-10">
                 <TextField
                     required
                     fullWidth
@@ -69,11 +74,11 @@ render(){
                     onChange={this.handleInput}
                     style={{ marginBottom: '1em' }}
                 />
-            </div>
+
 
             <div className="space-y-10"><br></br></div>
 
-            <div>
+
                 <ul>
                 <li>
                     <Link className="shadow transition duration-500 ease-in-out bg-blue-500 hover:bg-red-500 transform hover:-translate-y-1 hover:scale-105 bg-blue-300 border-blue-350 border-opacity-50 rounded-lg shadow-xl p-5 rounded text-xl font-bold" to="/game_board" name="start_game">
@@ -81,13 +86,13 @@ render(){
                     </Link>
                 </li>
                 </ul>
-            </div>
+
 
              <div className="space-y-10"><br></br></div>
 
                 </form>
 
-        </div></div>
+        </div></span></div>
 
 
     );
