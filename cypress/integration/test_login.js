@@ -23,7 +23,7 @@ context('Login Page Testing', () => {
     //test successful login with username "useruser" and password "pass1"
     it("Test Successful Login", () => {
         cy.get("input[id=username]")
-            .type('useruser').should('have.value', 'useruser')
+            .type('user1').should('have.value', 'user1')
         cy.get("input[id=password")
             .type('pass1').should('have.value', 'pass1')
         cy.contains('Sign in').click()
