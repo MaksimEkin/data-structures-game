@@ -106,9 +106,25 @@ class AIHandler():
                 self.best_move = best_move
             return best_val
 
-#### AI CALL ####
-def ai_move(state, deck, type, num_players, seen_moves = None, max_depth = 5):
-    """ call on ai to make a move """
-    ai = AIHandler(state, type, num_players, max_depth, deck, seen_moves)
-    ai.minimax(ai.mstate, ai.max_depth, ai.num_players, -math.inf, math.inf)
-    return ai.best_move
+
+""" AI API CALL(S) """
+def select_move(game_state, game_type, players, maximizer, cards, deck):
+    """ call on ai to make a move
+
+    :param game_state: game board state as it currently stands
+    :param game_type: the type of game being played. currently only AVL supported
+    :param players: list of player ids corresponding to active players
+    :param maximizer: player id for which AI will maximize points on this call
+    :param cards: dictionary of player ids corresponding to each player's hand (list of card moves)
+    :param deck: deck of available cards to draw from
+    :return card: game-specific action that the AI found works best
+    """
+
+    num_players = len(players)
+    hand_options = cards[maximizer]
+    return hand_options[0]
+
+    # deck = state['deck']
+    # ai = AIHandler(state, game_type, num_players, max_depth, deck, seen_moves)
+    # ai.minimax(ai.mstate, ai.max_depth, ai.num_players, -math.inf, math.inf)
+    # return ai.best_move

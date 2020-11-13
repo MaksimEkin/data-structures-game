@@ -62,6 +62,7 @@ class GameBoard extends Component {
       board: null,
       gameID: null,
       turn: null,
+      deckSize: null,
       playerPointVal: null,
       playerCardChoice: null,
       playerBalanceAttempt: null,
@@ -105,6 +106,7 @@ class GameBoard extends Component {
        //set the state values with respect to the dynamic json response
        this.setState({ board: board_, loading: false, turn: board_['turn']});
        this.setState({playerPointVal: board_['player_points'][this.state.turn]});
+       this.setState({deckSize: board_['deck'].length});
 
        //pass the new board state into create_graph function and set the made_graph state
        let made_graph = create_graph(this.state.board['graph'])
@@ -485,6 +487,7 @@ class GameBoard extends Component {
     //store the results
     this.setState({ board: newBoard, turn: newBoard['turn']});
     this.setState({playerPointVal: newBoard['player_points'][this.state.turn]})
+    this.setState({deckSize: newBoard['deck'].length});
 
     //check if board is balanced then rebalance tree if fxn returned false
     if(!this.checkRebalance()){
@@ -595,6 +598,9 @@ class GameBoard extends Component {
               </p>
               <p class="text-2xl font-semibold text-gray-800 dark:text-gray-200" className="turn_points_display">
                 {this.state.playerPointVal}
+              </p>
+              <p class="text-2xl font-semibold text-gray-800 dark:text-gray-200" className="deck_size_display">
+                Deck: {this.state.deckSize}
               </p>
             </div>
           </div>
