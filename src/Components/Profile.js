@@ -70,8 +70,6 @@ class Profile extends Component {
             const cookies = new Cookies()
             cookies.set('token', returned["token"], { path: '/' })
             cookies.set('username', this.state.username, { path: '/'})
-            console.log("Token", cookies.get('token'))
-            console.log("Username", cookies.get('username'))
 
             //alert successful login
             Swal.fire({
@@ -97,6 +95,52 @@ class Profile extends Component {
 
                 //may add "Forgot password" option later
                 text: 'If you believe this is a mistake, please try authenticating again'
+            })
+        }
+    }
+
+    //make api call to log out
+    logoutFxn = async () => {
+        const cookies = new Cookies()
+
+        //format user_id and token as FormData
+        let user_and_token = new FormData()
+        user_and_token.append("user_id", cookies.get('username'))
+        user_and_token.append("token", cookies.get('token'))
+
+        //request options
+        let requestOptions = {
+            method: 'POST',
+            body: user_and_token,
+            redirect: 'follow'
+        };
+
+        //make api call
+        let fetch_url = url + "profile_page/api/logout"
+        let response = await fetch(fetch_url, requestOptions);
+        let returned = await response.json();
+
+        //successful logout
+        if (returned["status"] == "success"){
+
+            //remove cookies
+            cookies.remove('username')
+            cookies.remove('token')
+
+            //show popup
+            Swal.fire({
+                title: 'Logout Successful!',
+                icon: 'success',
+                text: 'Come back soon!'
+            })
+        }
+
+        //error when attempt to logout - popup
+        else {
+            Swal.fire({
+                title: 'Logout Unsuccessful',
+                icon: 'error',
+                text: "Please make sure you're signed in"
             })
         }
     }
@@ -145,11 +189,23 @@ class Profile extends Component {
                         </div>
                     </div>
 
-                    {/*When user clicks "Sign in", make api call*/}
-                    <button class="bg-blue-500 text-white hover:bg-blue-700 ml-64 font-bold rounded py-2 px-4" id="login-btn" type="button"
-                        onClick={() => this.loginFxn()}>
-                        Sign in
+                    <div>
+                        {/*When user clicks "Sign in", make api call*/}
+                        <button class="bg-blue-500 text-white hover:bg-blue-700 ml-64 w-32 font-bold rounded py-2 px-4"
+                            id="login-btn" type="button"
+                            onClick={() => this.loginFxn()}>
+                            Sign in
+                        </button>
+                    </div>
+
+                    <div>
+                        {/*When user clicks "Sign out", make api call to log out*/}
+                        <button class="bg-red-500 text-white hover:bg-red-700 font-bold w-32 rounded px-4 py-2 mt-6 ml-64"
+                        id = "logout-btn" type="button"
+                        onClick={() => this.logoutFxn()}>
+                        Sign out?
                     </button>
+                </div>
                 </div>
             </form>
         )
