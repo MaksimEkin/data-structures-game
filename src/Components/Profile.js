@@ -1,4 +1,5 @@
 import React, {Component} from 'react'
+import Swal from "sweetalert2"
 
 //Fix XSS security issues when developing locally
 //this allows us to test separately locally and on Heroku by changing just one line
@@ -9,41 +10,57 @@ const remote = "https://data-structures-game.herokuapp.com/";
 //can also be const url = local; or const url = reactLocal;
 const url = local;
 
+/* This class provides the functionality for logging in and out,
+   registering a new account and (eventually) adding friends
+   and viewing user's profile info
+ */
 class Profile extends Component {
     constructor(props) {
         super(props);
 
+        //store the username and password that a user types in
         this.state = {
             username: null,
             password: null
         }
     }
 
+    //api call to login
+    //Note: api uses FormData for this call
     loginFxn = async () => {
+
+        //store user input in FormData format
         let user_and_pass = new FormData()
-        user_and_pass.append("user_id", "useruser")
-        user_and_pass.append("password", "pass1")
+        user_and_pass.append("user_id", this.state.username)
+        user_and_pass.append("password", this.state.password)
+
+        //api call parameters
         let requestOptions = {
             method: 'POST',
             body: user_and_pass,
             redirect: 'follow'
         };
 
+        //make api call
         let fetch_url = url + "profile_page/api/login"
         let response = await fetch(fetch_url, requestOptions);
         let returned = await response.json();
 
+        //if login attempt was successful
         if (returned["status"] == "success"){
             console.log("successfully logged in")
+            Swal.fire("Success!")
         }
     }
 
+    //update stored username when user types
     handleUserChange = (event) => {
         this.setState({
             username: event.target.value
         })
     }
 
+    //update stored password when user types
     handlePassChange = (event) => {
         this.setState({
             password: event.target.value
@@ -54,29 +71,33 @@ class Profile extends Component {
         return (
             <form class="container mx-auto h-full flex justify-center items-center align-center">
                 <div class="w-1/2 font-thin">
+
+                    {/*Header*/}
                     <h1 class="mt-12 mb-6 text-3xl text-center">
                         Login to view your profile!
                     </h1>
 
-                    <div>
-                        <label class="text-xl ml-32">
+                    {/*Username and password boxes*/}
+                    <div class="align-center items-center">
+                        <label class="text-xl ml-32 px-4">
                             Username:
                         </label>
-                        <input class="bg-gray-200 shadow border-blue-500 border rounded w-1/3 py-2 px-3 text-gray-700"
+                        <input class="bg-gray-200 shadow border-blue-500 border rounded w-48 py-2 px-2 text-gray-700"
                                id="username" type="text" value={this.state.username}
                                onChange={this.handleUserChange}>
                         </input>
-                    </div>
-                    <div class="py-4 px-3">
-                        <label className="text-xl ml-32">
+                        <div class="py-4 px-3">
+                        <label className="text-xl ml-32 px-3">
                             Password:
                         </label>
-                        <input className="bg-gray-200 shadow border-blue-500 border rounded w-1/3 py-2 px-3 text-gray-700"
-                               id="password" type="text" value = {this.state.password}
+                        <input className="bg-gray-200 shadow border-blue-500 border rounded w-48 py-2 px-2 text-gray-700"
+                               id="password" type="password" placeholder="******************" value = {this.state.password}
                                onChange={this.handlePassChange}>
                         </input>
+                        </div>
                     </div>
 
+                    {/*When user clicks "Sign in", make api call*/}
                     <button class="bg-blue-500 text-white hover:bg-blue-700 ml-64 font-bold rounded py-2 px-4" id="login-btn" type="button"
                         onClick={() => this.loginFxn()}>
                         Sign in
