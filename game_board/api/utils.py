@@ -256,22 +256,6 @@ def distribute_cards(player_ids, deck):
     return board_cards, deck
 
 
-def pick_a_card(deck):
-    """ Simulate picking a single card from the deck.
-    Note that only the card is returned
-    Deck must be manually adjusted (by removing the card)
-
-    :param deck: current game board deck of cards
-    :return: picked card or None if the deck is empty
-    """
-    # no more cards left to draw
-    if len(deck) == 0:
-        return None
-
-    picked_card = deck.pop(0)  # take the top card in the deck
-    return picked_card
-
-
 def ai_format_hands(board):
     """ Create a formatted version of board[cards] that the AI can use.
     Order is preserved such that player of key '0' is the maximizer and key '1' through 'num_players - 1'

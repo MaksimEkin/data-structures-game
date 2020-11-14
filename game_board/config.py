@@ -6,12 +6,13 @@
 # General
 #   DIFFICULTY_LEVELS: Game difficulty. Establishes the number of nodes in
 #                      the game or the height of the tree. See HEIGHT.
+#   CARD_IN_DECK:      How many cards are stored in the game deck
 #   CARDS_PER_PLAYER : How many cards each player gets.
 #                      Number of action choices each player have.
 #   MAX_NUM_PLAYERS  : Maximum number of players in the game.
 # ========================================================================
 DIFFICULTY_LEVELS = ['Hard', 'Medium', 'Easy']
-CARDS_IN_DECk = 28
+CARDS_IN_DECk = 24
 CARDS_PER_PLAYER = 3
 MAX_NUM_PLAYERS = 5
 

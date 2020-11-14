@@ -228,9 +228,7 @@ def ai_action(request, game_id):
                           board['curr_data_structure'],
                           ordered_cards,
                           board['deck'],
-                          max_depth=4)
-
-    print(f"SIR! YOUR CARD IS: {card}")
+                          max_depth=4)  # not sure what an appropriate search depth would be... 4 is pretty fast
 
     # Give the points
     if card.split(' ')[0] in config.GAIN_TIMES[board['curr_data_structure']]:
@@ -253,9 +251,6 @@ def ai_action(request, game_id):
 
     # Pick a new card
     else:
-        print(f"CURRENT HAND: {board['cards'][board['turn']]}")
-        print(f"CHOSEN CARD: {card}")
-
         board['cards'][board['turn']].remove(card)
         new_card = board['deck'].pop(0)
         board['cards'][board['turn']].append(new_card)
