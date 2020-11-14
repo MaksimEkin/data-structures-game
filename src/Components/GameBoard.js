@@ -5,6 +5,7 @@ import {create_adjacency, create_graph} from './CreateGraphAdj.js';
 import Cookies from 'universal-cookie';
 import WinModal from './Modal/WinModal.js';
 import ReactTooltip from "react-tooltip";
+import RebalanceModal from './Modal/RebalanceModal.js'
 
 //Uber's digraph react folder
 import {
@@ -26,6 +27,7 @@ import {
 } from "./config";
 
 import "./styles.css";
+
 //Fix XSS security issues when developing locally
 //this allows us to test separately locally and on Heroku by changing just one line
 const local = "http://127.0.0.1:8000/";
@@ -33,7 +35,7 @@ const reactLocal = "http://localhost:3000/"
 const remote = "https://data-structures-game.herokuapp.com/";
 
 //can also be const url = local; or const url = reactLocal;
-const url = remote;
+const url = local;
 
 //define sample node
 const sample = {
@@ -483,7 +485,8 @@ class GameBoard extends Component {
 
     //make the API call to actually play the card the user chose
     this.apiCall()
-
+    //check if rebalance needs to be done
+    this.rebalance()
     //check if playing selected card ended the game
     //this.checkGameStatus()
   }
@@ -509,7 +512,6 @@ class GameBoard extends Component {
     this.setState({deckSize: newBoard['deck'].length});
 
     //check if board is balanced then rebalance tree if fxn returned false
-
     let made_graph = create_graph(this.state.board['graph'])
     this.setState({ graph: made_graph});
     this.setState({loading: false})
@@ -659,7 +661,7 @@ class GameBoard extends Component {
         <div style={{height: "10rem"}}>
 
           {this.state.game_over ? <WinModal winner={this.state.turn} win_board={this.state.board}/> : <div> </div>}
-
+          {!this.state.board.graph.balanced ? <RebalanceModal turn={this.state.turn} /> : <div> </div>}
           <div className="bg-blue-800 flex items-center bg-gray-200 h-11">
 
             <div className="flex-1 text-gray-1000 text-center items-center bg-gray-200 px-4 py-2 m-2 rounded-lg">
@@ -679,7 +681,7 @@ class GameBoard extends Component {
                 <button onClick={() => this.playCard(card_3)}>{card_3}</button>
               </div>
             </div>
-
+            {!this.state.board.graph.balanced ? <RebalanceModal turn={this.state.turn} /> : <div> </div>}
           <div className="flex-1 text-gray-1000 text-center items-center bg-gray-200 px-4 py-2 m-2 rounded-lg">
             <div data-delay-show='500' data-place="bottom" data-tip="Shift click to make edges, delete a selected node with the keyboard's delete key" data-offset="{'top': -20}" data-text-color="yellow"
             class="transition duration-500 ease-in-out bg-yellow-300 hover:bg-orange-500 transform hover:-translate-y-1 hover:scale-105 bg-yellow-300 border-yellow-350 border-opacity-50 rounded-lg shadow-lg flex-1 m-1 py-1">
