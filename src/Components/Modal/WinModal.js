@@ -18,12 +18,11 @@ class WinModal extends Component {
 
     render() {
 
-        var i
-
         //string to store other players' scores
         let playerScores = ""
 
         //loop through all players in board
+        var i //loop counter for iterating through each player in the game
         for (i = 0; i < this.state.board["num_players"]; i++){
 
             //don't include winner in the list of other players (their score displayed separately)
