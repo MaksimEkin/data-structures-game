@@ -207,13 +207,13 @@ def action(request, card, game_id):
 
 
 @api_view(['GET'])
-def ai_action(request, game_id):
+def ai_pick(request, game_id):
     """
-    Have an AI make the move on the board
+    Have an AI pick a move to execute
 
     :param request:
     :param game_id: unique identifier of the board
-    :return game board JSON:
+    :return card: string that represents a valid action for current player to take
     """
     # Load the game board from database
     response_status = utils.load_board_db(game_id)
@@ -227,39 +227,5 @@ def ai_action(request, game_id):
                           board['curr_data_structure'],
                           ordered_cards,
                           board['deck'],
-                          max_depth=4)  # not sure what an appropriate search depth would be... 4 is pretty fast
-
-    # Give the points
-    if card.split(' ')[0] in config.GAIN_TIMES[board['curr_data_structure']]:
-        point = board['graph']['node_points'][card.split()[1]]
-        board['player_points'][board['turn']] += point
-
-    # Perform the action on the data structure
-    if board['curr_data_structure'] == 'AVL':
-        graph = avl.avlAction(card, board['graph'], balance=True)
-    # Currently only AVL supported
-    else:
-        graph = avl.avlAction(card, board['graph'], balance=True)
-
-    # Update the graph with the new graph state
-    board['graph'] = graph
-    # Make sure deck is not empty
-    if len(board['deck']) == 0:  # for now this checks deck so everyone always has 3 cards.
-                                 # Could check hand but not sure how that will affect frontend
-        pass
-
-    # Pick a new card
-    else:
-        board['cards'][board['turn']].remove(card)
-        new_card = board['deck'].pop(0)
-        board['cards'][board['turn']].append(new_card)
-
-
-    # Update the board on database
-    response_status = utils.update_board_db(board)
-    if response_status['error']:
-        return Response({'error': response_status['reason']},
-                        status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-    board_response = response_status['game_board']
-    return Response(board_response)
+                          max_depth=5)  # not sure what an appropriate search depth would be... 5 is pretty fast
+    return Response(card)

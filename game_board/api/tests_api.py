@@ -155,6 +155,38 @@ class Action(TestCase):
         db.remove_game(created_game.data['game_id'])
 
 
+class AIPick(TestCase):
+    """Tests API calls related to AI card selection """
+
+    def test_valid_card(self):
+        """Test if API will return a valid card"""
+
+        # create a new game
+        created_game = self.client.get('/game_board/api/start_game/Easy/ID1,ID2/AVL')
+
+        # get the board
+        board = self.client.get('/game_board/api/board/' + str(created_game.data['game_id'])).data
+
+        # get the AI to pick a card
+        picked_card = self.client.get('/game_board/api/ai_pick/' + str(created_game.data['game_id'])).data
+
+        # get current hand
+        hand = board['cards'][board['turn']]
+
+        is_card_in_hand = False
+        for card in hand:
+            if card == picked_card:
+                is_card_in_hand = True
+
+        self.assertTrue(is_card_in_hand,
+                        msg=f'{BColors.FAIL}\t[-]\tAI chose an invalid card!{BColors.ENDC}')
+        print(f"{BColors.OKGREEN}\t[+]\tPass attempting get valid AI card pick.{BColors.ENDC}")
+
+        # remove the created game
+        sleep(0.2)
+        db.remove_game(created_game.data['game_id'])
+
+
 class Rebalance(TestCase):
     """Tests the API calls that are related to balancing of the AVL tree."""
 
@@ -188,9 +220,9 @@ class PlayGame(TestCase):
         """remove the created game"""
         db.remove_game(self.game['game_id'])
 
-    def test_game_simulation(self):
+    def test_random_move_simulation(self):
         """Simulates a simple game for 50 rounds max or until the game ends to test the game play"""
-        print(f"{BColors.OKBLUE}\t[i]\tSimulating a simple game play (max 50 rounds)...{BColors.ENDC}")
+        print(f"{BColors.OKBLUE}\t[i]\tSimulating a simple game play with random moves (max 50 rounds)...{BColors.ENDC}")
         game_ended = False
 
         for _ in range(50):
@@ -204,7 +236,7 @@ class PlayGame(TestCase):
 
                 # game ended
                 if response['end_game']:
-                    print(f"{BColors.OKCYAN}\t[+]\tPass simulating a game. Game ended.{BColors.ENDC}")
+                    print(f"{BColors.OKCYAN}\t[+]\tPass simulating random move game. Game ended.{BColors.ENDC}")
                     game_ended = True
 
                     root_is_gold = response['graph']['gold_node'] == response['graph']['root_node']
@@ -240,7 +272,7 @@ class PlayGame(TestCase):
 
                 # game ended
                 if response['end_game']:
-                    print(f"{BColors.OKCYAN}\t[+]\tPass simulating a game. Game ended.{BColors.ENDC}")
+                    print(f"{BColors.OKCYAN}\t[+]\tPass simulating random move game. Game ended.{BColors.ENDC}")
                     game_ended = True
 
                     root_is_gold = response['graph']['gold_node'] == response['graph']['root_node']
@@ -254,23 +286,11 @@ class PlayGame(TestCase):
                     break
 
         if not game_ended:
-            print(f"{BColors.OKGREEN}\t[+]\tPass simulating a game. Reach max iterations.{BColors.ENDC}")
+            print(f"{BColors.OKGREEN}\t[+]\tPass simulating random move game. Reach max iterations.{BColors.ENDC}")
 
-
-class AIPlayGame(TestCase):
-    """Has the AI play the game by itself"""
-
-    def setUp(self):
-        """create a new game"""
-        self.game = self.client.get('/game_board/api/start_game/Easy/ID1,ID2,ID3/AVL').data
-
-    def tearDown(self):
-        """remove the created game"""
-        db.remove_game(self.game['game_id'])
-
-    def test_game_simulation(self):
+    def test_ai_move_simulation(self):
         """Simulates a simple game for 50 rounds max or until the game ends to test the game play"""
-        print(f"{BColors.OKBLUE}\t[i]\tSimulating a simple AI game play (max 50 rounds)...{BColors.ENDC}")
+        print(f"{BColors.OKBLUE}\t[i]\tSimulating a simple game play with AI moves (max 50 rounds)...{BColors.ENDC}")
         game_ended = False
 
         for _ in range(50):
@@ -279,14 +299,12 @@ class AIPlayGame(TestCase):
 
             # tree is balanced, play a card
             if board['graph']['balanced']:
-                curr_player = board['turn']
-                original_hand = board['cards'][curr_player]
-                response = self.client.get('/game_board/api/ai_action/' + str(self.game['game_id'])).data
-                new_hand = response['cards'][curr_player]
+                picked_card = self.client.get('/game_board/api/ai_pick/' + str(self.game['game_id'])).data
+                response = self.client.get('/game_board/api/action/' + picked_card + '/' + str(self.game['game_id'])).data
 
                 # game ended
                 if response['end_game']:
-                    print(f"{BColors.OKCYAN}\t[+]\tPass simulating an AI game. Game ended.{BColors.ENDC}")
+                    print(f"{BColors.OKCYAN}\t[+]\tPass simulating AI move game. Game ended.{BColors.ENDC}")
                     game_ended = True
 
                     root_is_gold = response['graph']['gold_node'] == response['graph']['root_node']
@@ -299,22 +317,17 @@ class AIPlayGame(TestCase):
                                      msg=f'{BColors.FAIL}\t[-]\tWrong winner!{BColors.ENDC}')
                     break
 
-                picked_card_list = list(set(original_hand) - set(new_hand))
-                if len(picked_card_list) != 0:  # a card with a duplicate value was not picked
-                                                # cannot accurately check by uid in the tree otherwise
-                    picked_card = picked_card_list[0]
+                # delete node action
+                if "Delete" in picked_card:
+                    deleted_node = picked_card.split(' ')[1]
+                    self.assertNotIn(deleted_node, response['graph']['node_points'].keys(),
+                                     msg=f'{BColors.FAIL}\t[-]\tDeleted node was still in the tree!{BColors.ENDC}')
 
-                    # delete node action
-                    if "Delete" in picked_card:
-                        deleted_node = picked_card.split(' ')[1]
-                        self.assertNotIn(deleted_node, response['graph']['node_points'].keys(),
-                                         msg=f'{BColors.FAIL}\t[-]\tDeleted node was still in the tree!{BColors.ENDC}')
-
-                    # insert node action
-                    elif "Insert" in picked_card:
-                        new_node = response['graph']['node_points'].keys() - board['graph']['node_points'].keys()
-                        self.assertEqual(response['graph']['node_points']["".join(new_node)], int(picked_card.split(' ')[1]),
-                                         msg=f'{BColors.FAIL}\t[-]\tFailed inserting node!{BColors.ENDC}')
+                # insert node action
+                elif "Insert" in picked_card:
+                    new_node = response['graph']['node_points'].keys() - board['graph']['node_points'].keys()
+                    self.assertEqual(response['graph']['node_points']["".join(new_node)], int(picked_card.split(' ')[1]),
+                                     msg=f'{BColors.FAIL}\t[-]\tFailed inserting node!{BColors.ENDC}')
 
             # balance tree action
             else:
@@ -327,7 +340,7 @@ class AIPlayGame(TestCase):
 
                 # game ended
                 if response['end_game']:
-                    print(f"{BColors.OKCYAN}\t[+]\tPass simulating a game. Game ended.{BColors.ENDC}")
+                    print(f"{BColors.OKCYAN}\t[+]\tPass simulating AI move game. Game ended.{BColors.ENDC}")
                     game_ended = True
 
                     root_is_gold = response['graph']['gold_node'] == response['graph']['root_node']
@@ -341,4 +354,4 @@ class AIPlayGame(TestCase):
                     break
 
         if not game_ended:
-            print(f"{BColors.OKGREEN}\t[+]\tPass simulating an AI game. Reach max iterations.{BColors.ENDC}")
+            print(f"{BColors.OKGREEN}\t[+]\tPass simulating AI move game. Reach max iterations.{BColors.ENDC}")
