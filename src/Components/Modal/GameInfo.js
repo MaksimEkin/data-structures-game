@@ -55,6 +55,7 @@ render(){
                htmlFor='game'>Data Structure     </label>
                 <select type='text' id="game" value={this.state.gameDS} onInput={this.handleInput} name='gameDS'
                         label='DSgame' style={{marginBottom: '1em'}}>
+                    <option value="AVL">Select Data Structure*</option>
                     <option value="AVL">AVL</option>
 
                  </select>
@@ -63,6 +64,7 @@ render(){
         <div class="form-group" className="space-y-2">
         <label  className="text-xl text-center font-semibold text-gray-800 mb-2" for='difficulty-level'>Difficulty     </label>
                 <select type='text' id='difficulty-level' value={this.state.level} name='level' onChange={this.handleInput} label='Difficulty Level' style={{ marginBottom: '1em' }}  >
+                    <option value="Easy">Select Difficulty*</option>
                     <option value="Easy">Easy</option>
                     <option value="Medium">Medium</option>
                     <option value="Hard">Hard</option>
