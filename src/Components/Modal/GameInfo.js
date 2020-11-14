@@ -2,6 +2,7 @@ import React from 'react';
 import {Button, TextField} from '@material-ui/core';
 import Cookies from 'universal-cookie';
 import {Link} from "react-router-dom";
+
 //set the construct by sharing/setting the constructor states between
 // Home and GameInfo & bind the state value's to the input change that happens
 class GameInfo extends React.Component {
@@ -26,15 +27,12 @@ class GameInfo extends React.Component {
         cookies.set('gameDS', this.state.gameDS, { path: '/' });
     };
 
-
-
 render(){
 
     return(
         //grid stores the different options that are set in the modal form
         // each value input changes handleInput and is rebinded to the state value
         //that is changed and resets the cookies
-
 
         <div className="w-full md:max-w-md mt-6">
             <span>
@@ -75,9 +73,7 @@ render(){
                     style={{ marginBottom: '1em' }}
                 />
 
-
             <div className="space-y-10"><br></br></div>
-
 
                 <ul>
                 <li>
@@ -87,13 +83,11 @@ render(){
                 </li>
                 </ul>
 
-
              <div className="space-y-10"><br></br></div>
 
                 </form>
 
         </div></span></div>
-
 
     );
 }

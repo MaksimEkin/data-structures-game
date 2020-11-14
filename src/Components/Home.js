@@ -1,14 +1,13 @@
-import React, { Component, useRef } from 'react'
+import React, { Component } from 'react'
 import "./styles.css";
 import Particles from 'react-particles-js';
 import { Button} from '@material-ui/core';
 import GameInfo from './Modal/GameInfo.js'
 import { RankingTable } from './RankingTable'
-import WinModal from "./Modal/WinModal";
+
 //this function is called from App.js to start the interface of the game
 //calls the GameInfo modal to get the new game's information
 class Home extends Component{
-
 
   //constructor to set the intial state value's
   constructor(props) {
@@ -16,17 +15,9 @@ class Home extends Component{
     this.state = {
       difficulty:null,
       players:null,
-      data_structure:null,
-      open_modal:false
+      data_structure:null
     };
   }
-
-startGameModal = () => {
-    this.setState({
-      open_modal: true
-    })
-  }
-
 
   //display the background particle
   //and the modal as a button and pass the state values in there
@@ -55,7 +46,6 @@ startGameModal = () => {
             }}
           />
 
-
             <div className="flex items-center justify-center h-screen">
                <Button>
                     <GameInfo className="flex items-center justify-center h-screen"
@@ -73,10 +63,6 @@ startGameModal = () => {
             </div>
 
     </div>
-
-
-
-
 
     )
 }
