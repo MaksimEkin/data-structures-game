@@ -256,35 +256,20 @@ def distribute_cards(player_ids, deck):
     return board_cards, deck
 
 
-def pick_a_card(deck, hand, card):
+def pick_a_card(deck):
     """ Simulate picking a single card from the deck.
+    Note that only the card is returned
+    Deck must be manually adjusted (by removing the card)
 
     :param deck: current game board deck of cards
-    :param hand: some player's current hand
-    :param card: the card that was just played
-    :return: picked card
+    :return: picked card or None if the deck is empty
     """
-
-    print(f'Card: {card}\n')
-    print(f'Hand: {hand}\n')
-    print(f'Deck: {deck}\n')
-
-    # end game condition, should prob be checked somewhere prior
-    if len(hand) == 0:
-        return
-
     # no more cards left to draw
     if len(deck) == 0:
-        return hand
+        return None
 
-    # card could not have been used because it was not available
-    if card not in hand:
-        return
-
-    hand.remove(card)  # first, remove the played card
-    picked_card = deck.pop()  # pick new card
-    hand.append(picked_card)
-    return hand, deck
+    picked_card = deck.pop(0)  # take the top card in the deck
+    return picked_card
 
 
 def ai_format_hands(board):
@@ -297,7 +282,7 @@ def ai_format_hands(board):
     """
 
     ordered_hands = dict()
-    next_player_index = (board['player_ids'].index(board['turn']) + 1) % len(board['player_ids'])
+    next_player_index = board['player_ids'].index(board['turn'])
     next_player = board['player_ids'][next_player_index]
 
     count = 0
@@ -305,39 +290,8 @@ def ai_format_hands(board):
         if count == len(board['player_ids']):
             break
         ordered_hands[count] = board['cards'][next_player]
-        next_player_index = (board['player_ids'].index(board['turn']) + 1) % len(board['player_ids'])
+        next_player_index = (next_player_index + 1) % len(board['player_ids'])
         next_player = board['player_ids'][next_player_index]
         count += 1
 
     return ordered_hands
-
-# def ai_format_hands(board):
-#     """ Create a formatted version of board[cards] that the AI can use.
-#     Order is preserved such that player of key '0' is the maximizer and key '1' through 'num_players - 1'
-#     are players that will go next (in order)
-#
-#     :param board: the game board as given by database
-#     :return ordered_hands: the ordered dict (starting from the current player, ie the maximizer)
-#     """
-#     count = 0
-#     ordered_hands = dict()
-#     maximizer = board['turn']
-#     print(maximizer)
-#     print(board['cards'])
-#     print(board['player_ids'])
-#     ordered_hands[count] = board['cards'][maximizer]
-#     next_player_index = (board['player_ids'].index(board['turn']) + 1) % len(board['player_ids'])
-#     next_player = board['player_ids'][next_player_index]
-#
-#     while True:
-#         if next_player is maximizer or count > 20:
-#             break
-#
-#         print(f'THE NEXT PLAYER IS... {next_player}')
-#         count += 1
-#         print(count)
-#         ordered_hands[count] = board['cards'][next_player]
-#         next_player_index = (board['player_ids'].index(board['turn']) + 1) % len(board['player_ids'])
-#         next_player = board['player_ids'][next_player_index]
-#
-#     return ordered_hands

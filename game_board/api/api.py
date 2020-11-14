@@ -192,7 +192,9 @@ def action(request, card, game_id):
 
     # Pick a new card
     else:
-        board['cards'][board['turn']], board['deck'] = utils.pick_a_card(board['deck'], board['cards'][board['turn']], card)
+        board['cards'][board['turn']].remove(card)
+        new_card = board['deck'].pop(0)
+        board['cards'][board['turn']].append(new_card)
 
     # Update the board on database
     response_status = utils.update_board_db(board)
@@ -226,7 +228,7 @@ def ai_action(request, game_id):
                           board['curr_data_structure'],
                           ordered_cards,
                           board['deck'],
-                          max_depth=1)
+                          max_depth=4)
 
     print(f"SIR! YOUR CARD IS: {card}")
 
@@ -251,7 +253,13 @@ def ai_action(request, game_id):
 
     # Pick a new card
     else:
-        board['cards'][board['turn']], board['deck'] = utils.pick_a_card(board['deck'], board['cards'][board['turn']], card)
+        print(f"CURRENT HAND: {board['cards'][board['turn']]}")
+        print(f"CHOSEN CARD: {card}")
+
+        board['cards'][board['turn']].remove(card)
+        new_card = board['deck'].pop(0)
+        board['cards'][board['turn']].append(new_card)
+
 
     # Update the board on database
     response_status = utils.update_board_db(board)

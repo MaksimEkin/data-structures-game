@@ -8,7 +8,7 @@ from game_board.avl import avl_handler as avl
 from .. import config
 
 
-class AIHandler():
+class AIHandler:
     """ Implementation of the AI """
     def __init__(self, state, game_type, cards, deck, max_depth):
         """
@@ -45,12 +45,13 @@ class AIHandler():
         """ finds the next ordered player """
         return (player + 1) % self.num_players
 
-    def evaluate_move(self, card):
+    def evaluate_move(self, card, values):
         """ calculate the value of a move
         The evaluation function that ultimately controls the decision making of the AI
         Currently the goal is just to maximize point value
 
         :param card:    a possible move
+        :param values:  a dictionary of nodes to values
         :return score:  the value of the move
         """
         generic_card = re.sub('\d+', '#', card, 1)  # replace number in card with '#'
@@ -59,7 +60,7 @@ class AIHandler():
 
         move = card.split(' ')
         if move[0] in config.GAIN_TIMES[self.game_type]:
-            return int(move[1])
+            return int(values[move[1]])
         else:
             return 0
 
@@ -117,7 +118,7 @@ class AIHandler():
                 next_player = self.next_player(player)
                 updated_moves = self.find_possible_moves(next_player, seen)
                 val = (self.minimax(updated_state, next_player, updated_moves, depth-1, alpha, beta, seen) +
-                       self.evaluate_move(move))
+                       self.evaluate_move(move, state['node_points']))
                 if val > best_val:
                     best_move = move
                 best_val = max(val, best_val)
@@ -137,7 +138,7 @@ class AIHandler():
                 next_player = self.next_player(player)
                 updated_moves = self.find_possible_moves(next_player, seen)
                 val = (self.minimax(updated_state, next_player, updated_moves, depth - 1, alpha, beta, seen) -
-                       self.evaluate_move(move))
+                       self.evaluate_move(move, state['node_points']))
                 best_val = min(val, best_val)
                 beta = min(beta, best_val)
                 if beta <= alpha:
@@ -150,13 +151,13 @@ class AIHandler():
 def select_move(game_state, game_type, cards, deck, max_depth=5):
     """ call on ai to make a move
 
-    :param game_state: game board state as it currently stands
-    :param game_type: the type of game being played. currently only AVL supported
-    :param maximizer: player id for which AI will maximize points on this call
-    :param cards: dictionary of lists where each list contains the cards available to the player
-                  this dictionary needs to have been processed by the ai_format_hands function
-    :param deck: deck of available cards to draw from
-    :return card: game-specific action that the AI found works best
+    :param game_state:  game board state as it currently stands
+    :param game_type:   the type of game being played. currently only AVL supported
+    :param cards:       dictionary of lists where each list contains the cards available to the player
+                        this dictionary needs to have been processed by the ai_format_hands function
+    :param deck:        deck of available cards to draw from
+    :param max_depth:   maximum recursive depth to search to
+    :return card:       game-specific action that the AI found works best
     """
     ai = AIHandler(game_state, game_type, cards, deck, max_depth)
     print('HANDLER INITIALIZED')
