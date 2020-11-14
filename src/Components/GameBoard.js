@@ -6,6 +6,7 @@ import Cookies from 'universal-cookie';
 import WinModal from './Modal/WinModal.js';
 import ReactTooltip from "react-tooltip";
 import Particles from 'react-particles-js';
+import RebalanceModal from './Modal/RebalanceModal.js'
 
 //Uber's digraph react folder
 import {
@@ -27,6 +28,7 @@ import {
 } from "./config";
 
 import "./styles.css";
+
 //Fix XSS security issues when developing locally
 //this allows us to test separately locally and on Heroku by changing just one line
 const local = "http://127.0.0.1:8000/";
@@ -34,7 +36,7 @@ const reactLocal = "http://localhost:3000/"
 const remote = "https://data-structures-game.herokuapp.com/";
 
 //can also be const url = local; or const url = reactLocal;
-const url = remote;
+const url = local;
 
 //define sample node
 const sample = {
@@ -487,7 +489,8 @@ class GameBoard extends Component {
 
     //make the API call to actually play the card the user chose
     this.apiCall()
-
+    //check if rebalance needs to be done
+    this.rebalance()
     //check if playing selected card ended the game
     //this.checkGameStatus()
   }
@@ -513,7 +516,11 @@ class GameBoard extends Component {
     this.setState({deckSize: newBoard['deck'].length});
 
     //check if board is balanced then rebalance tree if fxn returned false
-
+    if(!this.checkRebalance()){
+      //this.rebalance()
+      
+    }
+    this.setState({loading: false})
     let made_graph = create_graph(this.state.board['graph'])
     this.setState({ graph: made_graph});
     this.setState({loading: false})
@@ -761,12 +768,18 @@ class GameBoard extends Component {
         <div style={{height: "10rem"}}>
 
           {this.state.game_over ? <WinModal winner={this.state.turn} win_board={this.state.board}/> : <div> </div>}
-
+          { (this.state.board != null && !this.state.board.graph.balanced && !this.state.showModal) ? <RebalanceModal turn={this.state.turn}/> :  <div> </div> }
           <div className="flex items-center bg-opacity-0 h-11">
 
-            <button className="transition duration-500 ease-in-out bg-blue-500 hover:bg-red-500 transform hover:-translate-y-1 hover:scale-105 bg-blue-300 border-blue-350 border-opacity-50 rounded-lg shadow-2xl flex-1 m-1 py-1 flex justify-center font-bold text-xl text-gray-800" onClick={() => this.playCard(card_1)}>{card_1}</button>
-            <button className="transition duration-500 ease-in-out bg-blue-500 hover:bg-red-500 transform hover:-translate-y-1 hover:scale-105 bg-blue-300 border-blue-350 border-opacity-50 rounded-lg shadow-2xl flex-1 m-1 py-1 flex justify-center font-bold text-xl text-gray-800" onClick={() => this.playCard(card_2)}>{card_2}</button>
-            <button className="transition duration-500 ease-in-out bg-blue-500 hover:bg-red-500 transform hover:-translate-y-1 hover:scale-105 bg-blue-300 border-blue-350 border-opacity-50 rounded-lg shadow-2xl flex-1 m-1 py-1 flex justify-center font-bold text-xl text-gray-800" onClick={() => this.playCard(card_3)}>{card_3}</button>
+            <button className="transition duration-500 ease-in-out bg-blue-500 hover:bg-red-500 transform hover:-translate-y-1 hover:scale-105 bg-blue-300 border-blue-350 border-opacity-50 rounded-lg shadow-2xl flex-1 m-1 py-1 flex justify-center font-bold text-xl text-gray-800" 
+            disabled={(this.state.board != null && !this.state.board.graph.balanced)? true : false}
+            onClick={() => this.playCard(card_1)}>{card_1}</button>
+            <button className="transition duration-500 ease-in-out bg-blue-500 hover:bg-red-500 transform hover:-translate-y-1 hover:scale-105 bg-blue-300 border-blue-350 border-opacity-50 rounded-lg shadow-2xl flex-1 m-1 py-1 flex justify-center font-bold text-xl text-gray-800" 
+            disabled={(this.state.board != null && !this.state.board.graph.balanced)? true : false}
+            onClick={() => this.playCard(card_2)}>{card_2}</button>
+            <button className="transition duration-500 ease-in-out bg-blue-500 hover:bg-red-500 transform hover:-translate-y-1 hover:scale-105 bg-blue-300 border-blue-350 border-opacity-50 rounded-lg shadow-2xl flex-1 m-1 py-1 flex justify-center font-bold text-xl text-gray-800" 
+            disabled={(this.state.board != null && !this.state.board.graph.balanced)? true : false}
+            onClick={() => this.playCard(card_3)}>{card_3}</button>
 
             <div
                 className="flex justify-center">
