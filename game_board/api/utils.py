@@ -56,7 +56,8 @@ def update_board_db(board):
 
     try:
         # Game ended
-        if board['graph']['root_node'] == board['graph']['gold_node']:
+        if (board['graph']['root_node'] == board['graph']['gold_node'] or
+                len(board['deck']) == 0):
             db.remove_game(board['game_id'])
             board['end_game'] = True
             result['game_board'] = board

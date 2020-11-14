@@ -188,7 +188,7 @@ def action(request, card, game_id):
     # Make sure deck is not empty
     if len(board['deck']) == 0:  # for now this checks deck so everyone always has 3 cards.
                                  # Could check hand but not sure how that will affect frontend
-        board['end_game'] = True
+        pass
 
     # Pick a new card
     else:
@@ -223,7 +223,6 @@ def ai_action(request, game_id):
 
     board = response_status['game_board']
     ordered_cards = utils.ai_format_hands(board)
-    print(ordered_cards)
     card = ai.select_move(board['graph'],
                           board['curr_data_structure'],
                           ordered_cards,
@@ -247,7 +246,7 @@ def ai_action(request, game_id):
     # Make sure deck is not empty
     if len(board['deck']) == 0:  # for now this checks deck so everyone always has 3 cards.
                                  # Could check hand but not sure how that will affect frontend
-        board['end_game'] = True
+        pass
 
     # Pick a new card
     else:
