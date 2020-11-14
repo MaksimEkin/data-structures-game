@@ -285,3 +285,24 @@ def pick_a_card(deck, hand, card):
     picked_card = deck.pop()  # pick new card
     hand.append(picked_card)
     return hand, deck
+
+
+def ai_format_hands(board):
+    """ Create a formatted version of board[cards] that the AI can use.
+    Order is preserved such that player of key '0' is the maximizer and key '1' through 'num_players - 1'
+    are players that will go next (in order)
+
+    :param board: the game board as given by database
+    :return ordered_hands: the ordered dict (starting from the current player, ie the maximizer)
+    """
+    count = 0
+    ordered_hands = dict()
+    maximizer = board['turn']
+    ordered_hands[count] = board['cards'][maximizer]
+    next_player_index = (board['player_ids'].index(board['turn']) + 1) % len(board['player_ids'])
+    while next_player_index != maximizer:
+        count += 1
+        ordered_hands[count] = board['cards'][next_player_index]
+        next_player_index = (board['player_ids'].index(board['turn']) + 1) % len(board['player_ids'])
+
+    return ordered_hands
