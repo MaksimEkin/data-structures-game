@@ -427,6 +427,40 @@ class GameBoard extends Component {
 
   /* Define custom graph editing methods here */
 
+  //checks if the current player is an AI and calls AI API call if so
+  checkAI = () => {
+    let playerName = this.state.board.turn
+    if(playerName == "player2") {
+        console.log("spooky scary thinker says yes")
+        return true
+    } else {
+        console.log("spooky scary thinker says NOOO")
+        return false
+    }
+  }
+
+  AIapiCall = async () => {
+    //form the URL that will be used
+    let fetch_url = url+"game_board/api/ai_action/" + this.state.gameID
+    //fetch_url = fetch_url + this.state.board['game_id']
+
+    this.setState({ loading: true});
+    console.log("scary spooky thinking things")
+
+    //make the API call
+    let response = await fetch(fetch_url);
+    let newBoard = await response.json();
+
+    //store the results
+    this.setState({ board: newBoard, turn: newBoard['turn']});
+    this.setState({playerPointVal: newBoard['player_points'][this.state.turn]})
+    this.setState({deckSize: newBoard['deck'].length});
+
+    this.setState({loading: false})
+    let made_graph = create_graph(this.state.board['graph'])
+    this.setState({ graph: made_graph});
+  }
+
   //checks if the current board is balanced and returns true or false
   checkRebalance = () => {
     let isBalanced = this.state.board.graph.balanced
@@ -505,6 +539,10 @@ class GameBoard extends Component {
     //if the JSON has end_game = true, store that in the state
     if (this.state.board['end_game']){
       this.setState({game_over: true})
+    }
+
+    if(this.checkAI()){
+      this.AIapiCall()
     }
 
     //introduced a timeout because of a bug that arose without it:

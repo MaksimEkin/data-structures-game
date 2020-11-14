@@ -205,7 +205,7 @@ def action(request, card, game_id):
 
 
 @api_view(['GET'])
-def ai_action(request, card, game_id):
+def ai_action(request, game_id):
     """
     Have an AI make the move on the board
 
@@ -220,12 +220,15 @@ def ai_action(request, card, game_id):
                         status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     board = response_status['game_board']
+    ordered_cards = utils.ai_format_hands(board)
+    print(ordered_cards)
     card = ai.select_move(board['graph'],
                           board['curr_data_structure'],
-                          board['player_ids'],
-                          board['turn'],
-                          board['cards'],
-                          board['deck'])
+                          ordered_cards,
+                          board['deck'],
+                          max_depth=1)
+
+    print(f"SIR! YOUR CARD IS: {card}")
 
     # Give the points
     if card.split(' ')[0] in config.GAIN_TIMES[board['curr_data_structure']]:

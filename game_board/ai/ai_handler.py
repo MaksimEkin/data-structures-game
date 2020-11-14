@@ -20,8 +20,8 @@ class AIHandler():
         :param deck:        deck of cards not yet claimed by any player
         :param max_depth:   maximum recursive depth on the minimax call
         """
-        self.original_state = self.parse_state(state)
         self.game_type = game_type
+        self.original_state = self.parse_state(state)
         self.cards = cards
         self.deck = deck
         self.max_depth = max_depth
@@ -96,10 +96,11 @@ class AIHandler():
         :param beta:    saved beta value for alpha-beta pruning
         :param seen:    list of already played cards
         """
+        print("WE IN MINIMAX")
         if seen is None:
             seen = []
 
-        if self.game_type is not 'AVL':
+        if self.game_type != 'AVL':
             raise Exception(f'Given unsupported game type: {self.game_type}')
 
         if (depth == 0 or
@@ -107,24 +108,8 @@ class AIHandler():
                 len(moves) == 0):
             return 0
 
-        if player != 0:
-            best_val = math.inf
-            for move in moves:
-                seen.append(move)
-                updated_state = avl.avlAction(move, state, balance=True)
-                next_player = self.next_player(player)
-                updated_moves = self.find_possible_moves(next_player, seen)
-                val = (self.minimax(updated_state, next_player, updated_moves, depth-1, alpha, beta, seen) -
-                       self.evaluate_move(move))
-                best_val = min(val, best_val)
-                beta = min(beta, best_val)
-                if beta <= alpha:
-                    break
-
-            return best_val
-
-        else:
-            best_val = math.inf
+        if player == 0:
+            best_val = -math.inf
             best_move = None
             for move in moves:
                 seen.append(move)
@@ -144,6 +129,22 @@ class AIHandler():
                 self.best_move = best_move
             return best_val
 
+        else:
+            best_val = math.inf
+            for move in moves:
+                seen.append(move)
+                updated_state = avl.avlAction(move, state, balance=True)
+                next_player = self.next_player(player)
+                updated_moves = self.find_possible_moves(next_player, seen)
+                val = (self.minimax(updated_state, next_player, updated_moves, depth - 1, alpha, beta, seen) -
+                       self.evaluate_move(move))
+                best_val = min(val, best_val)
+                beta = min(beta, best_val)
+                if beta <= alpha:
+                    break
+
+            return best_val
+
 
 """ AI API CALL(S) """
 def select_move(game_state, game_type, cards, deck, max_depth=5):
@@ -158,5 +159,6 @@ def select_move(game_state, game_type, cards, deck, max_depth=5):
     :return card: game-specific action that the AI found works best
     """
     ai = AIHandler(game_state, game_type, cards, deck, max_depth)
+    print('HANDLER INITIALIZED')
     ai.minimax(ai.original_state, 0, ai.cards[0], ai.max_depth, -math.inf, math.inf)
     return ai.best_move

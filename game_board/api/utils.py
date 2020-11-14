@@ -295,14 +295,49 @@ def ai_format_hands(board):
     :param board: the game board as given by database
     :return ordered_hands: the ordered dict (starting from the current player, ie the maximizer)
     """
-    count = 0
+
     ordered_hands = dict()
-    maximizer = board['turn']
-    ordered_hands[count] = board['cards'][maximizer]
     next_player_index = (board['player_ids'].index(board['turn']) + 1) % len(board['player_ids'])
-    while next_player_index != maximizer:
-        count += 1
-        ordered_hands[count] = board['cards'][next_player_index]
+    next_player = board['player_ids'][next_player_index]
+
+    count = 0
+    while True:
+        if count == len(board['player_ids']):
+            break
+        ordered_hands[count] = board['cards'][next_player]
         next_player_index = (board['player_ids'].index(board['turn']) + 1) % len(board['player_ids'])
+        next_player = board['player_ids'][next_player_index]
+        count += 1
 
     return ordered_hands
+
+# def ai_format_hands(board):
+#     """ Create a formatted version of board[cards] that the AI can use.
+#     Order is preserved such that player of key '0' is the maximizer and key '1' through 'num_players - 1'
+#     are players that will go next (in order)
+#
+#     :param board: the game board as given by database
+#     :return ordered_hands: the ordered dict (starting from the current player, ie the maximizer)
+#     """
+#     count = 0
+#     ordered_hands = dict()
+#     maximizer = board['turn']
+#     print(maximizer)
+#     print(board['cards'])
+#     print(board['player_ids'])
+#     ordered_hands[count] = board['cards'][maximizer]
+#     next_player_index = (board['player_ids'].index(board['turn']) + 1) % len(board['player_ids'])
+#     next_player = board['player_ids'][next_player_index]
+#
+#     while True:
+#         if next_player is maximizer or count > 20:
+#             break
+#
+#         print(f'THE NEXT PLAYER IS... {next_player}')
+#         count += 1
+#         print(count)
+#         ordered_hands[count] = board['cards'][next_player]
+#         next_player_index = (board['player_ids'].index(board['turn']) + 1) % len(board['player_ids'])
+#         next_player = board['player_ids'][next_player_index]
+#
+#     return ordered_hands
