@@ -156,7 +156,6 @@ class AIHandler:
             return best_val
 
 
-""" AI API CALL(S) """
 def select_move(game_state, game_type, cards, deck, max_depth=5):
     """ call on ai to make a move
 
