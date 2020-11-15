@@ -17,25 +17,38 @@ class WinModal extends Component {
     }
 
     render() {
-        /*var i
-        let players = []
-        for (i = 0; i < this.state.board["num_players"]; i++) {
-            players.push(this.state.board["player_ids"][i])
-        }
 
-        let testing = ""
+        //string to store other players' scores
+        let playerScores = ""
+
+        //loop through all players in board
+        var i //loop counter for iterating through each player in the game
         for (i = 0; i < this.state.board["num_players"]; i++){
-            testing += players[i]
-            testing += this.state.board["player_points"][[players][i]]
+
+            //don't include winner in the list of other players (their score displayed separately)
+            if (!(this.state.board["player_ids"][i] == this.state.winner)){
+
+                //get id of player (not a winner)
+                let curPlayer =  this.state.board["player_ids"][i]
+                playerScores += curPlayer
+
+                //and their score
+                playerScores += " with " + this.state.board.player_points[curPlayer] + " points!,"
+            }
         }
 
-        console.log("Testing: ", testing) */
-
+        //slice off last comma
+        playerScores = playerScores.substring(0, playerScores.length - 1)
 
         //Display win message
         Swal.fire({
-            title: "Congrats! You are the Data Structures Wizard!",
-            text: "Winner is: " + this.state.winner + " with " + this.state.board["player_points"][this.state.winner] + " points!",
+            //display winner score
+            title: "Congrats " + this.state.winner + "! You are a Data Structures Wizard, with "
+                + this.state.board["player_points"][this.state.winner] + " points!",
+
+            //display other players' scores
+            text: "Other all-stars: " + playerScores,
+
             imageUrl: Party_Face,
             confirmButtonText: "Return to Home Page"
         }).then((result) => {
