@@ -4,6 +4,7 @@ import { Button, Grid, Typography, Card, CardHeader, CardActions, CardActionArea
 import {create_adjacency, create_graph} from './CreateGraphAdj.js';
 import Cookies from 'universal-cookie';
 import WinModal from './Modal/WinModal.js';
+import ReactTooltip from "react-tooltip";
 
 //Uber's digraph react folder
 import {
@@ -677,18 +678,21 @@ class GameBoard extends Component {
             </div>
 
           <div className="flex-1 text-gray-1000 text-center items-center bg-gray-200 px-4 py-2 m-2 rounded-lg">
-            <div class="transition duration-500 ease-in-out bg-yellow-300 hover:bg-orange-500 transform hover:-translate-y-1 hover:scale-105 bg-yellow-300 border-yellow-350 border-opacity-50 rounded-lg shadow-lg flex-1 m-1 py-1">
+            <div data-delay-show='500' data-place="bottom" data-tip="Shift click to make edges, delete a selected node with the keyboard's delete key" data-offset="{'top': -20}" data-text-color="yellow"
+            class="transition duration-500 ease-in-out bg-yellow-300 hover:bg-orange-500 transform hover:-translate-y-1 hover:scale-105 bg-yellow-300 border-yellow-350 border-opacity-50 rounded-lg shadow-lg flex-1 m-1 py-1">
               <button onClick={() =>this.repositionNodes()}>Reposition Nodes</button>
             </div>
           </div>
 
           <div className="flex-1 text-gray-1000 text-center items-center bg-gray-200 px-4 py-2 m-2 rounded-lg">
-            <div class="transition duration-500 ease-in-out bg-yellow-300 hover:bg-orange-500 transform hover:-translate-y-1 hover:scale-105 bg-yellow-300 border-yellow-350 border-opacity-50 rounded-lg shadow-lg flex-1 m-1 py-1">
+            <div data-delay-show='500' data-place="bottom" data-tip="End's turn and determines rebalance correctness" data-offset="{'top': -20}" data-text-color="yellow"
+            class="transition duration-500 ease-in-out bg-yellow-300 hover:bg-orange-500 transform hover:-translate-y-1 hover:scale-105 bg-yellow-300 border-yellow-350 border-opacity-50 rounded-lg shadow-lg flex-1 m-1 py-1">
               <button onClick={() =>this.checkNodes()}>Check Nodes</button>
             </div>
           </div>
         </div>
 
+        <ReactTooltip />
         {/*from react digraph library to format graph */}
         <div id = "graph" style={{ height: "60rem"}}>
           <GraphView
