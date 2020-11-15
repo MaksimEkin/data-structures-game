@@ -114,7 +114,7 @@ class GameBoard extends Component {
        this.setState({loading: false});
 
         if (!this.state.game_over) {
-            if (this.state.turn.toLowerCase().startsWith('bot')) {
+            if (this.state.turn.replace(/\s+/g, "").toLowerCase().startsWith('bot')) {
                 if (!this.state.loading) {
                     // if this is a bot, call AI action
                     this.aiCall()
@@ -475,7 +475,7 @@ class GameBoard extends Component {
     this.apiCall()
 
     //check if playing selected card ended the game
-    this.checkGameStatus()
+    //this.checkGameStatus()
   }
 
   //modularize the api call for playing a card
@@ -539,7 +539,7 @@ class GameBoard extends Component {
     //introduced a timeout because of a bug that arose without it:
     //the state was updating before the API call returned,
     //and the game was ending 1 turn after it should have
-    setTimeout(this.checkBoard, 200)
+    //setTimeout(this.checkBoard, 200)
   }
 
   //if the API can no longer find the game board in the db,
@@ -609,11 +609,10 @@ class GameBoard extends Component {
       card_3 = this.state.board['cards'][this.state.board['turn']][2]
     }
 
-    if (!this.state.game_over) {
-        this.checkGameStatus()
-        if (this.state.turn.toLowerCase().startsWith('bot')) {
-            if (!this.state.loading) {
-                // if this is a bot, call AI action
+    if (!this.state.loading) {  // if changes are not being made
+        this.checkGameStatus()  // update win condition
+        if (!this.state.game_over) {  // if game is still ongoing
+            if (this.state.turn.replace(/\s+/g, "").toLowerCase().startsWith('bot')) {  // if its the bots turn
                 this.aiCall()
             }
         }
