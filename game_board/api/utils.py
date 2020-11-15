@@ -57,9 +57,6 @@ def update_board_db(board):
 
     try:
 
-        # Debug print deck
-        print(f"Deck:\n{board['deck']}")
-
         # Game ended
         if (board['graph']['root_node'] == board['graph']['gold_node'] or
                 len(board['deck']) == 0):

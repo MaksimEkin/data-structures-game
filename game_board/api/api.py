@@ -219,7 +219,6 @@ def ai_pick(request, game_id):
     :param game_id: unique identifier of the board
     :return card: string that represents a valid action for current player to take
     """
-    print("WE IN HERE")
     # Load the game board from database
     response_status = utils.load_board_db(game_id)
     if response_status['error']:
@@ -228,13 +227,8 @@ def ai_pick(request, game_id):
 
     # Grab the board
     board = response_status['game_board']
-    #print(f'\n\n{board}\n\n')
-    print(f"Current Turn: {board['turn']}")
-
-    # Check if name is bot
-    print(board['turn'].lower().startswith(config.BOT_NAME_PREFIX))
     if not board['turn'].lower().startswith(config.BOT_NAME_PREFIX):
-        return Response({'error': 'The current player is not a BOT. Why are you calling them bad?'},
+        return Response({'error': 'The current player is not a BOT'},
                         status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     ordered_cards = utils.ai_format_hands(board)
@@ -276,9 +270,6 @@ def ai_pick(request, game_id):
                         status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     board_response = response_status['game_board']
-    sleep(2)
+    sleep(config.BOT_SLEEP_TIME)
     return Response(board_response)
-
-    # response = Client().get('/game_board/api/action/' + card + '/' + game_id).data
-    # return Response(response)
 
