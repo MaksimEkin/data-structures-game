@@ -503,13 +503,10 @@ class GameBoard extends Component {
     this.setState({deckSize: newBoard['deck'].length});
 
     //check if board is balanced then rebalance tree if fxn returned false
-    if(!this.checkRebalance() && !this.state.turn.replace(/\s+/g, "").toLowerCase().startsWith('bot')){
-        this.rebalance()
-    } else {
-        let made_graph = create_graph(this.state.board['graph'])
-        this.setState({ graph: made_graph});
-        this.setState({loading: false})
-    }
+
+    let made_graph = create_graph(this.state.board['graph'])
+    this.setState({ graph: made_graph});
+    this.setState({loading: false})
   }
 
   //AI api call
@@ -620,6 +617,9 @@ class GameBoard extends Component {
             if (this.state.turn.replace(/\s+/g, "").toLowerCase().startsWith('bot')) {  // if its the bots turn
                 this.aiCall()
             }
+        }
+        if(!this.checkRebalance() && !this.state.turn.replace(/\s+/g, "").toLowerCase().startsWith('bot')){
+            this.rebalance()
         }
     }
 
