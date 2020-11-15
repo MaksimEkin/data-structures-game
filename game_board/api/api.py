@@ -266,15 +266,6 @@ def ai_pick(request, game_id):
             point = config.GAIN_TIMES_POINTS[card.split(' ')[0]]
             board['player_points'][board['turn']] += point
 
-        # Perform the action on the data structure
-        if board['curr_data_structure'] == 'AVL':
-            graph = avl.avlAction(card, board['graph'], balance=True)
-        # Currently only AVL supported
-        else:
-            graph = avl.avlAction(card, board['graph'], balance=True)
-
-        # Update the graph with the new graph state
-        board['graph'] = graph
         # Make sure deck is not empty
         if len(board['deck']) == 0:  # for now this checks deck so everyone always has 3 cards.
                                      # Could check hand but not sure how that will affect frontend
