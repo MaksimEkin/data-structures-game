@@ -2,6 +2,7 @@
     API for Game Board that allows interaction with boards.
 """
 import json
+from time import sleep
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
@@ -10,17 +11,18 @@ from rest_framework.throttling import UserRateThrottle
 from rest_framework.decorators import throttle_classes
 from game_board.api import utils
 from game_board.avl import avl_handler as avl
+from game_board.ai import ai_handler as ai
 from .. import config
 
 
 @api_view(['GET'])
 def api_overview(request):
-    '''
+    """
     Overview of the API calls exist.
 
     :param request:
     :return: Response, list of API URLs.
-    '''
+    """
     api_urls = {
         'Start Game': '/start_game/<str:difficulty>/<str:player_ids>/<str:data_structures>',
         'Game Board': '/board/<str:id>',
@@ -34,7 +36,7 @@ def api_overview(request):
 @throttle_classes([AnonRateThrottle])
 @throttle_classes([UserRateThrottle])
 def start_game(request, difficulty, player_ids, data_structures):
-    '''
+    """
     Creates a new game board.
 
     :param request:
@@ -42,7 +44,7 @@ def start_game(request, difficulty, player_ids, data_structures):
     :param player_ids: string of player IDs, comma seperated if more than one
     :param data_structures: string of data structures, comma seperated if more than one
     :return game board id:
-    '''
+    """
 
     # Chosen difficulty does not exist
     if difficulty not in config.DIFFICULTY_LEVELS:
@@ -73,13 +75,13 @@ def start_game(request, difficulty, player_ids, data_structures):
 
 @api_view(['GET'])
 def board(request, game_id):
-    '''
+    """
     Returns the current game board state.
 
     :param request:
     :param game_id: unique identifier of the board
     :return game board JSON:
-    '''
+    """
 
     response_status = utils.load_board_db(game_id)
     if response_status['error']:
@@ -94,13 +96,13 @@ def board(request, game_id):
 
 @api_view(['POST'])
 def rebalance(request, game_id):
-    '''
+    """
     Re-balance a un-balanced AVL tree.
 
     :param request:
     :param game_id: unique identifier of the board
     :return game board JSON:
-    '''
+    """
 
     # Get the POST request
     post_request = json.loads(request.body)
@@ -129,6 +131,8 @@ def rebalance(request, game_id):
     # Do the re-balance action and get the new state of the graph
     if board['curr_data_structure'] == 'AVL':
         graph = avl.avlRebalance(board['graph'])
+    else:
+        graph = avl.avlRebalance(board['graph']) # change this if adding stack
     board['graph'] = graph
 
     # If not correct lose points
@@ -148,14 +152,14 @@ def rebalance(request, game_id):
 
 @api_view(['GET'])
 def action(request, card, game_id):
-    '''
+    """
     Perform action on the Data Structure using a card
 
     :param request:
     :param card: what action to be performed
     :param game_id: unique identifier of the board
     :return game board JSON:
-    '''
+    """
 
     # Load the game board from database
     response_status = utils.load_board_db(game_id)
@@ -177,17 +181,23 @@ def action(request, card, game_id):
 
     # Perform the action on the data structure
     if board['curr_data_structure'] == 'AVL':
-        graph = avl.avlAction(card, board['graph'])
+        graph = avl.avlAction(card, board['graph'], balance=False)
     # Currently only AVL supported
     else:
-        graph = avl.avlAction(card, board['graph'])
+        graph = avl.avlAction(card, board['graph'], balance=False)
 
     # Update the graph with the new graph state
     board['graph'] = graph
-    # Remove the played card
-    board['cards'][board['turn']].remove(card)
+    # Make sure deck is not empty
+    if len(board['deck']) == 0:  # for now this checks deck so everyone always has 3 cards.
+                                 # Could check hand but not sure how that will affect frontend
+        pass
+
     # Pick a new card
-    board['cards'][board['turn']].append(utils.pick_a_card(board))
+    else:
+        board['cards'][board['turn']].remove(card)
+        new_card = board['deck'].pop(0)
+        board['cards'][board['turn']].append(new_card)
 
     # Update the board on database
     response_status = utils.update_board_db(board)
@@ -196,5 +206,68 @@ def action(request, card, game_id):
                         status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     board_response = response_status['game_board']
+    return Response(board_response)
 
+
+@api_view(['GET'])
+def ai_pick(request, game_id):
+    """
+    Have an AI pick a move to execute
+
+    :param request:
+    :param game_id: unique identifier of the board
+    :return card: string that represents a valid action for current player to take
+    """
+    # Load the game board from database
+    response_status = utils.load_board_db(game_id)
+    if response_status['error']:
+        return Response({'error': response_status['reason']},
+                        status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    # Grab the board
+    board = response_status['game_board']
+    if not board['turn'].replace(" ", "").lower().startswith(config.BOT_NAME_PREFIX):
+        return Response({'error': 'The current player is not a BOT'},
+                        status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    ordered_cards = utils.ai_format_hands(board)
+    card = ai.select_move(board['graph'],
+                          board['curr_data_structure'],
+                          ordered_cards,
+                          board['deck'],
+                          max_depth=20)  # not sure what an appropriate search depth would be... 5 is pretty fast
+
+    # Give the points
+    if card.split(' ')[0] in config.GAIN_TIMES[board['curr_data_structure']]:
+        point = board['graph']['node_points'][card.split()[1]]
+        board['player_points'][board['turn']] += point
+
+    # Perform the action on the data structure
+    if board['curr_data_structure'] == 'AVL':
+        graph = avl.avlAction(card, board['graph'], balance=True)
+    # Currently only AVL supported
+    else:
+        graph = avl.avlAction(card, board['graph'], balance=True)
+
+    # Update the graph with the new graph state
+    board['graph'] = graph
+    # Make sure deck is not empty
+    if len(board['deck']) == 0:  # for now this checks deck so everyone always has 3 cards.
+                                 # Could check hand but not sure how that will affect frontend
+        pass
+
+    # Pick a new card
+    else:
+        board['cards'][board['turn']].remove(card)
+        new_card = board['deck'].pop(0)
+        board['cards'][board['turn']].append(new_card)
+
+    # Update the board on database
+    response_status = utils.update_board_db(board)
+    if response_status['error']:
+        return Response({'error': response_status['reason']},
+                        status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    board_response = response_status['game_board']
+    sleep(config.BOT_SLEEP_TIME)
     return Response(board_response)

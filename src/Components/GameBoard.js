@@ -61,7 +61,8 @@ class GameBoard extends Component {
       //store state of board
       board: null,
       gameID: null,
-      turn: null,
+      turn: "",
+      deckSize: null,
       playerPointVal: null,
       playerCardChoice: null,
       playerBalanceAttempt: null,
@@ -103,13 +104,23 @@ class GameBoard extends Component {
        let board_ = await response.json();
 
        //set the state values with respect to the dynamic json response
-       this.setState({ board: board_, loading: false, turn: board_['turn']});
+       this.setState({ board: board_, turn: board_['turn']});
        this.setState({playerPointVal: board_['player_points'][this.state.turn]});
+       this.setState({deckSize: board_['deck'].length});
 
        //pass the new board state into create_graph function and set the made_graph state
        let made_graph = create_graph(this.state.board['graph'])
        this.setState({ graph: made_graph});
+       this.setState({loading: false});
 
+        if (!this.state.game_over) {
+            if (this.state.turn.replace(/\s+/g, "").toLowerCase().startsWith('bot')) {
+                if (!this.state.loading) {
+                    // if this is a bot, call AI action
+                    this.aiCall()
+                }
+            }
+        }
     }
 
   //from imported digraph folder - function to display node
@@ -449,7 +460,7 @@ class GameBoard extends Component {
 
     //player might lose points when re-balance occurs
     this.setState({playerPointVal: newBoard['player_points'][this.state.turn]})
-    this.setState({ board: newBoard});
+    this.setState({ board: newBoard, turn: newBoard['turn']});
 
   }
 
@@ -464,7 +475,7 @@ class GameBoard extends Component {
     this.apiCall()
 
     //check if playing selected card ended the game
-    this.checkGameStatus()
+    //this.checkGameStatus()
   }
 
   //modularize the api call for playing a card
@@ -485,15 +496,36 @@ class GameBoard extends Component {
     //store the results
     this.setState({ board: newBoard, turn: newBoard['turn']});
     this.setState({playerPointVal: newBoard['player_points'][this.state.turn]})
+    this.setState({deckSize: newBoard['deck'].length});
 
     //check if board is balanced then rebalance tree if fxn returned false
     if(!this.checkRebalance()){
       this.rebalance()
     }
-    this.setState({loading: false})
     let made_graph = create_graph(this.state.board['graph'])
     this.setState({ graph: made_graph});
+    this.setState({loading: false})
+  }
 
+  //AI api call
+  aiCall = async () => {
+    let ai_url = url+"game_board/api/ai_pick/" + this.state.board['game_id']
+
+    this.setState({ loading: true});
+
+    //make the API call
+    let ai_response = await fetch(ai_url);
+    let ai_board = await ai_response.json();
+
+    //store the results
+    this.setState({ board: ai_board, turn: ai_board['turn']});
+    this.setState({playerPointVal: ai_board['player_points'][this.state.turn]})
+    this.setState({deckSize: ai_board['deck'].length});
+
+    // update the tree visual
+    let made_graph = create_graph(this.state.board['graph'])
+    this.setState({ graph: made_graph});
+    this.setState({loading: false})
   }
 
   //check if game is over (ie: is golden node at the root of the tree/does API end_game == true?)
@@ -507,7 +539,7 @@ class GameBoard extends Component {
     //introduced a timeout because of a bug that arose without it:
     //the state was updating before the API call returned,
     //and the game was ending 1 turn after it should have
-    setTimeout(this.checkBoard, 200)
+    //setTimeout(this.checkBoard, 200)
   }
 
   //if the API can no longer find the game board in the db,
@@ -577,6 +609,15 @@ class GameBoard extends Component {
       card_3 = this.state.board['cards'][this.state.board['turn']][2]
     }
 
+    if (!this.state.loading) {  // if changes are not being made
+        this.checkGameStatus()  // update win condition
+        if (!this.state.game_over) {  // if game is still ongoing
+            if (this.state.turn.replace(/\s+/g, "").toLowerCase().startsWith('bot')) {  // if its the bots turn
+                this.aiCall()
+            }
+        }
+    }
+
     //html returned to display page. When each card is played, the appropriate function is called, which in turn makes an API call
     return (
 
@@ -595,6 +636,9 @@ class GameBoard extends Component {
               </p>
               <p class="text-2xl font-semibold text-gray-800 dark:text-gray-200" className="turn_points_display">
                 {this.state.playerPointVal}
+              </p>
+              <p class="text-2xl font-semibold text-gray-800 dark:text-gray-200" className="deck_size_display">
+                Deck: {this.state.deckSize}
               </p>
             </div>
           </div>
