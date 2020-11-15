@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import RebalanceModal from './Modal/RebalanceModal'
 import ReactDOM from "react-dom";
 import { Button, Grid, Typography, Card, CardHeader, CardActions, CardActionArea, CardContent, Chip } from '@material-ui/core';
 import {create_adjacency, create_graph} from './CreateGraphAdj.js';
@@ -32,7 +33,7 @@ const reactLocal = "http://localhost:3000/"
 const remote = "https://data-structures-game.herokuapp.com/";
 
 //can also be const url = local; or const url = reactLocal;
-const url = remote;
+const url = local;
 
 //define sample node
 const sample = {
@@ -71,7 +72,9 @@ class GameBoard extends Component {
       data_structure:null,
 
       //used in conjunction with the API's end_game returned in the JSON
-      game_over: false
+      game_over: false,
+
+      rebalance_modal:false
     };
   }
 
@@ -112,7 +115,7 @@ class GameBoard extends Component {
        let made_graph = create_graph(this.state.board['graph'])
        this.setState({ graph: made_graph});
        this.setState({loading: false});
-
+    
         if (!this.state.game_over) {
             if (this.state.turn.replace(/\s+/g, "").toLowerCase().startsWith('bot')) {
                 if (!this.state.loading) {
@@ -436,6 +439,10 @@ class GameBoard extends Component {
 
   /* Define custom graph editing methods here */
 
+  rebalanceAlert = () => {
+    this.setState({ rebalance_modal: true});
+
+  }
   //checks if the current board is balanced and returns true or false
   checkRebalance = () => {
     let isBalanced = this.state.board.graph.balanced
@@ -504,11 +511,12 @@ class GameBoard extends Component {
     this.setState({playerPointVal: newBoard['player_points'][this.state.turn]})
     this.setState({deckSize: newBoard['deck'].length});
 
-    //check if board is balanced then rebalance tree if fxn returned false
-
+    if(this.checkRebalance()){
+      console.log('in apiCall checkRebalance');
     let made_graph = create_graph(this.state.board['graph'])
     this.setState({ graph: made_graph});
     this.setState({loading: false})
+    }
   }
 
   //AI api call
@@ -617,11 +625,17 @@ class GameBoard extends Component {
         this.checkGameStatus()  // update win condition
         if (!this.state.game_over) {  // if game is still ongoing
             if (this.state.turn.replace(/\s+/g, "").toLowerCase().startsWith('bot')) {  // if its the bots turn
+              console.log('bots turn, ai call');
                 this.aiCall()
             }
         }
         if(!this.checkRebalance() && !this.state.turn.replace(/\s+/g, "").toLowerCase().startsWith('bot')){
-            this.rebalance()
+          //check if board is balanced then rebalance tree if fxn returned false
+          console.log("non-bot user turn");
+          this.setState({ rebalance_modal: true});
+          //aftre ok button is clicked show 2 buttons
+          //after submit button is clicked proceed to rebalance, pass their adj list to the rebalance api
+          //then have it auto rebalance the board
         }
     }
 
@@ -655,7 +669,7 @@ class GameBoard extends Component {
         <div style={{height: "10rem"}}>
 
           {this.state.game_over ? <WinModal winner={this.state.turn} win_board={this.state.board}/> : <div> </div>}
-
+          {this.state.rebalance_modal ? <RebalanceModal turn={this.state.turn} /> : <div> </div>}
           <div className="bg-blue-800 flex items-center bg-gray-200 h-11">
 
             <div className="flex-1 text-gray-1000 text-center items-center bg-gray-200 px-4 py-2 m-2 rounded-lg">
@@ -688,7 +702,7 @@ class GameBoard extends Component {
             </div>
           </div>
         </div>
-
+        
         {/*from react digraph library to format graph */}
         <div id = "graph" style={{ height: "60rem"}}>
           <GraphView
