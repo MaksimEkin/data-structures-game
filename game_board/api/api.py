@@ -138,6 +138,8 @@ def rebalance(request, game_id):
     # If not correct lose points
     if board['graph']['adjacency_list'] != adjacency_list:
         board['player_points'][board['turn']] -= config.LOSS[str(board['difficulty'])]
+    else:
+        board['player_points'][board['turn']] += config.GAIN[str(board['difficulty'])]
 
     # Update board
     response_status = utils.update_board_db(board)
