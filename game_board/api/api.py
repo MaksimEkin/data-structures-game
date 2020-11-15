@@ -2,7 +2,6 @@
     API for Game Board that allows interaction with boards.
 """
 import json
-from django.test import Client
 from time import sleep
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -272,4 +271,3 @@ def ai_pick(request, game_id):
     board_response = response_status['game_board']
     sleep(config.BOT_SLEEP_TIME)
     return Response(board_response)
-

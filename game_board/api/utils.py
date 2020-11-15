@@ -2,7 +2,6 @@
     Helper functions for the Game Board API.
 """
 import random
-import math
 import uuid
 import json
 from datetime import datetime
