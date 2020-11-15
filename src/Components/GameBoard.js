@@ -447,6 +447,8 @@ class GameBoard extends Component {
   //post request to get correct/balanced game board and sets gameboard to
   //return balanced board
   rebalance = async () => {
+    this.setState({loading:true})
+
     let fetch_url = url+"game_board/api/rebalance/" + this.state.gameID
     let balance_attempt={'adjacency_list':{'node2':['node0'],'node0':['node5','node3'],'node5':[],'node3':[]}}
     let requestOptions = {
