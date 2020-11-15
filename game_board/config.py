@@ -99,7 +99,6 @@ GAIN_TIMES = {
     'STACK': ['Pop']
 }
 
-
 GAIN_TIMES_POINTS = {
     'Insert' : 5,
     'Delete' : 5
