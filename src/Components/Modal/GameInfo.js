@@ -25,7 +25,7 @@ class GameInfo extends React.Component {
         //cookies then are set to the changed values
         handleInput = async (e) => {
         await this.setState({ [e.target.name]: e.target.value });
-        console.log(this.state)
+        
 
         //update cookie values when game is customized
         const cookies = new Cookies();

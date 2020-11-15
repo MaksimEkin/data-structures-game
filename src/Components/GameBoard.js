@@ -450,6 +450,7 @@ class GameBoard extends Component {
   checkRebalance = () => {
     let isBalanced = this.state.board.graph.balanced
     console.log("balanced: ",this.state.board.graph.balanced)
+    //{!this.state.board.graph.balanced ? <RebalanceModal turn={this.state.turn} /> : <div> </div>}
     return isBalanced
   }
 
