@@ -10,7 +10,7 @@ class GameInfo extends React.Component {
         super(props);
         this.customNodeRef = React.createRef();
         //hard coded defaults
-        this.state = {level:'Easy', playerList:'player1,player2', gameDS:'AVL'};
+        this.state = {level:'Easy', playerList:'player1,bot1', gameDS:'AVL'};
         this.handleInput = this.handleInput.bind(this);
         this.submitDSG = this.handleInput.bind(this)
     }
