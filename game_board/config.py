@@ -77,15 +77,15 @@ HEIGHT = {
 #            its value is the number of points to lose for invalid action
 # ========================================================================
 LOSS = {
-    DIFFICULTY_LEVELS[0] : 30,
-    DIFFICULTY_LEVELS[1] : 20,
-    DIFFICULTY_LEVELS[2] : 10
+    DIFFICULTY_LEVELS[0] : 40,
+    DIFFICULTY_LEVELS[1] : 30,
+    DIFFICULTY_LEVELS[2] : 20
 }
 
 GAIN = {
-    DIFFICULTY_LEVELS[0] : 20,
-    DIFFICULTY_LEVELS[1] : 10,
-    DIFFICULTY_LEVELS[2] : 5
+    DIFFICULTY_LEVELS[0] : 30,
+    DIFFICULTY_LEVELS[1] : 20,
+    DIFFICULTY_LEVELS[2] : 10
 }
 
 
