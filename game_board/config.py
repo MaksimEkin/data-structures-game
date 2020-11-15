@@ -26,8 +26,8 @@ BOT_SLEEP_TIME = 2
 #                   for a game of the difficulty
 # ========================================================================
 CARDS_IN_DECK = {
-    DIFFICULTY_LEVELS[0] : 108,
-    DIFFICULTY_LEVELS[1] : 54,
+    DIFFICULTY_LEVELS[0] : 54,
+    DIFFICULTY_LEVELS[1] : 36,
     DIFFICULTY_LEVELS[2] : 22
 }
 
@@ -67,7 +67,7 @@ POINTS = {
 HEIGHT = {
     DIFFICULTY_LEVELS[0] : 6,
     DIFFICULTY_LEVELS[1] : 5,
-    DIFFICULTY_LEVELS[2] : 3
+    DIFFICULTY_LEVELS[2] : 4
 }
 
 

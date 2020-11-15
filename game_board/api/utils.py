@@ -198,6 +198,7 @@ def create_card_deck(nodes, data_structure, difficulty, gold_node):
     # Minimum and maximum possible node value
     min_point = config.POINTS[str(difficulty)]['min']
     max_point = config.POINTS[str(difficulty)]['max']
+    card_diversity = list(range(min_point, max_point+1))
 
     # Card types for the DS
     card_types = config.CARDS[str(data_structure)]
@@ -228,7 +229,12 @@ def create_card_deck(nodes, data_structure, difficulty, gold_node):
 
         # point dependent action (For example: Insert #)
         else:
-            cards.append(picked_card.replace('#', str(random.randint(min_point, max_point))))
+            if card_diversity:  # try to make the cards a little more distinct
+                selected_value = random.choice(card_diversity)
+                card_diversity.remove(selected_value)
+                cards.append(picked_card.replace('#', str(selected_value)))
+            else:
+                cards.append(picked_card.replace('#', str(random.randint(min_point, max_point))))
 
     # Shuffle the deck of cards
     random.shuffle(cards)

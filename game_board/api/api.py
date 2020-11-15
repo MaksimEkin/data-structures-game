@@ -226,7 +226,7 @@ def ai_pick(request, game_id):
 
     # Grab the board
     board = response_status['game_board']
-    if not board['turn'].lower().startswith(config.BOT_NAME_PREFIX):
+    if not board['turn'].replace(" ", "").lower().startswith(config.BOT_NAME_PREFIX):
         return Response({'error': 'The current player is not a BOT'},
                         status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
