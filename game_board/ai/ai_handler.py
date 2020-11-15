@@ -64,7 +64,7 @@ class AIHandler:
 
         move = card.split(' ')
         if move[0] in config.GAIN_TIMES[self.game_type]:
-            return int(values[move[1]])
+            return config.GAIN_TIMES_POINTS[move[0]]
         else:
             return 0
 

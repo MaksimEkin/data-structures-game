@@ -2,6 +2,7 @@
     API for Game Board that allows interaction with boards.
 """
 import json
+import random
 from time import sleep
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -138,6 +139,8 @@ def rebalance(request, game_id):
     # If not correct lose points
     if board['graph']['adjacency_list'] != adjacency_list:
         board['player_points'][board['turn']] -= config.LOSS[str(board['difficulty'])]
+    else:
+        board['player_points'][board['turn']] += config.GAIN[str(board['difficulty'])]
 
     # Update board
     response_status = utils.update_board_db(board)
@@ -176,7 +179,7 @@ def action(request, card, game_id):
 
     # Give the points
     if card.split(' ')[0] in config.GAIN_TIMES[board['curr_data_structure']]:
-        point = board['graph']['node_points'][card.split()[1]]
+        point = config.GAIN_TIMES_POINTS[card.split(' ')[0]]
         board['player_points'][board['turn']] += point
 
     # Perform the action on the data structure
@@ -230,37 +233,58 @@ def ai_pick(request, game_id):
         return Response({'error': 'The current player is not a BOT'},
                         status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    ordered_cards = utils.ai_format_hands(board)
-    card = ai.select_move(board['graph'],
-                          board['curr_data_structure'],
-                          ordered_cards,
-                          board['deck'],
-                          max_depth=20)  # not sure what an appropriate search depth would be... 5 is pretty fast
+    # tree is unbalanced,
+    if not board['graph']['balanced']:
 
-    # Give the points
-    if card.split(' ')[0] in config.GAIN_TIMES[board['curr_data_structure']]:
-        point = board['graph']['node_points'][card.split()[1]]
-        board['player_points'][board['turn']] += point
+        # Do the re-balance action and get the new state of the graph
+        if board['curr_data_structure'] == 'AVL':
+            graph = avl.avlRebalance(board['graph'])
+        else:
+            graph = avl.avlRebalance(board['graph'])  # change this if adding stack
+        board['graph'] = graph
 
-    # Perform the action on the data structure
-    if board['curr_data_structure'] == 'AVL':
-        graph = avl.avlAction(card, board['graph'], balance=True)
-    # Currently only AVL supported
+        # calculate the balance decision threshold
+        # if it is higher than the limit for the difficulty, points will be lost
+        balance_thresh = random.randint(1, 100)
+        if balance_thresh <= config.REBAL_CHANCE[str(board['difficulty'])]:
+            board['player_points'][board['turn']] += config.GAIN[str(board['difficulty'])]
+        else:
+            # If not correct lose points
+            board['player_points'][board['turn']] -= config.LOSS[str(board['difficulty'])]
+
+    # tree is balanced, can pick a move
     else:
-        graph = avl.avlAction(card, board['graph'], balance=True)
+        ordered_cards = utils.ai_format_hands(board)
+        card = ai.select_move(board['graph'],
+                              board['curr_data_structure'],
+                              ordered_cards,
+                              board['deck'],
+                              max_depth=20)  # not sure what an appropriate search depth would be... 5 is pretty fast
 
-    # Update the graph with the new graph state
-    board['graph'] = graph
-    # Make sure deck is not empty
-    if len(board['deck']) == 0:  # for now this checks deck so everyone always has 3 cards.
-                                 # Could check hand but not sure how that will affect frontend
-        pass
+        # Give the points
+        if card.split(' ')[0] in config.GAIN_TIMES[board['curr_data_structure']]:
+            point = config.GAIN_TIMES_POINTS[card.split(' ')[0]]
+            board['player_points'][board['turn']] += point
 
-    # Pick a new card
-    else:
-        board['cards'][board['turn']].remove(card)
-        new_card = board['deck'].pop(0)
-        board['cards'][board['turn']].append(new_card)
+        # Perform the action on the data structure
+        if board['curr_data_structure'] == 'AVL':
+            graph = avl.avlAction(card, board['graph'], balance=False)
+        # Currently only AVL supported
+        else:
+            graph = avl.avlAction(card, board['graph'], balance=False)
+
+        # Update the graph with the new graph state
+        board['graph'] = graph
+        # Make sure deck is not empty
+        if len(board['deck']) == 0:  # for now this checks deck so everyone always has 3 cards.
+                                     # Could check hand but not sure how that will affect frontend
+            pass
+
+        # Pick a new card
+        else:
+            board['cards'][board['turn']].remove(card)
+            new_card = board['deck'].pop(0)
+            board['cards'][board['turn']].append(new_card)
 
     # Update the board on database
     response_status = utils.update_board_db(board)

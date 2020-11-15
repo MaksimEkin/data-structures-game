@@ -447,6 +447,8 @@ class GameBoard extends Component {
   //post request to get correct/balanced game board and sets gameboard to
   //return balanced board
   rebalance = async () => {
+    this.setState({loading:true})
+
     let fetch_url = url+"game_board/api/rebalance/" + this.state.gameID
     let balance_attempt={'adjacency_list':{'node2':['node0'],'node0':['node5','node3'],'node5':[],'node3':[]}}
     let requestOptions = {
@@ -461,6 +463,10 @@ class GameBoard extends Component {
     //player might lose points when re-balance occurs
     this.setState({playerPointVal: newBoard['player_points'][this.state.turn]})
     this.setState({ board: newBoard, turn: newBoard['turn']});
+
+    let made_graph = create_graph(this.state.board['graph'])
+    this.setState({ graph: made_graph});
+    this.setState({loading: false})
 
   }
 
@@ -499,9 +505,7 @@ class GameBoard extends Component {
     this.setState({deckSize: newBoard['deck'].length});
 
     //check if board is balanced then rebalance tree if fxn returned false
-    if(!this.checkRebalance()){
-      this.rebalance()
-    }
+
     let made_graph = create_graph(this.state.board['graph'])
     this.setState({ graph: made_graph});
     this.setState({loading: false})
@@ -615,6 +619,9 @@ class GameBoard extends Component {
             if (this.state.turn.replace(/\s+/g, "").toLowerCase().startsWith('bot')) {  // if its the bots turn
                 this.aiCall()
             }
+        }
+        if(!this.checkRebalance() && !this.state.turn.replace(/\s+/g, "").toLowerCase().startsWith('bot')){
+            this.rebalance()
         }
     }
 
