@@ -93,8 +93,8 @@ const SpecialEdgeShape = (
     transform="rotate(45)"
     x="27.5"
     y="-7.5"
-    width="15"
-    height="15"
+    width="30"
+    height="30"
     fill="rgba(153, 102, 0)"
     />
   </symbol>
@@ -107,8 +107,8 @@ const EmptyEdgeShape = (
   transform="rotate(45)"
   x="27.5"
   y="-7.5"
-  width="15"
-  height="15"
+  width="30"
+  height="30"
   fill="rgba(0, 0, 0)"
   />
   </symbol>
