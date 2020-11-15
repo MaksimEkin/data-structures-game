@@ -73,8 +73,8 @@ HEIGHT = {
 
 # ========================================================================
 # Loss-Gain Points for rebalance action
-#   LOSS : Each key is a difficulty from DIFFICULTY_LEVELS, and
-#            its value is the number of points to lose for invalid action
+#   LOSS/GAIN : Each key is a difficulty from DIFFICULTY_LEVELS, and
+#            its value is the number of points to lose/gain for invalid action
 # ========================================================================
 LOSS = {
     DIFFICULTY_LEVELS[0] : 40,
@@ -91,7 +91,7 @@ GAIN = {
 
 # ========================================================================
 # When to gain points for card actions
-#   GAIN_TIMES : Each key is a data structure and its value is list of card
+#   GAIN_TIMES/GAIN_TIMES_POINTS : Each key is a data structure and its value is list of card
 #                types that gains points to the player.
 # ========================================================================
 GAIN_TIMES = {
@@ -99,7 +99,20 @@ GAIN_TIMES = {
     'STACK': ['Pop']
 }
 
+
 GAIN_TIMES_POINTS = {
     'Insert' : 5,
     'Delete' : 5
 }
+
+# ========================================================================
+# Chances of correctly rebalancing (in %) for each difficultu
+#   REBAL_CHANCE : The number of times out of 100 an AI of difficulty level
+#                  will be able to correctly rebalance itself
+# ========================================================================
+REBAL_CHANCE = {
+    DIFFICULTY_LEVELS[0] : 80,
+    DIFFICULTY_LEVELS[1] : 65,
+    DIFFICULTY_LEVELS[2] : 50
+}
+
