@@ -88,7 +88,12 @@ LOSS = {
 #   GAIN_TIMES : Each key is a data structure and its value is list of card
 #                types that gains points to the player.
 # ========================================================================
-GAIN_TIMES  = {
-    'AVL'  : ['Delete'],
+GAIN_TIMES = {
+    'AVL'  : ['Delete', 'Insert'],
     'STACK': ['Pop']
+}
+
+GAIN_TIMES_POINTS = {
+    'Insert' : 5,
+    'Delete' : 5
 }

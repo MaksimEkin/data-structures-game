@@ -176,7 +176,7 @@ def action(request, card, game_id):
 
     # Give the points
     if card.split(' ')[0] in config.GAIN_TIMES[board['curr_data_structure']]:
-        point = board['graph']['node_points'][card.split()[1]]
+        point = config.GAIN_TIMES_POINTS[card.split(' ')[0]]
         board['player_points'][board['turn']] += point
 
     # Perform the action on the data structure
