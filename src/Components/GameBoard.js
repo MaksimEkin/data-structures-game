@@ -4,9 +4,7 @@ import { Button, Grid, Typography, Card, CardHeader, CardActions, CardActionArea
 import {create_adjacency, create_graph} from './CreateGraphAdj.js';
 import Cookies from 'universal-cookie';
 import WinModal from './Modal/WinModal.js';
-
 import ReactTooltip from "react-tooltip";
-
 
 //Uber's digraph react folder
 import {
