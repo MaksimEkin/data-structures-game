@@ -234,19 +234,23 @@ def ai_pick(request, game_id):
                         status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     # tree is unbalanced,
-    if not board['balanced']:
+    if not board['graph']['balanced']:
+
+        # Do the re-balance action and get the new state of the graph
+        if board['curr_data_structure'] == 'AVL':
+            graph = avl.avlRebalance(board['graph'])
+        else:
+            graph = avl.avlRebalance(board['graph'])  # change this if adding stack
+        board['graph'] = graph
 
         # calculate the balance decision threshold
         # if it is higher than the limit for the difficulty, points will be lost
         balance_thresh = random.randint(1, 100)
         if balance_thresh <= config.REBAL_CHANCE[str(board['difficulty'])]:
-
-            # Do the re-balance action and get the new state of the graph
-            if board['curr_data_structure'] == 'AVL':
-                graph = avl.avlRebalance(board['graph'])
-            else:
-                graph = avl.avlRebalance(board['graph'])  # change this if adding stack
-            board['graph'] = graph
+            board['player_points'][board['turn']] += config.GAIN[str(board['difficulty'])]
+        else:
+            # If not correct lose points
+            board['player_points'][board['turn']] -= config.LOSS[str(board['difficulty'])]
 
     # tree is balanced, can pick a move
     else:
@@ -259,7 +263,7 @@ def ai_pick(request, game_id):
 
         # Give the points
         if card.split(' ')[0] in config.GAIN_TIMES[board['curr_data_structure']]:
-            point = board['graph']['node_points'][card.split()[1]]
+            point = config.GAIN_TIMES_POINTS[card.split(' ')[0]]
             board['player_points'][board['turn']] += point
 
         # Perform the action on the data structure
