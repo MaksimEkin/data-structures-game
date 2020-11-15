@@ -168,18 +168,18 @@ def avlNew(height, point_cap, debug=False):
     return handler.get_gamestate()
 
 
-def avlAction(command, graph, debug=False):
+def avlAction(command, graph, balance=False, debug=False):
     """ take an action on the tree """
     handler = AVLHandler.from_graph(graph)
     c, t = command.split()  # get command and target
     if c == 'Delete':
         nid = tryint(t[4:])
-        handler.delNodeByID(nid, b=False)
+        handler.delNodeByID(nid, b=balance)
         if debug:
             print(f'Tried to delete node of id {nid}')
     elif c == 'Insert':
         key = tryint(t)
-        handler.addNewNode(key, b=False)
+        handler.addNewNode(key, b=balance)
         if debug:
             print(f'Tried to add new node with key {key}')
     else:
