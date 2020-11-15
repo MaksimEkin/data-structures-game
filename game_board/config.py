@@ -92,3 +92,14 @@ GAIN_TIMES  = {
     'AVL'  : ['Delete'],
     'STACK': ['Pop']
 }
+
+# ========================================================================
+# Chances of correctly rebalancing (in %) for each difficultu
+#   REBAL_CHANCE : The number of times out of 100 an AI of difficulty level
+#                  will be able to correctly rebalance itself
+# ========================================================================
+REBAL_CHANCE = {
+    DIFFICULTY_LEVELS[0] : 80,
+    DIFFICULTY_LEVELS[1] : 65,
+    DIFFICULTY_LEVELS[2] : 50
+}
