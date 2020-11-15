@@ -431,6 +431,7 @@ class GameBoard extends Component {
   checkRebalance = () => {
     let isBalanced = this.state.board.graph.balanced
     console.log("balanced: ",this.state.board.graph.balanced)
+    //{!this.state.board.graph.balanced ? <RebalanceModal turn={this.state.turn} /> : <div> </div>}
     return isBalanced
   }
 
@@ -608,7 +609,7 @@ class GameBoard extends Component {
         <div style={{height: "10rem"}}>
 
           {this.state.game_over ? <WinModal winner={this.state.turn} win_board={this.state.board}/> : <div> </div>}
-          {!this.state.board.graph.balanced ? <RebalanceModal turn={this.state.turn} /> : <div> </div>}
+          
           <div className="bg-blue-800 flex items-center bg-gray-200 h-11">
 
             <div className="flex-1 text-gray-1000 text-center items-center bg-gray-200 px-4 py-2 m-2 rounded-lg">

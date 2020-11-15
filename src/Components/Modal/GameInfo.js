@@ -19,7 +19,7 @@ class GameInfo extends React.Component {
     //cookies then are set to the changed values
         handleInput = async (e) => {
         await this.setState({ [e.target.name]: e.target.value });
-        console.log(this.state)
+        
 
         const cookies = new Cookies();
         cookies.set('level', this.state.level, { path: '/' });
