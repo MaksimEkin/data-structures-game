@@ -2,6 +2,7 @@
     Helper functions for the Game Board API.
 """
 import random
+import math
 import uuid
 import json
 from datetime import datetime
@@ -55,11 +56,16 @@ def update_board_db(board):
     result = {'error': False, 'reason': '', 'game_board': board}
 
     try:
+
+        # Debug print deck
+        print(f"Deck:\n{board['deck']}")
+
         # Game ended
         if (board['graph']['root_node'] == board['graph']['gold_node'] or
                 len(board['deck']) == 0):
             db.remove_game(board['game_id'])
             board['end_game'] = True
+            board['turn'] = max(board['player_points'], key=board['player_points'].get)  # get player w/ max points
             result['game_board'] = board
 
         # Game continues
@@ -135,6 +141,7 @@ def new_board(difficulty, player_ids, data_structures):
 
     deck = create_card_deck(list(graph['node_points'].keys()), data_structures[0], difficulty, graph['gold_node'])
     cards, deck = distribute_cards(player_ids, deck)
+    #real_players = [player for player in player_ids if not player.lower().startswith(config.BOT_NAME_PREFIX)]
 
     board = {
         'game_id': str(uuid.uuid1()),
@@ -204,7 +211,7 @@ def create_card_deck(nodes, data_structure, difficulty, gold_node):
 
     # generate the deck of cards
     cards = list()
-    for _ in range(config.CARDS_IN_DECk):
+    for _ in range(config.CARDS_IN_DECK[str(difficulty)]):
 
         # can not pick node dependent action anymore (run out of all nodes)
         if len(nodes) == 0:

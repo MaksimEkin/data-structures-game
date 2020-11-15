@@ -2,6 +2,8 @@
     API for Game Board that allows interaction with boards.
 """
 import json
+from django.test import Client
+from time import sleep
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
@@ -130,6 +132,8 @@ def rebalance(request, game_id):
     # Do the re-balance action and get the new state of the graph
     if board['curr_data_structure'] == 'AVL':
         graph = avl.avlRebalance(board['graph'])
+    else:
+        graph = avl.avlRebalance(board['graph']) # change this if adding stack
     board['graph'] = graph
 
     # If not correct lose points
@@ -215,17 +219,66 @@ def ai_pick(request, game_id):
     :param game_id: unique identifier of the board
     :return card: string that represents a valid action for current player to take
     """
+    print("WE IN HERE")
     # Load the game board from database
     response_status = utils.load_board_db(game_id)
     if response_status['error']:
         return Response({'error': response_status['reason']},
                         status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+    # Grab the board
     board = response_status['game_board']
+    #print(f'\n\n{board}\n\n')
+    print(f"Current Turn: {board['turn']}")
+
+    # Check if name is bot
+    print(board['turn'].lower().startswith(config.BOT_NAME_PREFIX))
+    if not board['turn'].lower().startswith(config.BOT_NAME_PREFIX):
+        return Response({'error': 'The current player is not a BOT. Why are you calling them bad?'},
+                        status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
     ordered_cards = utils.ai_format_hands(board)
     card = ai.select_move(board['graph'],
                           board['curr_data_structure'],
                           ordered_cards,
                           board['deck'],
-                          max_depth=5)  # not sure what an appropriate search depth would be... 5 is pretty fast
-    return Response(card)
+                          max_depth=20)  # not sure what an appropriate search depth would be... 5 is pretty fast
+
+    # Give the points
+    if card.split(' ')[0] in config.GAIN_TIMES[board['curr_data_structure']]:
+        point = board['graph']['node_points'][card.split()[1]]
+        board['player_points'][board['turn']] += point
+
+    # Perform the action on the data structure
+    if board['curr_data_structure'] == 'AVL':
+        graph = avl.avlAction(card, board['graph'], balance=True)
+    # Currently only AVL supported
+    else:
+        graph = avl.avlAction(card, board['graph'], balance=True)
+
+    # Update the graph with the new graph state
+    board['graph'] = graph
+    # Make sure deck is not empty
+    if len(board['deck']) == 0:  # for now this checks deck so everyone always has 3 cards.
+                                 # Could check hand but not sure how that will affect frontend
+        pass
+
+    # Pick a new card
+    else:
+        board['cards'][board['turn']].remove(card)
+        new_card = board['deck'].pop(0)
+        board['cards'][board['turn']].append(new_card)
+
+    # Update the board on database
+    response_status = utils.update_board_db(board)
+    if response_status['error']:
+        return Response({'error': response_status['reason']},
+                        status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    board_response = response_status['game_board']
+    sleep(2)
+    return Response(board_response)
+
+    # response = Client().get('/game_board/api/action/' + card + '/' + game_id).data
+    # return Response(response)
+

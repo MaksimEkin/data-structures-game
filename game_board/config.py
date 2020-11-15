@@ -7,15 +7,25 @@
 #   DIFFICULTY_LEVELS: Game difficulty. Establishes the number of nodes in
 #                      the game or the height of the tree. See HEIGHT.
 #   CARD_IN_DECK:      How many cards are stored in the game deck
-#   CARDS_PER_PLAYER : How many cards each player gets.
 #                      Number of action choices each player have.
 #   MAX_NUM_PLAYERS  : Maximum number of players in the game.
 # ========================================================================
 DIFFICULTY_LEVELS = ['Hard', 'Medium', 'Easy']
-CARDS_IN_DECk = 24
 CARDS_PER_PLAYER = 3
 MAX_NUM_PLAYERS = 5
+BOT_NAME_PREFIX = "bot"
 
+# ========================================================================
+# Size of the deck of cards for each difficulty level
+#   CARDS_IN_DECK : Each key is a difficulty from DIFFICULTY_LEVELS, and
+#                   its value is the number of cards to be put in the deck
+#                   for a game of the difficulty
+# ========================================================================
+CARDS_IN_DECK = {
+    DIFFICULTY_LEVELS[0] : 108,
+    DIFFICULTY_LEVELS[1] : 54,
+    DIFFICULTY_LEVELS[2] : 22
+}
 
 # ========================================================================
 # Available cards (actions) for each data structure.
@@ -52,7 +62,7 @@ POINTS = {
 # ========================================================================
 HEIGHT = {
     DIFFICULTY_LEVELS[0] : 6,
-    DIFFICULTY_LEVELS[1] : 4,
+    DIFFICULTY_LEVELS[1] : 5,
     DIFFICULTY_LEVELS[2] : 3
 }
 
