@@ -69,7 +69,9 @@ class GameBoard extends Component {
       playerBalanceAttempt: null,
       difficulty:null,
       players:null,
+      playersArray:[],
       data_structure:null,
+      initial_load:true,
 
       //used in conjunction with the API's end_game returned in the JSON
       game_over: false
@@ -86,6 +88,7 @@ class GameBoard extends Component {
         //set state variables to these variables to be used in the url
         let difficulty = cookies.get('level');
         let players = cookies.get('playerList');
+        this.setState({playersArray:players.split(',')})
         let ds = cookies.get('gameDS');
 
        //get cookie variables from state and insert into url
@@ -112,7 +115,7 @@ class GameBoard extends Component {
        //pass the new board state into create_graph function and set the made_graph state
        let made_graph = create_graph(this.state.board['graph'])
        this.setState({ graph: made_graph});
-       this.setState({loading: false});
+       this.setState({loading: false, initial_load: false});
 
         if (!this.state.game_over) {
             if (this.state.turn.replace(/\s+/g, "").toLowerCase().startsWith('bot')) {
@@ -589,6 +592,40 @@ class GameBoard extends Component {
     })
   }
 
+  // Function to display all of the players in the gameboard
+  playersDisplay = (player) => {
+
+    // Get all of the cards as string to be displayed
+    let cardsDisplay = "";
+    this.state.board["cards"][player].map((card, ii, arr) => {
+        if (arr.length - 1 === ii) {
+            // last one
+           cardsDisplay += card
+        } else {
+           cardsDisplay += card + " - "
+        }
+    });
+
+    // Return HTML component cards with the information
+    return (
+          <div className="flex items-center p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800">
+            <div
+                className="p-3 mr-4 text-green-500 bg-green-100 rounded-full dark:text-green-100 dark:bg-green-500">
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
+              </svg>
+            </div>
+            <div>
+              <p className="mb-2 text-xl font-medium text-gray-600 dark:text-gray-400" className="p_display">
+                {player + ": " + this.state.board["player_points"][player] + " Points"}
+              </p>
+              <p className="text-2xl font-semibold text-gray-800 dark:text-gray-200" className="p_points_display">
+                {cardsDisplay}
+              </p>
+            </div>
+          </div>
+    )
+  }
 
   //in react life cycle, code that is rendered occurs after constructor initialization
   //and component mounting and then reflects the change in state/prop values
@@ -630,6 +667,9 @@ class GameBoard extends Component {
     return (
 
       <div>
+        <div className="flex mb-4 flex justify-center space-x-4">
+            { !this.state.initial_load && this.state.playersArray.map((player) => this.playersDisplay(player)) }
+        </div>
 
         <div className="transition duration-500 ease-in-out transform hover:-translate-y-1 hover:scale-103 flex justify-center">
           <div class="flex items-center p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800">
