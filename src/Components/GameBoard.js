@@ -1,10 +1,10 @@
 import React, { Component } from "react";
-import RebalanceModal from './Modal/RebalanceModal'
 import ReactDOM from "react-dom";
 import { Button, Grid, Typography, Card, CardHeader, CardActions, CardActionArea, CardContent, Chip } from '@material-ui/core';
 import {create_adjacency, create_graph} from './CreateGraphAdj.js';
 import Cookies from 'universal-cookie';
 import WinModal from './Modal/WinModal.js';
+import ReactTooltip from "react-tooltip";
 
 //Uber's digraph react folder
 import {
@@ -33,7 +33,7 @@ const reactLocal = "http://localhost:3000/"
 const remote = "https://data-structures-game.herokuapp.com/";
 
 //can also be const url = local; or const url = reactLocal;
-const url = local;
+const url = remote;
 
 //define sample node
 const sample = {
@@ -72,9 +72,7 @@ class GameBoard extends Component {
       data_structure:null,
 
       //used in conjunction with the API's end_game returned in the JSON
-      game_over: false,
-
-      rebalance_modal:false
+      game_over: false
     };
   }
 
@@ -115,7 +113,7 @@ class GameBoard extends Component {
        let made_graph = create_graph(this.state.board['graph'])
        this.setState({ graph: made_graph});
        this.setState({loading: false});
-    
+
         if (!this.state.game_over) {
             if (this.state.turn.replace(/\s+/g, "").toLowerCase().startsWith('bot')) {
                 if (!this.state.loading) {
@@ -439,10 +437,6 @@ class GameBoard extends Component {
 
   /* Define custom graph editing methods here */
 
-  rebalanceAlert = () => {
-    this.setState({ rebalance_modal: true});
-
-  }
   //checks if the current board is balanced and returns true or false
   checkRebalance = () => {
     let isBalanced = this.state.board.graph.balanced
@@ -511,12 +505,11 @@ class GameBoard extends Component {
     this.setState({playerPointVal: newBoard['player_points'][this.state.turn]})
     this.setState({deckSize: newBoard['deck'].length});
 
-    if(this.checkRebalance()){
-      console.log('in apiCall checkRebalance');
+    //check if board is balanced then rebalance tree if fxn returned false
+
     let made_graph = create_graph(this.state.board['graph'])
     this.setState({ graph: made_graph});
     this.setState({loading: false})
-    }
   }
 
   //AI api call
@@ -625,17 +618,11 @@ class GameBoard extends Component {
         this.checkGameStatus()  // update win condition
         if (!this.state.game_over) {  // if game is still ongoing
             if (this.state.turn.replace(/\s+/g, "").toLowerCase().startsWith('bot')) {  // if its the bots turn
-              console.log('bots turn, ai call');
                 this.aiCall()
             }
         }
         if(!this.checkRebalance() && !this.state.turn.replace(/\s+/g, "").toLowerCase().startsWith('bot')){
-          //check if board is balanced then rebalance tree if fxn returned false
-          console.log("non-bot user turn");
-          this.setState({ rebalance_modal: true});
-          //aftre ok button is clicked show 2 buttons
-          //after submit button is clicked proceed to rebalance, pass their adj list to the rebalance api
-          //then have it auto rebalance the board
+            this.rebalance()
         }
     }
 
@@ -669,7 +656,7 @@ class GameBoard extends Component {
         <div style={{height: "10rem"}}>
 
           {this.state.game_over ? <WinModal winner={this.state.turn} win_board={this.state.board}/> : <div> </div>}
-          {this.state.rebalance_modal ? <RebalanceModal turn={this.state.turn} /> : <div> </div>}
+
           <div className="bg-blue-800 flex items-center bg-gray-200 h-11">
 
             <div className="flex-1 text-gray-1000 text-center items-center bg-gray-200 px-4 py-2 m-2 rounded-lg">
@@ -691,18 +678,21 @@ class GameBoard extends Component {
             </div>
 
           <div className="flex-1 text-gray-1000 text-center items-center bg-gray-200 px-4 py-2 m-2 rounded-lg">
-            <div class="transition duration-500 ease-in-out bg-yellow-300 hover:bg-orange-500 transform hover:-translate-y-1 hover:scale-105 bg-yellow-300 border-yellow-350 border-opacity-50 rounded-lg shadow-lg flex-1 m-1 py-1">
+            <div data-delay-show='500' data-place="bottom" data-tip="Shift click to make edges, delete a selected node with the keyboard's delete key" data-offset="{'top': -20}" data-text-color="yellow"
+            class="transition duration-500 ease-in-out bg-yellow-300 hover:bg-orange-500 transform hover:-translate-y-1 hover:scale-105 bg-yellow-300 border-yellow-350 border-opacity-50 rounded-lg shadow-lg flex-1 m-1 py-1">
               <button onClick={() =>this.repositionNodes()}>Reposition Nodes</button>
             </div>
           </div>
 
           <div className="flex-1 text-gray-1000 text-center items-center bg-gray-200 px-4 py-2 m-2 rounded-lg">
-            <div class="transition duration-500 ease-in-out bg-yellow-300 hover:bg-orange-500 transform hover:-translate-y-1 hover:scale-105 bg-yellow-300 border-yellow-350 border-opacity-50 rounded-lg shadow-lg flex-1 m-1 py-1">
+            <div data-delay-show='500' data-place="bottom" data-tip="End's turn and determines rebalance correctness" data-offset="{'top': -20}" data-text-color="yellow"
+            class="transition duration-500 ease-in-out bg-yellow-300 hover:bg-orange-500 transform hover:-translate-y-1 hover:scale-105 bg-yellow-300 border-yellow-350 border-opacity-50 rounded-lg shadow-lg flex-1 m-1 py-1">
               <button onClick={() =>this.checkNodes()}>Check Nodes</button>
             </div>
           </div>
         </div>
-        
+
+        <ReactTooltip />
         {/*from react digraph library to format graph */}
         <div id = "graph" style={{ height: "60rem"}}>
           <GraphView
