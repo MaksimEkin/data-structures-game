@@ -6,12 +6,30 @@
 # General
 #   DIFFICULTY_LEVELS: Game difficulty. Establishes the number of nodes in
 #                      the game or the height of the tree. See HEIGHT.
-#   CARDS_PER_PLAYER : How many cards each player gets.
+#   CARD_IN_DECK:      How many cards are stored in the game deck
 #                      Number of action choices each player have.
+#   MAX_NUM_PLAYERS:   Maximum number of players in the game.
+#   BOT_NAME_PREFIX:   Players with this prefix can access the AI api call
+#   BOT_SLEEP_TIME:    Duration in seconds that an AI API call will sleep
+#                      to simulate time spent thinking
 # ========================================================================
 DIFFICULTY_LEVELS = ['Hard', 'Medium', 'Easy']
 CARDS_PER_PLAYER = 3
+MAX_NUM_PLAYERS = 5
+BOT_NAME_PREFIX = "bot"
+BOT_SLEEP_TIME = 2
 
+# ========================================================================
+# Size of the deck of cards for each difficulty level
+#   CARDS_IN_DECK : Each key is a difficulty from DIFFICULTY_LEVELS, and
+#                   its value is the number of cards to be put in the deck
+#                   for a game of the difficulty
+# ========================================================================
+CARDS_IN_DECK = {
+    DIFFICULTY_LEVELS[0] : 54,
+    DIFFICULTY_LEVELS[1] : 36,
+    DIFFICULTY_LEVELS[2] : 22
+}
 
 # ========================================================================
 # Available cards (actions) for each data structure.
@@ -48,29 +66,51 @@ POINTS = {
 # ========================================================================
 HEIGHT = {
     DIFFICULTY_LEVELS[0] : 6,
-    DIFFICULTY_LEVELS[1] : 4,
-    DIFFICULTY_LEVELS[2] : 3
+    DIFFICULTY_LEVELS[1] : 5,
+    DIFFICULTY_LEVELS[2] : 4
 }
 
 
 # ========================================================================
-# Loss Points
-#   LOSS : Each key is a difficulty from DIFFICULTY_LEVELS, and
-#            its value is the number of points to lose for invalid action
+# Loss-Gain Points for rebalance action
+#   LOSS/GAIN : Each key is a difficulty from DIFFICULTY_LEVELS, and
+#            its value is the number of points to lose/gain for invalid action
 # ========================================================================
 LOSS = {
-    DIFFICULTY_LEVELS[0] : 25,
-    DIFFICULTY_LEVELS[1] : 10,
-    DIFFICULTY_LEVELS[2] : 5
+    DIFFICULTY_LEVELS[0] : 40,
+    DIFFICULTY_LEVELS[1] : 30,
+    DIFFICULTY_LEVELS[2] : 20
+}
+
+GAIN = {
+    DIFFICULTY_LEVELS[0] : 30,
+    DIFFICULTY_LEVELS[1] : 20,
+    DIFFICULTY_LEVELS[2] : 10
 }
 
 
 # ========================================================================
-# When to gain points
-#   GAIN_TIMES : Each key is a data structure and its value is list of card
+# When to gain points for card actions
+#   GAIN_TIMES/GAIN_TIMES_POINTS : Each key is a data structure and its value is list of card
 #                types that gains points to the player.
 # ========================================================================
-GAIN_TIMES  = {
-    'AVL'  : ['Delete'],
+GAIN_TIMES = {
+    'AVL'  : ['Delete', 'Insert'],
     'STACK': ['Pop']
+}
+
+GAIN_TIMES_POINTS = {
+    'Insert' : 5,
+    'Delete' : 5
+}
+
+# ========================================================================
+# Chances of correctly rebalancing (in %) for each difficultu
+#   REBAL_CHANCE : The number of times out of 100 an AI of difficulty level
+#                  will be able to correctly rebalance itself
+# ========================================================================
+REBAL_CHANCE = {
+    DIFFICULTY_LEVELS[0] : 80,
+    DIFFICULTY_LEVELS[1] : 65,
+    DIFFICULTY_LEVELS[2] : 50
 }

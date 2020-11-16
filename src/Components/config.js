@@ -65,9 +65,9 @@ const CustomEmptyShape = (
     cx="100"
     cy="100"
     r="50"
-    stroke="rgba(100, 100, 100)"
+    stroke="rgba(76, 156, 68)"
     stroke-width="5"
-    fill="rgba(0, 204, 204)"
+    fill="rgba(119, 193, 113)"
     />
   </symbol>
   );
@@ -79,9 +79,9 @@ const SpecialShape = (
     transform="translate(50) rotate(45)"
     width="109"
     height="109"
-    fill="rgba(117, 255, 112)"
+    fill="rgba(76, 156, 68)"
     stroke="black"
-    stroke-width="3"
+    stroke-width="5"
     />
   </symbol>
   );
@@ -93,8 +93,8 @@ const SpecialEdgeShape = (
     transform="rotate(45)"
     x="27.5"
     y="-7.5"
-    width="15"
-    height="15"
+    width="30"
+    height="30"
     fill="rgba(153, 102, 0)"
     />
   </symbol>
@@ -107,8 +107,8 @@ const EmptyEdgeShape = (
   transform="rotate(45)"
   x="27.5"
   y="-7.5"
-  width="15"
-  height="15"
+  width="30"
+  height="30"
   fill="rgba(0, 0, 0)"
   />
   </symbol>

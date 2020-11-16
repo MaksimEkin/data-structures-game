@@ -52,6 +52,14 @@ class StartGame(TestCase):
                          msg=f'{BColors.FAIL}\t[-]\tInvalid difficulty level got accepted!{BColors.ENDC}')
         print(f"{BColors.OKGREEN}\t[+]\tPass not accepting invalid difficulty level.{BColors.ENDC}")
 
+        # Test requesting too many users
+        response2 = self.client.get('/game_board/api/start_game/Easy/ID1,ID2,ID3,ID4,ID5,ID6/AVL')
+
+        self.assertEqual(response2.data, {'error': 'Too many players requested!',
+                                          'options': config.MAX_NUM_PLAYERS},
+                         msg=f'{BColors.FAIL}\t[-]\tAccepted a game with too many players!{BColors.ENDC}')
+        print(f"{BColors.OKGREEN}\t[+]\tPass not accepting too many players.{BColors.ENDC}")
+
     def test_start_game(self):
         """Tests starting new games"""
         random.seed(42)
@@ -120,7 +128,7 @@ class StartGame(TestCase):
 
 
 class Action(TestCase):
-    """Tests API calls realted to card actions on the board."""
+    """Tests API calls related to card actions on the board."""
 
     def test_invalid_card(self):
         """Test if API will accept playing an invalid action"""
@@ -141,6 +149,26 @@ class Action(TestCase):
         self.assertEqual(response.data, {'invalid_action': 'Tree is already balanced!'},
                          msg=f'{BColors.FAIL}\t[-]\tTree is already balanced!{BColors.ENDC}')
         print(f"{BColors.OKGREEN}\t[+]\tPass attempting to balance an already balanced tree.{BColors.ENDC}")
+
+        # remove the created game
+        sleep(0.2)
+        db.remove_game(created_game.data['game_id'])
+
+
+class AIPick(TestCase):
+    """Tests API calls related to AI decision making."""
+
+    def test_invalid_player(self):
+        """Test if API will let a non bot player know the AI move"""
+
+        # create a new game
+        created_game = self.client.get('/game_board/api/start_game/Easy/ID1,ID2/AVL')
+
+        # play invalid card
+        response = self.client.get('/game_board/api/ai_pick/' + str(created_game.data['game_id']))
+        self.assertEqual(response.data, {'error': 'The current player is not a BOT'},
+                         msg=f'{BColors.FAIL}\t[-]\tAllowed AI to make a move for a real player!{BColors.ENDC}')
+        print(f"{BColors.OKGREEN}\t[+]\tPass attempting to let the AI make move as a real player.{BColors.ENDC}")
 
         # remove the created game
         sleep(0.2)
@@ -174,15 +202,15 @@ class PlayGame(TestCase):
 
     def setUp(self):
         """create a new game"""
-        self.game = self.client.get('/game_board/api/start_game/Easy/ID1,ID2,ID3/AVL').data
+        self.game = self.client.get('/game_board/api/start_game/Easy/bot1,bot2,bot3/AVL').data
 
     def tearDown(self):
         """remove the created game"""
         db.remove_game(self.game['game_id'])
 
-    def test_game_simulation(self):
+    def test_random_move_simulation(self):
         """Simulates a simple game for 50 rounds max or until the game ends to test the game play"""
-        print(f"{BColors.OKBLUE}\t[i]\tSimulating a simple game play (max 50 rounds)...{BColors.ENDC}")
+        print(f"{BColors.OKBLUE}\t[i]\tSimulating a simple game play with random moves (max 50 rounds)...{BColors.ENDC}")
         game_ended = False
 
         for _ in range(50):
@@ -196,14 +224,18 @@ class PlayGame(TestCase):
 
                 # game ended
                 if response['end_game']:
-                    print(f"{BColors.OKCYAN}\t[+]\tPass simulating a game. Game ended.{BColors.ENDC}")
+                    print(f"{BColors.OKCYAN}\t[+]\tPass simulating random move game. Game ended.{BColors.ENDC}")
                     game_ended = True
 
-                    self.assertEqual(response['graph']['gold_node'], response['graph']['root_node'],
-                                     msg=f'{BColors.FAIL}\t[-]\tGolden node was not at root when game ended!{BColors.ENDC}')
+                    root_is_gold = response['graph']['gold_node'] == response['graph']['root_node']
+                    deck_is_empty = len(response['deck']) == 0
 
-                    self.assertEqual(response['turn'], board['turn'],
-                                     msg=f'{BColors.FAIL}\t[-]\tWrong winner!{BColors.ENDC}')
+                    self.assertTrue(root_is_gold or deck_is_empty,
+                                    msg=f'{BColors.FAIL}\t[-]\tGame ended without valid game ending condition!{BColors.ENDC}')
+
+                    # I don't think this assesses the win condition accurately anymore
+                    # self.assertEqual(response['turn'], board['turn'],
+                    #                  msg=f'{BColors.FAIL}\t[-]\tWrong winner!{BColors.ENDC}')
                     break
 
                 # delete node action
@@ -229,16 +261,91 @@ class PlayGame(TestCase):
 
                 # game ended
                 if response['end_game']:
-                    print(f"{BColors.OKCYAN}\t[+]\tPass simulating a game. Game ended.{BColors.ENDC}")
+                    print(f"{BColors.OKCYAN}\t[+]\tPass simulating random move game. Game ended.{BColors.ENDC}")
                     game_ended = True
 
-                    self.assertEqual(response['graph']['gold_node'], response['graph']['root_node'],
-                                     msg=f'{BColors.FAIL}\t[-]\tGolden node was not at root when game ended!{BColors.ENDC}')
+                    root_is_gold = response['graph']['gold_node'] == response['graph']['root_node']
+                    deck_is_empty = len(response['deck']) == 0
 
-                    self.assertEqual(response['turn'], board['turn'],
-                                     msg=f'{BColors.FAIL}\t[-]\tWrong winner!{BColors.ENDC}')
+                    self.assertTrue(root_is_gold or deck_is_empty,
+                                    msg=f'{BColors.FAIL}\t[-]\tGame ended without valid game ending condition!{BColors.ENDC}')
 
+                    # self.assertEqual(response['turn'], board['turn'],
+                    #                  msg=f'{BColors.FAIL}\t[-]\tWrong winner!{BColors.ENDC}')
                     break
 
         if not game_ended:
-            print(f"{BColors.OKGREEN}\t[+]\tPass simulating a game. Reach max iterations.{BColors.ENDC}")
+            print(f"{BColors.OKGREEN}\t[+]\tPass simulating random move game. Reach max iterations.{BColors.ENDC}")
+
+    def test_ai_move_simulation(self):
+        """Simulates a simple game for 50 rounds max or until the game ends to test the game play"""
+        print(f"{BColors.OKBLUE}\t[i]\tSimulating a simple game play with AI moves (max 50 rounds)...{BColors.ENDC}")
+        game_ended = False
+
+        for _ in range(50):
+            sleep(0.5)
+            board = self.client.get('/game_board/api/board/' + str(self.game['game_id'])).data
+
+            # tree is balanced, play a card
+            if board['graph']['balanced']:
+
+                bot = board['turn']
+                original_hand = board['cards'][bot]
+                response = self.client.get('/game_board/api/ai_pick/' + str(self.game['game_id'])).data
+                new_hand = board['cards'][bot]
+                picked_cards = list(set(original_hand) - set(new_hand))
+
+                # game ended
+                if response['end_game']:
+                    print(f"{BColors.OKCYAN}\t[+]\tPass simulating AI move game. Game ended.{BColors.ENDC}")
+                    game_ended = True
+
+                    root_is_gold = response['graph']['gold_node'] == response['graph']['root_node']
+                    deck_is_empty = len(response['deck']) == 0
+
+                    self.assertTrue(root_is_gold or deck_is_empty,
+                                    msg=f'{BColors.FAIL}\t[-]\tGame ended without valid game ending condition!{BColors.ENDC}')
+
+                    break
+
+                if picked_cards:
+                    picked_card = picked_cards[0]
+
+                    # delete node action
+                    if "Delete" in picked_card:
+                        deleted_node = picked_card.split(' ')[1]
+                        self.assertNotIn(deleted_node, response['graph']['node_points'].keys(),
+                                         msg=f'{BColors.FAIL}\t[-]\tDeleted node was still in the tree!{BColors.ENDC}')
+
+                    # insert node action
+                    elif "Insert" in picked_card:
+                        new_node = response['graph']['node_points'].keys() - board['graph']['node_points'].keys()
+                        self.assertEqual(response['graph']['node_points']["".join(new_node)], int(picked_card.split(' ')[1]),
+                                         msg=f'{BColors.FAIL}\t[-]\tFailed inserting node!{BColors.ENDC}')
+
+            # balance tree action
+            else:
+                post_data = json.dumps({'adjacency_list': 'test'})
+                response = self.client.post('/game_board/api/rebalance/' + str(self.game['game_id']),
+                                            post_data, content_type='application/json').data
+
+                self.assertEqual(response['graph']['balanced'], True,
+                                 msg=f'{BColors.FAIL}\t[-]\tFailed balancing the tree!{BColors.ENDC}')
+
+                # game ended
+                if response['end_game']:
+                    print(f"{BColors.OKCYAN}\t[+]\tPass simulating AI move game. Game ended.{BColors.ENDC}")
+                    game_ended = True
+
+                    root_is_gold = response['graph']['gold_node'] == response['graph']['root_node']
+                    deck_is_empty = len(response['deck']) == 0
+
+                    self.assertTrue(root_is_gold or deck_is_empty,
+                                    msg=f'{BColors.FAIL}\t[-]\tGame ended without valid game ending condition!{BColors.ENDC}')
+
+                    self.assertEqual(response['turn'], board['turn'],
+                                     msg=f'{BColors.FAIL}\t[-]\tWrong winner!{BColors.ENDC}')
+                    break
+
+        if not game_ended:
+            print(f"{BColors.OKGREEN}\t[+]\tPass simulating AI move game. Reach max iterations.{BColors.ENDC}")

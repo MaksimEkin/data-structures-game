@@ -33,6 +33,59 @@ class APIOverview(TestCase):
         print(f"{BColors.OKGREEN}\t[+]\tPass return code api_overview.{BColors.ENDC}")
 
 
+class Profile(TestCase):
+    """Tests the API calls that is related to getting the all user profile."""
+
+    def setUp(self):
+        """Create an account."""
+        sleep(1)
+
+        # temporary user name
+        self.user_info = str(uuid.uuid1()).split('-')[0]
+
+        post_data = {'user_name':  self.user_info,
+                     'password1': 'smith1',
+                     'password2': 'smith1',
+                     'email':  self.user_info}
+        response = self.client.post('/profile_page/api/register', post_data)
+        self.assertEqual(response.status_code, 200,
+                          msg=f'{BColors.FAIL}\t[-]\tFailed creating an account!{BColors.ENDC}')
+        print(f"{BColors.OKGREEN}\t[+]\tPass creating a user.{BColors.ENDC}")
+
+        # Authentication token
+        self.token = response.data['token']
+
+    def tearDown(self):
+        """Removes the testing user from the database."""
+        profile_db.remove_user(self.user_info)
+
+    def test_profile(self):
+        """Tests user profile by checking if it contains all fields."""
+
+        # logout
+        post_data = {'user_id': self.user_info,
+                     'token': self.token}
+
+        response = self.client.post('/profile_page/api/profile', post_data)
+        self.assertEqual(response.status_code, 200,
+                         msg=f'{BColors.FAIL}\t[-]\tFailed getting profile information!{BColors.ENDC}')
+        print(f"{BColors.OKGREEN}\t[+]\tPass getting profile information.{BColors.ENDC}")
+
+        # check that user profile has all the information required
+        profile_data_points = list(response.data['user_profile'].keys())
+        expected_points = ['user_name', 'badges', 'current_story_level', 'friends',
+                           'points', 'rank', 'saved_games']
+
+        self.assertEqual(profile_data_points, expected_points,
+                         msg=f'{BColors.FAIL}\t[-]\tUser profile missing information!{BColors.ENDC}')
+        print(f"{BColors.OKGREEN}\t[+]\tUser profile contains all the information needed.{BColors.ENDC}")
+
+        # check that user profile information is for the correct user
+        self.assertEqual(response.data['user_profile']['user_name'], self.user_info,
+                         msg=f'{BColors.FAIL}\t[-]\tUser profile is for the wrong user!{BColors.ENDC}')
+        print(f"{BColors.OKGREEN}\t[+]\tUser profile information for the correct user.{BColors.ENDC}")
+
+
 class Register(TestCase):
     """Tests the API calls that is related to user registration."""
 
@@ -214,7 +267,7 @@ class Logout(TestCase):
 
         # logout
         post_data = {'user_id': self.user_info,
-                    'token': self.token}
+                     'token': self.token}
 
         response = self.client.post('/profile_page/api/logout', post_data)
         self.assertEqual(response.status_code, 200,
@@ -225,6 +278,46 @@ class Logout(TestCase):
         self.assertEqual(profile_db.check_user(self.user_info, self.token), False,
                          msg=f'{BColors.FAIL}\t[-]\tUser still have the token after log-out!{BColors.ENDC}')
         print(f"{BColors.OKGREEN}\t[+]\tUser does not have the token after log-out.{BColors.ENDC}")
+
+
+class Delete(TestCase):
+    """Tests the API calls that is related to deleting user account."""
+
+    def setUp(self):
+        """Create an account."""
+        sleep(1)
+
+        # temporary user name
+        self.user_info = str(uuid.uuid1()).split('-')[0]
+
+        post_data = {'user_name': self.user_info,
+                     'password1': 'pineapple',
+                     'password2': 'pineapple',
+                     'email': self.user_info}
+        response = self.client.post('/profile_page/api/register', post_data)
+        self.assertEqual(response.status_code, 200,
+                          msg=f'{BColors.FAIL}\t[-]\tFailed creating an account!{BColors.ENDC}')
+        print(f"{BColors.OKGREEN}\t[+]\tPass creating a user.{BColors.ENDC}")
+
+        # Authentication token
+        self.token = response.data['token']
+
+    def test_delete(self):
+        """Tests account deleting by checking if it is still in the database."""
+
+        # delete account
+        post_data = {'user_id': self.user_info,
+                     'token': self.token}
+
+        response = self.client.post('/profile_page/api/delete', post_data)
+        self.assertEqual(response.status_code, 200,
+                         msg=f'{BColors.FAIL}\t[-]\tFailed deleting the account!{BColors.ENDC}')
+        print(f"{BColors.OKGREEN}\t[+]\tPass deleting the account.{BColors.ENDC}")
+
+        # check if user the user does not exist after it got deleted
+        self.assertEqual(profile_db.read_one_user(self.user_info), False,
+                         msg=f'{BColors.FAIL}\t[-]\tUser still exist after the account deleted!{BColors.ENDC}')
+        print(f"{BColors.OKGREEN}\t[+]\tUser is no longer in the database after got removed.{BColors.ENDC}")
 
 
 class SaveBoard(TestCase):
@@ -653,3 +746,131 @@ class LoadBoard(TestCase):
         self.assertEqual(active_game.status_code, 200,
                           msg=f'{BColors.FAIL}\t[-]\tLoaded game is not in the active games!{BColors.ENDC}')
         print(f"{BColors.OKGREEN}\t[+]\tPass loading the in to the active games.{BColors.ENDC}")
+
+
+class AddRemoveFriend(TestCase):
+    """Tests the API calls that is related to adding friend."""
+
+    def setUp(self):
+        """Create two accounts."""
+        sleep(1)
+
+        # temporary user names
+        self.user_1_info = str(uuid.uuid1()).split('-')[0]
+        self.user_2_info = str(uuid.uuid1()).split('-')[0]
+
+        # Create the user 1
+        post_data_1 = {'user_name': self.user_1_info,
+                       'password1': 'pineapple',
+                       'password2': 'pineapple',
+                       'email': self.user_1_info}
+        response_1 = self.client.post('/profile_page/api/register', post_data_1)
+        self.assertEqual(response_1.status_code, 200,
+                          msg=f'{BColors.FAIL}\t[-]\tFailed creating an account!{BColors.ENDC}')
+        print(f"{BColors.OKGREEN}\t[+]\tPass creating a user.{BColors.ENDC}")
+
+        # Create user 2
+        post_data_2 = {'user_name': self.user_2_info,
+                       'password1': 'pineapple',
+                       'password2': 'pineapple',
+                       'email': self.user_2_info}
+        response_2 = self.client.post('/profile_page/api/register', post_data_2)
+        self.assertEqual(response_2.status_code, 200,
+                          msg=f'{BColors.FAIL}\t[-]\tFailed creating an account!{BColors.ENDC}')
+        print(f"{BColors.OKGREEN}\t[+]\tPass creating a user.{BColors.ENDC}")
+
+        # Authentication tokens
+        self.token_user_1 = response_1.data['token']
+        self.token_user_2 = response_2.data['token']
+
+    def tearDown(self):
+        """Removes the testing users."""
+
+        # remove the users
+        profile_db.remove_user(self.user_1_info)
+        profile_db.remove_user(self.user_2_info)
+
+    def test_decline_friend(self):
+        """Attempts to decline the friend request after adding."""
+
+        # First add friend
+        post_data = {'source_user_id': self.user_1_info,
+                     'dest_user_id': self.user_2_info,
+                     'token': self.token_user_1}
+        response = self.client.post('/profile_page/api/add_friend', post_data)
+        self.assertEqual(response.status_code, 200,
+                          msg=f'{BColors.FAIL}\t[-]\tFailed adding the friend!{BColors.ENDC}')
+        print(f"{BColors.OKGREEN}\t[+]\tPass adding the friend.{BColors.ENDC}")
+
+        # TODO: Check that destination user has the pending friend request in the list (pending database).
+
+        # Decline friend request
+        post_data2 = {'source_user_id': self.user_2_info,
+                      'dest_user_id': self.user_1_info,
+                      'accept': 'no',
+                      'token': self.token_user_2}
+        response2 = self.client.post('/profile_page/api/accept_decline_friend', post_data2)
+        self.assertEqual(response2.status_code, 200,
+                          msg=f'{BColors.FAIL}\t[-]\tFailed declining the friend request!{BColors.ENDC}')
+        print(f"{BColors.OKGREEN}\t[+]\tPass declining the friend request.{BColors.ENDC}")
+
+        # TODO: Make sure the user does not have that friend in its profile (pending database).
+        # TODO: Make sure the user add request is no longer in the user's profile (pending database).
+
+    def test_accept_friend(self):
+        """Attempts to accept the friend request after adding."""
+
+        # First add friend
+        post_data = {'source_user_id': self.user_1_info,
+                     'dest_user_id': self.user_2_info,
+                     'token': self.token_user_1}
+        response = self.client.post('/profile_page/api/add_friend', post_data)
+        self.assertEqual(response.status_code, 200,
+                          msg=f'{BColors.FAIL}\t[-]\tFailed adding the friend!{BColors.ENDC}')
+        print(f"{BColors.OKGREEN}\t[+]\tPass adding the friend.{BColors.ENDC}")
+
+        # Accept friend request
+        post_data2 = {'source_user_id': self.user_2_info,
+                      'dest_user_id': self.user_1_info,
+                      'accept': 'yes',
+                      'token': self.token_user_2}
+        response2 = self.client.post('/profile_page/api/accept_decline_friend', post_data2)
+        self.assertEqual(response2.status_code, 200,
+                          msg=f'{BColors.FAIL}\t[-]\tFailed accepting the friend request!{BColors.ENDC}')
+        print(f"{BColors.OKGREEN}\t[+]\tPass accepting the friend request.{BColors.ENDC}")
+
+        # TODO: Make sure the added user is in both of the user's profile (pending database).
+        # TODO: Make sure added user is not in the pending friend request list (pending database).
+
+    def test_remove_friend(self):
+        """Attempts to remove the friend after adding."""
+
+        # First add friend
+        post_data = {'source_user_id': self.user_1_info,
+                     'dest_user_id': self.user_2_info,
+                     'token': self.token_user_1}
+        response = self.client.post('/profile_page/api/add_friend', post_data)
+        self.assertEqual(response.status_code, 200,
+                          msg=f'{BColors.FAIL}\t[-]\tFailed adding the friend!{BColors.ENDC}')
+        print(f"{BColors.OKGREEN}\t[+]\tPass adding the friend.{BColors.ENDC}")
+
+        # Accept friend request
+        post_data2 = {'source_user_id': self.user_2_info,
+                      'dest_user_id': self.user_1_info,
+                      'accept': 'yes',
+                      'token': self.token_user_2}
+        response2 = self.client.post('/profile_page/api/accept_decline_friend', post_data2)
+        self.assertEqual(response2.status_code, 200,
+                          msg=f'{BColors.FAIL}\t[-]\tFailed accepting the friend request!{BColors.ENDC}')
+        print(f"{BColors.OKGREEN}\t[+]\tPass accepting the friend request.{BColors.ENDC}")
+
+        # Remove the friend from the profile
+        post_data3 = {'source_user_id': self.user_1_info,
+                      'dest_user_id': self.user_2_info,
+                      'token': self.token_user_1}
+        response3 = self.client.post('/profile_page/api/remove_friend', post_data3)
+        self.assertEqual(response3.status_code, 200,
+                          msg=f'{BColors.FAIL}\t[-]\tFailed removing the friend!{BColors.ENDC}')
+        print(f"{BColors.OKGREEN}\t[+]\tPass removing the friend from profile.{BColors.ENDC}")
+
+        # TODO: Make sure both of the profiles no longer has each other under friends.
