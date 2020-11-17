@@ -81,6 +81,7 @@ class GameBoard extends Component {
   // access the DOM to make API calls and update the state and re-renders
   // component did mount to update the values of the state
   async componentDidMount() {
+
         const cookies = new Cookies();
 
         //set state variables to these variables to be used in the url
@@ -728,5 +729,5 @@ class GameBoard extends Component {
   }
 }
 export default GameBoard;
-const rootElement = document.getElementById("root");
-ReactDOM.render(<GameBoard />, rootElement);
+//const rootElement = document.getElementById("root");
+//ReactDOM.render(<GameBoard />, rootElement);
