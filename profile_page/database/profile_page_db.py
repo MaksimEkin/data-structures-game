@@ -226,7 +226,9 @@ def create_user(user_id : str, passhash : str, email : str, token : str):
     "points":0,
     "rank":"Baby Panda",
     "save_games":[],
-    "sharing": True
+    "sharing": True,
+    "pending_friends_sent":[],
+    "pending_friend_received":[]
     }
 
     return save_user(user)
@@ -484,3 +486,80 @@ def change_share_setting( user_id : str, can_share : bool ):
     ).modified_count
 
     return value_returned > 0
+
+def get_points(user_id: str):
+    """
+    Allows an active user's points to be retrieved from the database and passed back to the API
+
+    Parameters:
+    user_id (str): unique identification for the user
+
+    Returns:
+    On Success:
+        int: User's points
+    On Fail:
+        Boolean: False
+    """
+
+    value_returned = client.InitialDB.User_Profile.find_one({ "user_id": user_id},
+        {'_id':0, 'points':1}
+    )
+
+    if value_returned is None:
+        return False
+
+    return value_returned["points"]
+
+def set_points(user_id: str, new_points: int):
+    """
+    Allows an active user's points to be updated in the database
+
+    Parameters:
+    user_id (str): unique identification for the user
+    new_points (int): number of points the user has now
+
+    Returns:
+    On Success:
+        Boolean: True
+    On Fail:
+        Boolean: False
+    """
+
+    value_returned = client.InitialDB.User_Profile.find_one_and_update(
+        {"user_id": user_id},
+        {"$set":{"points":new_points}},
+        {'_id':0, 'points':1},
+        upsert=False, return_document = ReturnDocument.AFTER
+    )
+
+    if value_returned["points"] == new_points:
+        return True
+
+    return False
+
+def set_ranking(user_id: str, new_rank: int):
+    """
+    Allows an active user's rank to be updated in the database
+
+    Parameters:
+    user_id (str): unique identification for the user
+    new_rank (int): New rank relative to other players
+
+    Returns:
+    On Success:
+        Boolean: True
+    On Fail:
+        Boolean: False
+    """
+
+    value_returned = client.InitialDB.User_Profile.find_one_and_update(
+        {"user_id": user_id},
+        {"$set":{"rank":new_rank}},
+        {'_id':0, 'rank':1},
+        upsert=False, return_document = ReturnDocument.AFTER
+    )
+
+    if value_returned["rank"] == new_rank:
+        return True
+
+    return False
