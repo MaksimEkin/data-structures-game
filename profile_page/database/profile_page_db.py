@@ -228,7 +228,7 @@ def create_user(user_id : str, passhash : str, email : str, token : str):
     "save_games":[],
     "sharing": True,
     "pending_friends_sent":[],
-    "pending_friend_received":[]
+    "pending_friends_received":[]
     }
 
     return save_user(user)
