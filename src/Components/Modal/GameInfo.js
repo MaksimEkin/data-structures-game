@@ -18,6 +18,7 @@ class GameInfo extends React.Component {
         cookies.set('gameDS', this.state.gameDS, { path: '/' });
         this.handleInput = this.handleInput.bind(this);
         this.submitDSG = this.handleInput.bind(this)
+        
     }
     
         //this handls the change in input and is later binded to state values
@@ -25,16 +26,15 @@ class GameInfo extends React.Component {
         handleInput = async (e) => {
         await this.setState({ [e.target.name]: e.target.value });
         console.log(this.state)
+
         //update cookie values when game is customized
         const cookies = new Cookies();
         cookies.set('level', this.state.level, { path: '/' });
         cookies.set('playerList', this.state.playerList, { path: '/' });
         cookies.set('gameDS', this.state.gameDS, { path: '/' });
-        console.log('GameInfo cookies: ');
-        console.log(cookies.get('level'));
-        console.log(cookies.get('playerList'));
-        console.log(cookies.get('gameDS'));
+       
         }
+
 
 render(){
 
