@@ -602,7 +602,7 @@ class GameBoard extends Component {
         y={-(gridSize || 0) / 4}
         width={gridSize}
         height={gridSize}
-        fill={"#bde2ba"}
+        fill={"#8e8d8a"}
       />
     );
   };
@@ -674,36 +674,36 @@ class GameBoard extends Component {
 
           {this.state.game_over ? <WinModal winner={this.state.turn} win_board={this.state.board}/> : <div> </div>}
 
-          <div className="bg-blue-800 flex items-center bg-gray-200 h-11">
+          <div className="bg-gray-800 bg-opacity-75 flex items-center bg-gray-200 h-11">
 
-            <div className="flex-1 text-gray-1000 text-center items-center bg-gray-200 px-4 py-2 m-2 rounded-lg">
-              <div class="transition duration-500 ease-in-out bg-blue-500 hover:bg-red-500 transform hover:-translate-y-1 hover:scale-105 bg-blue-300 border-blue-350 border-opacity-50 rounded-lg shadow-lg flex-1 m-1 py-1">
+            <div className="flex-1 text-gray-1000 text-center items-center bg-gradient-to-r from-orange-100 via-orange-200 to-orange-100 px-4 py-2 m-2 rounded-lg">
+              <div class="transition duration-500 ease-in-out bg-blue-500 hover:bg-red-500 transform hover:-translate-y-1 hover:scale-105 bg-blue-300 border-blue-350 border-opacity-50 rounded-lg shadow-lg flex-1 m-1 py-2">
                 <button onClick={() => this.playCard(card_1)}>{card_1}</button>
               </div>
             </div>
 
-            <div className="flex-1 text-gray-1000 text-center items-center bg-gray-200 px-4 py-2 m-2 rounded-lg">
-              <div class="transition duration-500 ease-in-out bg-blue-500 hover:bg-red-500 transform hover:-translate-y-1 hover:scale-105 bg-blue-300 border-blue-350 border-opacity-50 rounded-lg shadow-lg flex-1 m-1 py-1">
+            <div className="flex-1 text-gray-1000 text-center items-center bg-gradient-to-r from-orange-100 via-orange-200 to-orange-100 px-4 py-2 m-2 rounded-lg">
+              <div class="transition duration-500 ease-in-out bg-blue-500 hover:bg-red-500 transform hover:-translate-y-1 hover:scale-105 bg-blue-300 border-blue-350 border-opacity-50 rounded-lg shadow-lg flex-1 m-1 py-2">
                 <button onClick={() => this.playCard(card_2)}>{card_2}</button>
               </div>
             </div>
 
-            <div className="flex-1 text-gray-1000 text-center items-center bg-gray-200 px-4 py-2 m-2 rounded-lg">
-              <div class="transition duration-500 ease-in-out bg-blue-500 hover:bg-red-500 transform hover:-translate-y-1 hover:scale-105 bg-blue-300 border-blue-350 border-opacity-50 rounded-lg shadow-lg flex-1 m-1 py-1">
+            <div className="flex-1 text-gray-1000 text-center items-center bg-gradient-to-r from-orange-100 via-orange-200 to-orange-100 px-4 py-2 m-2 rounded-lg">
+              <div class="transition duration-500 ease-in-out bg-blue-500 hover:bg-red-500 transform hover:-translate-y-1 hover:scale-105 bg-blue-300 border-blue-350 border-opacity-50 rounded-lg shadow-lg flex-1 m-1 py-2">
                 <button onClick={() => this.playCard(card_3)}>{card_3}</button>
               </div>
             </div>
 
-          <div className="flex-1 text-gray-1000 text-center items-center bg-gray-200 px-4 py-2 m-2 rounded-lg">
+          <div className="flex-1 text-gray-1000 text-center items-center bg-gradient-to-r from-orange-100 via-orange-200 to-orange-100 px-4 py-2 m-2 rounded-lg">
             <div data-delay-show='500' data-place="bottom" data-tip="Shift click to make edges, delete a selected node with the keyboard's delete key" data-offset="{'top': -20}" data-text-color="yellow"
-            class="transition duration-500 ease-in-out bg-yellow-300 hover:bg-orange-500 transform hover:-translate-y-1 hover:scale-105 bg-yellow-300 border-yellow-350 border-opacity-50 rounded-lg shadow-lg flex-1 m-1 py-1">
+            class="transition duration-500 ease-in-out bg-yellow-300 hover:bg-orange-500 transform hover:-translate-y-1 hover:scale-105 bg-yellow-300 border-yellow-350 border-opacity-50 rounded-lg shadow-lg flex-1 m-1 py-2">
               <button onClick={() =>this.repositionNodes()}>Reposition Nodes</button>
             </div>
           </div>
 
-          <div className="flex-1 text-gray-1000 text-center items-center bg-gray-200 px-4 py-2 m-2 rounded-lg">
+          <div className="flex-1 text-gray-1000 text-center items-center bg-gradient-to-r from-orange-100 via-orange-200 to-orange-100 px-4 py-2 m-2 rounded-lg">
             <div data-delay-show='500' data-place="bottom" data-tip="End's turn and determines rebalance correctness" data-offset="{'top': -20}" data-text-color="yellow"
-            class="transition duration-500 ease-in-out bg-yellow-300 hover:bg-orange-500 transform hover:-translate-y-1 hover:scale-105 bg-yellow-300 border-yellow-350 border-opacity-50 rounded-lg shadow-lg flex-1 m-1 py-1">
+            class="transition duration-500 ease-in-out bg-yellow-300 hover:bg-orange-500 transform hover:-translate-y-1 hover:scale-105 bg-yellow-300 border-yellow-350 border-opacity-50 rounded-lg shadow-lg flex-1 m-1 py-2">
               <button onClick={() =>this.checkNodes()}>Check Nodes</button>
             </div>
           </div>
@@ -715,7 +715,7 @@ class GameBoard extends Component {
           <GraphView
           showGraphControls={true}
           gridSize={20000}
-          gridDotSize={4}
+          gridDotSize={1}
           renderNodeText={this.renderNodeText}
           ref="GraphView"
           nodeKey={NODE_KEY}
