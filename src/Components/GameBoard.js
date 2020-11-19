@@ -22,7 +22,7 @@ import {
   SPECIAL_EDGE_TYPE,
   SPECIAL_TYPE,
   SKINNY_TYPE,
-    GOLD_NODE
+  GOLD_NODE
 } from "./config";
 
 import "./styles.css";
@@ -33,7 +33,7 @@ const reactLocal = "http://localhost:3000/"
 const remote = "https://data-structures-game.herokuapp.com/";
 
 //can also be const url = local; or const url = reactLocal;
-const url = remote;
+const url = local;
 
 //define sample node
 const sample = {
@@ -590,6 +590,22 @@ class GameBoard extends Component {
     })
   }
 
+  afterRenderEdge = () => {
+    console.log("Called afterRenderEdge");
+  }
+
+
+  renderBackground = (gridSize) => {
+    return (
+      <rect className="background"
+        x={-(gridSize || 0) / 4}
+        y={-(gridSize || 0) / 4}
+        width={gridSize}
+        height={gridSize}
+        fill={"#bde2ba"}
+      />
+    );
+  };
 
   //in react life cycle, code that is rendered occurs after constructor initialization
   //and component mounting and then reflects the change in state/prop values
@@ -698,8 +714,8 @@ class GameBoard extends Component {
         <div id = "graph" style={{ height: "60rem"}}>
           <GraphView
           showGraphControls={true}
-          gridSize="100rem"
-          gridDotSize={1}
+          gridSize={20000}
+          gridDotSize={4}
           renderNodeText={this.renderNodeText}
           ref="GraphView"
           nodeKey={NODE_KEY}
@@ -709,6 +725,7 @@ class GameBoard extends Component {
           nodeTypes={nodeConfig.NodeTypes}
           nodeSubtypes={nodeConfig.NodeSubtypes}
           edgeTypes={nodeConfig.NodeTypes}
+
           onSelectNode={this.onSelectNode}
           onCreateNode={this.onCreateNode}
           onUpdateNode={this.onUpdateNode}
@@ -718,8 +735,17 @@ class GameBoard extends Component {
           onSwapEdge={this.onSwapEdge}
           onDeleteEdge={this.onDeleteEdge}
           readOnly={this.state.read_only}
-          dark={true}
           layoutEngineType={this.state.layoutEngineType}
+
+          afterRenderEdge={this.afterRenderEdge}
+          centerNodeOnMove={true}
+          layoutEngineType={this.state.layoutEngineType}
+          edgeHandleSize={10}
+          edgeArrowSize={10}
+          nodeSize={110}
+          gridSpacing={5}
+          rotateEdgeHandle={true}
+          renderBackground={this.renderBackground}
         />
         </div>
 
