@@ -11,21 +11,30 @@ class GameInfo extends React.Component {
         this.customNodeRef = React.createRef();
         //hard coded defaults
         this.state = {level:'Easy', playerList:'player1,bot1', gameDS:'AVL'};
-        this.handleInput = this.handleInput.bind(this);
-        this.submitDSG = this.handleInput.bind(this)
-    }
-
-    //this handls the change in input and is later binded to state values
-    //cookies then are set to the changed values
-        handleInput = async (e) => {
-        await this.setState({ [e.target.name]: e.target.value });
-        console.log(this.state)
-
+        //set cookies in constructor so that initial values work when game play settings are not customized
         const cookies = new Cookies();
         cookies.set('level', this.state.level, { path: '/' });
         cookies.set('playerList', this.state.playerList, { path: '/' });
         cookies.set('gameDS', this.state.gameDS, { path: '/' });
-    };
+        this.handleInput = this.handleInput.bind(this);
+        this.submitDSG = this.handleInput.bind(this)
+        
+    }
+    
+        //this handls the change in input and is later binded to state values
+        //cookies then are set to the changed values
+        handleInput = async (e) => {
+        await this.setState({ [e.target.name]: e.target.value });
+        console.log(this.state)
+
+        //update cookie values when game is customized
+        const cookies = new Cookies();
+        cookies.set('level', this.state.level, { path: '/' });
+        cookies.set('playerList', this.state.playerList, { path: '/' });
+        cookies.set('gameDS', this.state.gameDS, { path: '/' });
+       
+        }
+
 
 render(){
 
@@ -49,6 +58,7 @@ render(){
                htmlFor='game'>Data Structure     </label>
                 <select type='text' id="game" value={this.state.gameDS} onInput={this.handleInput} name='gameDS'
                         label='DSgame' style={{marginBottom: '1em'}}>
+                    
                     <option value="AVL">AVL</option>
 
                  </select>
@@ -57,6 +67,7 @@ render(){
         <div class="form-group" className="space-y-2">
         <label  className="text-xl text-center font-semibold text-gray-800 mb-2" for='difficulty-level'>Difficulty     </label>
                 <select type='text' id='difficulty-level' value={this.state.level} name='level' onChange={this.handleInput} label='Difficulty Level' style={{ marginBottom: '1em' }}  >
+                    
                     <option value="Easy">Easy</option>
                     <option value="Medium">Medium</option>
                     <option value="Hard">Hard</option>
