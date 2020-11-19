@@ -695,7 +695,7 @@ class GameBoard extends Component {
             </div>
 
           <div className="flex-1 text-gray-1000 text-center items-center bg-gradient-to-r from-orange-100 via-orange-200 to-orange-100 px-4 py-2 m-2 rounded-lg">
-            <div data-delay-show='500' data-place="bottom" data-tip="Shift click to make edges, delete a selected node with the keyboard's delete key" data-offset="{'top': -20}" data-text-color="yellow"
+            <div data-delay-show='500' data-place="bottom" data-tip="Shift click to make edges, delete a selected edge with the keyboard's delete key" data-offset="{'top': -20}" data-text-color="yellow"
             class="transition duration-500 ease-in-out bg-yellow-300 hover:bg-orange-500 transform hover:-translate-y-1 hover:scale-105 bg-yellow-300 border-yellow-350 border-opacity-50 rounded-lg shadow-lg flex-1 m-1 py-2">
               <button onClick={() =>this.repositionNodes()}>Reposition Nodes</button>
             </div>
