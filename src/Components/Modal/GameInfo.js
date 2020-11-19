@@ -11,27 +11,30 @@ class GameInfo extends React.Component {
         this.customNodeRef = React.createRef();
         //hard coded defaults
         this.state = {level:'Easy', playerList:'player1,bot1', gameDS:'AVL'};
-        this.handleInput = this.handleInput.bind(this);
-        this.submitDSG = this.handleInput.bind(this)
-        //defined cookie in constructor with initial values 
+        //set cookies in constructor so that initial values work when game play settings are not customized
         const cookies = new Cookies();
         cookies.set('level', this.state.level, { path: '/' });
         cookies.set('playerList', this.state.playerList, { path: '/' });
         cookies.set('gameDS', this.state.gameDS, { path: '/' });
-        
+        this.handleInput = this.handleInput.bind(this);
+        this.submitDSG = this.handleInput.bind(this)
     }
-
-    //this handls the change in input and is later binded to state values
-    //cookies then are set to the changed values
+    
+        //this handls the change in input and is later binded to state values
+        //cookies then are set to the changed values
         handleInput = async (e) => {
         await this.setState({ [e.target.name]: e.target.value });
         console.log(this.state)
-
-        
-        this.cookies.set('level', this.state.level, { path: '/' });
-        this.cookies.set('playerList', this.state.playerList, { path: '/' });
-        this.cookies.set('gameDS', this.state.gameDS, { path: '/' });
-    };
+        //update cookie values when game is customized
+        const cookies = new Cookies();
+        cookies.set('level', this.state.level, { path: '/' });
+        cookies.set('playerList', this.state.playerList, { path: '/' });
+        cookies.set('gameDS', this.state.gameDS, { path: '/' });
+        console.log('GameInfo cookies: ');
+        console.log(cookies.get('level'));
+        console.log(cookies.get('playerList'));
+        console.log(cookies.get('gameDS'));
+        }
 
 render(){
 
