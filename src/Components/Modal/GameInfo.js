@@ -11,21 +11,30 @@ class GameInfo extends React.Component {
         this.customNodeRef = React.createRef();
         //hard coded defaults
         this.state = {level:'Easy', playerList:'player1,bot1', gameDS:'AVL'};
-        this.handleInput = this.handleInput.bind(this);
-        this.submitDSG = this.handleInput.bind(this)
-    }
-
-    //this handls the change in input and is later binded to state values
-    //cookies then are set to the changed values
-        handleInput = async (e) => {
-        await this.setState({ [e.target.name]: e.target.value });
-        console.log(this.state)
-
+        //set cookies in constructor so that initial values work when game play settings are not customized
         const cookies = new Cookies();
         cookies.set('level', this.state.level, { path: '/' });
         cookies.set('playerList', this.state.playerList, { path: '/' });
         cookies.set('gameDS', this.state.gameDS, { path: '/' });
-    };
+        this.handleInput = this.handleInput.bind(this);
+        this.submitDSG = this.handleInput.bind(this)
+        
+    }
+    
+        //this handls the change in input and is later binded to state values
+        //cookies then are set to the changed values
+        handleInput = async (e) => {
+        await this.setState({ [e.target.name]: e.target.value });
+        console.log(this.state)
+
+        //update cookie values when game is customized
+        const cookies = new Cookies();
+        cookies.set('level', this.state.level, { path: '/' });
+        cookies.set('playerList', this.state.playerList, { path: '/' });
+        cookies.set('gameDS', this.state.gameDS, { path: '/' });
+       
+        }
+
 
 render(){
 
