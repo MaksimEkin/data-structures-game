@@ -64,7 +64,7 @@ class GameBoard extends Component {
       board: null,
       gameID: null,
       turn: "",
-      deckSize: null,
+      deckSize: 1000,
       playerPointVal: null,
       playerCardChoice: null,
       playerBalanceAttempt: null,
@@ -569,11 +569,20 @@ class GameBoard extends Component {
 
   // Create custom text content for the nodes: Node point and Node ID
   renderNodeText = (data) => {
+    let x = '-20';
+    let y = '-45';
+    let points_class_name = "text-4xl font-bold text-gray-900 dark:text-gray-200";
+    let node_id_class_name =  "text-l font-semibold text-gray-800 dark:text-gray-200";
+
+    if (data.points < 10) {
+      x = '-10';
+    }
+
     return (
-      <foreignObject x='-20' y='-30' width='200' height='50'>
-        <div className="graph_node">
-          <p className="node_points_text">{data.points}</p>
-          <p className="node_id_text">{data.node_id}</p>
+      <foreignObject x={x} y={y} width='200' height='250'>
+        <div id="graph_node" className="flex items-center">
+          <p className={points_class_name} id="node_points_text">{data.points}</p>
+          <p className={node_id_class_name} id="node_id_text">   <br></br><br></br><br></br> {data.node_id}</p>
         </div>
       </foreignObject>
     );
@@ -597,13 +606,37 @@ class GameBoard extends Component {
   playersDisplay = (player) => {
 
     // class for the main background in player displays
-    let class_name = "space-y-5 flex items-center p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800";
+    let class_name_box = "space-y-5 flex items-center p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800";
     let player_name = player;
+    let class_name_points = "p-3 mr-4 text-4xl text-green-600 bg-white rounded-full dark:text-green-100 font-bold";
+
+    // if points is less than 0
+    if (this.state.board["player_points"][player] < 0) {
+      class_name_points = "p-3 mr-4 text-4xl text-red-700 bg-white rounded-full font-bold animate-pulse-once";
+    }
+
 
     // If it is the player who's turn it is to play
     if (this.state.turn == player) {
-      class_name = "space-y-5 flex items-center p-4 bg-blue-500 rounded-lg shadow-xs dark:bg-gray-800 shadow-2xl";
+      class_name_box = "space-y-5 flex items-center p-4 bg-blue-500 rounded-lg shadow-xs dark:bg-gray-800 shadow-2xl";
       player_name = "* " + player;
+    }
+
+    // Find the player with the highest points
+    let winning_player = "";
+    let winning_player_points = 0;
+    this.state.board["player_ids"].map((curr_player, ii, arr) => {
+        if (this.state.board["player_points"][curr_player] > winning_player_points) {
+          winning_player_points = this.state.board["player_points"][curr_player];
+          winning_player = curr_player;
+        }
+    });
+
+    // draw the winning player differently
+    if (winning_player == player) {
+      if (winning_player_points > 0) {
+        class_name_points = "p-3 mr-4 text-4xl text-blue-800 bg-white rounded-full dark:text-green-100 font-bold animate-wiggle";
+      }
     }
 
     // Get all of the cards as string to be displayed
@@ -619,8 +652,8 @@ class GameBoard extends Component {
 
     // Return HTML component cards with the information
     return (
-          <div className={class_name}>
-            <div className="p-3 mr-4 text-4xl text-green-800 bg-white rounded-full dark:text-green-100 font-bold">
+          <div className={class_name_box}>
+            <div className={class_name_points}>
                 {this.state.board["player_points"][player]}
             </div>
             <div>
@@ -651,6 +684,13 @@ class GameBoard extends Component {
     let card_1 = null;
     let card_2 = null;
     let card_3 = null;
+
+    // Deck size visual
+    let deck_size_visual = "text-xl font-semibold text-gray-800 dark:text-gray-200";
+    if (this.state.deckSize <= 5) {
+      deck_size_visual = "text-xl font-semibold text-red-700 animate-pulse";
+    }
+
 
     //if loading is completed, statically store cards
     if (!this.state.loading) {
@@ -686,7 +726,7 @@ class GameBoard extends Component {
                     distance:50,
                   },
                   number: {
-                    value: 20,
+                    value: 38,
                     density: {
                       enable: true,
                       value_area: 500,
@@ -728,8 +768,8 @@ class GameBoard extends Component {
                   </svg>
                 </div>
                 <div>
-                  <p className="text-xl font-semibold text-gray-800 dark:text-gray-200" id="deck_size_display">
-                    Remaining Cards: {this.state.deckSize}
+                  <p className={deck_size_visual} id="deck_size_display">
+                    Remaining Turns: {this.state.deckSize}
                   </p>
                 </div>
               </div>
