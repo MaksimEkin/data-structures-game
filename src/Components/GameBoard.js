@@ -74,7 +74,8 @@ class GameBoard extends Component {
       data_structure:null,
 
       //used in conjunction with the API's end_game returned in the JSON
-      game_over: false
+      game_over: false,
+      rebalance_modal:false
     };
     
     
@@ -466,7 +467,7 @@ class GameBoard extends Component {
     console.log("request option parameters: ", requestOptions)
     let response = await fetch(fetch_url, requestOptions);
     let newBoard = await response.json();
-
+    
     //player might lose points when re-balance occurs
     this.setState({playerPointVal: newBoard['player_points'][this.state.turn]})
     this.setState({ board: newBoard, turn: newBoard['turn']});
@@ -595,6 +596,11 @@ class GameBoard extends Component {
     })
   }
 
+  displayRebalanceModal = () =>{
+   
+
+  }
+
 
   //in react life cycle, code that is rendered occurs after constructor initialization
   //and component mounting and then reflects the change in state/prop values
@@ -660,7 +666,7 @@ class GameBoard extends Component {
 
 
         <div style={{height: "10rem"}}>
-
+        { (this.state.board != null && !this.state.board.graph.balanced) ? <RebalanceModal turn={this.state.turn}/> :  <div> </div> }
           {this.state.game_over ? <WinModal winner={this.state.turn} win_board={this.state.board}/> : <div> </div>}
           
           <div className="bg-blue-800 flex items-center bg-gray-200 h-11">
@@ -682,7 +688,7 @@ class GameBoard extends Component {
                 <button onClick={() => this.playCard(card_3)}>{card_3}</button>
               </div>
             </div>
-            {!this.state.board.graph.balanced ? <RebalanceModal turn={this.state.turn} /> : <div> </div>}
+            
           <div className="flex-1 text-gray-1000 text-center items-center bg-gray-200 px-4 py-2 m-2 rounded-lg">
             <div data-delay-show='500' data-place="bottom" data-tip="Shift click to make edges, delete a selected node with the keyboard's delete key" data-offset="{'top': -20}" data-text-color="yellow"
             class="transition duration-500 ease-in-out bg-yellow-300 hover:bg-orange-500 transform hover:-translate-y-1 hover:scale-105 bg-yellow-300 border-yellow-350 border-opacity-50 rounded-lg shadow-lg flex-1 m-1 py-1">
@@ -697,7 +703,7 @@ class GameBoard extends Component {
             </div>
           </div>
         </div>
-
+        
         <ReactTooltip />
         {/*from react digraph library to format graph */}
         <div id = "graph" style={{ height: "60rem"}}>
@@ -727,6 +733,7 @@ class GameBoard extends Component {
           layoutEngineType={this.state.layoutEngineType}
         />
         </div>
+        
 
         </div>
       </div>
