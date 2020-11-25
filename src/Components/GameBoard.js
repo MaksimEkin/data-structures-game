@@ -596,6 +596,16 @@ class GameBoard extends Component {
   // Function to display all of the players in the gameboard
   playersDisplay = (player) => {
 
+    // class for the main background in player displays
+    let class_name = "space-y-5 flex items-center p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800";
+    let player_name = player;
+
+    // If it is the player who's turn it is to play
+    if (this.state.turn == player) {
+      class_name = "space-y-5 flex items-center p-4 bg-blue-500 rounded-lg shadow-xs dark:bg-gray-800 shadow-2xl";
+      player_name = "* " + player;
+    }
+
     // Get all of the cards as string to be displayed
     let cardsDisplay = "";
     this.state.board["cards"][player].map((card, ii, arr) => {
@@ -609,13 +619,13 @@ class GameBoard extends Component {
 
     // Return HTML component cards with the information
     return (
-          <div className="flex items-center p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800">
+          <div className={class_name}>
             <div className="p-3 mr-4 text-4xl text-green-800 bg-white rounded-full dark:text-green-100 font-bold">
                 {this.state.board["player_points"][player]}
             </div>
             <div>
               <p  className="text-l text-center font-bold text-gray-800 mb-2" id="p_display">
-                {player}
+                {player_name}
               </p>
               <p className="text-m font-semibold text-gray-800 dark:text-gray-200" id="p_points_display">
                 {cardsDisplay}
@@ -718,9 +728,6 @@ class GameBoard extends Component {
                   </svg>
                 </div>
                 <div>
-                  <p className="mb-2 text-xl font-medium text-gray-600 dark:text-gray-400" id="turn_display">
-                    Turn: {this.state.turn + " "} Points: {this.state.playerPointVal}
-                  </p>
                   <p className="text-xl font-semibold text-gray-800 dark:text-gray-200" id="deck_size_display">
                     Remaining Cards: {this.state.deckSize}
                   </p>
