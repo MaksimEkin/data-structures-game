@@ -5,6 +5,7 @@ import {create_adjacency, create_graph} from './CreateGraphAdj.js';
 import Cookies from 'universal-cookie';
 import WinModal from './Modal/WinModal.js';
 import ReactTooltip from "react-tooltip";
+import Particles from 'react-particles-js';
 
 //Uber's digraph react folder
 import {
@@ -609,23 +610,21 @@ class GameBoard extends Component {
     // Return HTML component cards with the information
     return (
           <div className="flex items-center p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800">
-            <div
-                className="p-3 mr-4 text-green-500 bg-green-100 rounded-full dark:text-green-100 dark:bg-green-500">
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
-              </svg>
+            <div className="p-3 mr-4 text-4xl text-green-800 bg-white rounded-full dark:text-green-100 font-bold">
+                {this.state.board["player_points"][player]}
             </div>
             <div>
-              <p className="mb-2 text-xl font-medium text-gray-600 dark:text-gray-400" className="p_display">
-                {player + ": " + this.state.board["player_points"][player] + " Points"}
+              <p  className="text-l text-center font-bold text-gray-800 mb-2" id="p_display">
+                {player}
               </p>
-              <p className="text-2xl font-semibold text-gray-800 dark:text-gray-200" className="p_points_display">
+              <p className="text-m font-semibold text-gray-800 dark:text-gray-200" id="p_points_display">
                 {cardsDisplay}
               </p>
             </div>
           </div>
     )
   }
+
 
   //in react life cycle, code that is rendered occurs after constructor initialization
   //and component mounting and then reflects the change in state/prop values
@@ -667,29 +666,34 @@ class GameBoard extends Component {
     return (
 
       <div>
+        <Particles
+              id="particles2"
+              params={{
+                particles: {
+                  color:"#000000",
+                  line_linked: {
+                    color:"#000000",
+                    distance:50,
+                  },
+                  number: {
+                    value: 20,
+                    density: {
+                      enable: true,
+                      value_area: 500,
+                    }
+                  },
+                  move:{
+                    direction:"bottom",
+                    random:true,
+                    speed:1,
+                    out_mode:"out",
+                  }
+                },
+              }}
+        />
+
         <div className="flex mb-4 flex justify-center space-x-4">
             { !this.state.initial_load && this.state.playersArray.map((player) => this.playersDisplay(player)) }
-        </div>
-
-        <div className="transition duration-500 ease-in-out transform hover:-translate-y-1 hover:scale-103 flex justify-center">
-          <div class="flex items-center p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800">
-            <div class="p-3 mr-4 text-orange-500 bg-orange-100 rounded-full dark:text-orange-100 dark:bg-orange-500">
-              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"></path>
-              </svg>
-            </div>
-            <div>
-              <p class="mb-2 text-xl font-medium text-gray-600 dark:text-gray-400" className="turn_display">
-                {this.state.turn}
-              </p>
-              <p class="text-2xl font-semibold text-gray-800 dark:text-gray-200" className="turn_points_display">
-                {this.state.playerPointVal}
-              </p>
-              <p class="text-2xl font-semibold text-gray-800 dark:text-gray-200" className="deck_size_display">
-                Deck: {this.state.deckSize}
-              </p>
-            </div>
-          </div>
         </div>
 
 
@@ -697,39 +701,36 @@ class GameBoard extends Component {
 
           {this.state.game_over ? <WinModal winner={this.state.turn} win_board={this.state.board}/> : <div> </div>}
 
-          <div className="bg-blue-800 flex items-center bg-gray-200 h-11">
+          <div className="flex items-center bg-opacity-0 h-11">
 
-            <div className="flex-1 text-gray-1000 text-center items-center bg-gray-200 px-4 py-2 m-2 rounded-lg">
-              <div class="transition duration-500 ease-in-out bg-blue-500 hover:bg-red-500 transform hover:-translate-y-1 hover:scale-105 bg-blue-300 border-blue-350 border-opacity-50 rounded-lg shadow-lg flex-1 m-1 py-1">
-                <button onClick={() => this.playCard(card_1)}>{card_1}</button>
+            <button className="transition duration-500 ease-in-out bg-blue-500 hover:bg-red-500 transform hover:-translate-y-1 hover:scale-105 bg-blue-300 border-blue-350 border-opacity-50 rounded-lg shadow-2xl flex-1 m-1 py-1 flex justify-center font-bold text-xl text-gray-800" onClick={() => this.playCard(card_1)}>{card_1}</button>
+            <button className="transition duration-500 ease-in-out bg-blue-500 hover:bg-red-500 transform hover:-translate-y-1 hover:scale-105 bg-blue-300 border-blue-350 border-opacity-50 rounded-lg shadow-2xl flex-1 m-1 py-1 flex justify-center font-bold text-xl text-gray-800" onClick={() => this.playCard(card_2)}>{card_2}</button>
+            <button className="transition duration-500 ease-in-out bg-blue-500 hover:bg-red-500 transform hover:-translate-y-1 hover:scale-105 bg-blue-300 border-blue-350 border-opacity-50 rounded-lg shadow-2xl flex-1 m-1 py-1 flex justify-center font-bold text-xl text-gray-800" onClick={() => this.playCard(card_3)}>{card_3}</button>
+
+            <div
+                className="flex justify-center">
+              <div className="flex items-center p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800">
+                <div
+                    className="p-3 mr-4 text-orange-500 bg-orange-100 rounded-full dark:text-orange-100 dark:bg-orange-500">
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path
+                        d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"></path>
+                  </svg>
+                </div>
+                <div>
+                  <p className="mb-2 text-xl font-medium text-gray-600 dark:text-gray-400" id="turn_display">
+                    Turn: {this.state.turn + " "} Points: {this.state.playerPointVal}
+                  </p>
+                  <p className="text-xl font-semibold text-gray-800 dark:text-gray-200" id="deck_size_display">
+                    Remaining Cards: {this.state.deckSize}
+                  </p>
+                </div>
               </div>
             </div>
 
-            <div className="flex-1 text-gray-1000 text-center items-center bg-gray-200 px-4 py-2 m-2 rounded-lg">
-              <div class="transition duration-500 ease-in-out bg-blue-500 hover:bg-red-500 transform hover:-translate-y-1 hover:scale-105 bg-blue-300 border-blue-350 border-opacity-50 rounded-lg shadow-lg flex-1 m-1 py-1">
-                <button onClick={() => this.playCard(card_2)}>{card_2}</button>
-              </div>
-            </div>
+            <button className="transition duration-500 ease-in-out bg-orange-500 hover:bg-orange-600  transform hover:-translate-y-1 hover:scale-105   border-orange-500 border-opacity-50 rounded-lg shadow-2xl flex-1 m-1 py-1 flex justify-center font-bold text-xl text-gray-800" onClick={() =>this.repositionNodes()}>Reposition Nodes</button>
+            <button className="transition duration-500 ease-in-out bg-orange-500 hover:bg-orange-600  transform hover:-translate-y-1 hover:scale-105   border-orange-500  border-opacity-50 rounded-lg shadow-2xl flex-1 m-1 py-1 flex justify-center font-bold text-xl text-gray-800" onClick={() =>this.checkNodes()}>Check Nodes</button>
 
-            <div className="flex-1 text-gray-1000 text-center items-center bg-gray-200 px-4 py-2 m-2 rounded-lg">
-              <div class="transition duration-500 ease-in-out bg-blue-500 hover:bg-red-500 transform hover:-translate-y-1 hover:scale-105 bg-blue-300 border-blue-350 border-opacity-50 rounded-lg shadow-lg flex-1 m-1 py-1">
-                <button onClick={() => this.playCard(card_3)}>{card_3}</button>
-              </div>
-            </div>
-
-          <div className="flex-1 text-gray-1000 text-center items-center bg-gray-200 px-4 py-2 m-2 rounded-lg">
-            <div data-delay-show='500' data-place="bottom" data-tip="Shift click to make edges, delete a selected node with the keyboard's delete key" data-offset="{'top': -20}" data-text-color="yellow"
-            class="transition duration-500 ease-in-out bg-yellow-300 hover:bg-orange-500 transform hover:-translate-y-1 hover:scale-105 bg-yellow-300 border-yellow-350 border-opacity-50 rounded-lg shadow-lg flex-1 m-1 py-1">
-              <button onClick={() =>this.repositionNodes()}>Reposition Nodes</button>
-            </div>
-          </div>
-
-          <div className="flex-1 text-gray-1000 text-center items-center bg-gray-200 px-4 py-2 m-2 rounded-lg">
-            <div data-delay-show='500' data-place="bottom" data-tip="End's turn and determines rebalance correctness" data-offset="{'top': -20}" data-text-color="yellow"
-            class="transition duration-500 ease-in-out bg-yellow-300 hover:bg-orange-500 transform hover:-translate-y-1 hover:scale-105 bg-yellow-300 border-yellow-350 border-opacity-50 rounded-lg shadow-lg flex-1 m-1 py-1">
-              <button onClick={() =>this.checkNodes()}>Check Nodes</button>
-            </div>
-          </div>
         </div>
 
         <ReactTooltip />
