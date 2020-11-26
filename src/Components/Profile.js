@@ -22,7 +22,8 @@ class Profile extends Component {
         //store the username and password that a user types in
         this.state = {
             username: null,
-            password: null
+            password: null,
+            loggedIn: false
         }
     }
 
@@ -71,6 +72,10 @@ class Profile extends Component {
             cookies.set('token', returned["token"], { path: '/' })
             cookies.set('username', this.state.username, { path: '/'})
 
+            if (cookies.get('token') == returned["token"]) {
+                this.setState({loggedIn: true})
+            }
+
             //alert successful login
             Swal.fire({
                 title: 'Successfully logged in as ' + this.state.username + '!',
@@ -105,8 +110,10 @@ class Profile extends Component {
 
         //format user_id and token as FormData
         let user_and_token = new FormData()
-        user_and_token.append("user_id", cookies.get('username'))
-        user_and_token.append("token", cookies.get('token'))
+        if (this.state.loggedIn) {
+            user_and_token.append("user_id", cookies.get('username'))
+            user_and_token.append("token", cookies.get('token'))
+        }
 
         //request options
         let requestOptions = {
@@ -124,8 +131,10 @@ class Profile extends Component {
         if (returned["status"] == "success"){
 
             //remove cookies
-            cookies.remove('username')
-            cookies.remove('token')
+            cookies.remove('username', { path: '/'})
+            cookies.remove('token', { path: '/'})
+
+            console.log('in logout', cookies.get('username'))
 
             //show popup
             Swal.fire({
@@ -159,7 +168,7 @@ class Profile extends Component {
         })
     }
 
-    render() {
+    displayLogIn = () => {
         return (
             <form class="container mx-auto h-full flex justify-center items-center align-center">
                 <div class="w-1/2 font-thin">
@@ -174,24 +183,28 @@ class Profile extends Component {
                         <label class="text-xl ml-32 px-4">
                             Username:
                         </label>
-                        <input class="bg-gray-200 shadow border-blue-500 border rounded w-48 py-2 px-2 text-gray-700"
-                               id="username" type="text" value={this.state.username}
-                               onChange={this.handleUserChange}>
+                        <input
+                            class="bg-gray-200 shadow border-blue-500 border rounded w-48 py-2 px-2 text-gray-700"
+                            id="username" type="text" value={this.state.username}
+                            onChange={this.handleUserChange}>
                         </input>
                         <div class="py-4 px-3">
-                        <label className="text-xl ml-32 px-3">
-                            Password:
-                        </label>
-                        <input className="bg-gray-200 shadow border-blue-500 border rounded w-48 py-2 px-2 text-gray-700"
-                               id="password" type="password" placeholder="******************" value = {this.state.password}
-                               onChange={this.handlePassChange}>
-                        </input>
+                            <label className="text-xl ml-32 px-3">
+                                Password:
+                            </label>
+                            <input
+                                className="bg-gray-200 shadow border-blue-500 border rounded w-48 py-2 px-2 text-gray-700"
+                                id="password" type="password" placeholder="******************"
+                                value={this.state.password}
+                                onChange={this.handlePassChange}>
+                            </input>
                         </div>
                     </div>
 
                     <div>
                         {/*When user clicks "Sign in", make api call*/}
-                        <button class="bg-blue-500 text-white hover:bg-blue-700 ml-64 w-32 font-bold rounded py-2 px-4"
+                        <button
+                            class="bg-blue-500 text-white hover:bg-blue-700 ml-64 w-32 font-bold rounded py-2 px-4"
                             id="login-btn" type="button"
                             onClick={() => this.loginFxn()}>
                             Sign in
@@ -200,15 +213,29 @@ class Profile extends Component {
 
                     <div>
                         {/*When user clicks "Sign out", make api call to log out*/}
-                        <button class="bg-red-500 text-white hover:bg-red-700 font-bold w-32 rounded px-4 py-2 mt-6 ml-64"
-                        id = "logout-btn" type="button"
-                        onClick={() => this.logoutFxn()}>
-                        Sign out?
-                    </button>
-                </div>
+                        <button
+                            class="bg-red-500 text-white hover:bg-red-700 font-bold w-32 rounded px-4 py-2 mt-6 ml-64"
+                            id="logout-btn" type="button"
+                            onClick={() => this.logoutFxn()}>
+                            Sign out?
+                        </button>
+                    </div>
                 </div>
             </form>
         )
+    }
+
+    render() {
+        const cookies = new Cookies()
+        const cookieToken = cookies.get('token')
+        console.log("cookieToken: ", cookieToken)
+        if ((this.state.loggedIn === false) || (cookieToken == '')){
+            console.log("In if", cookieToken)
+            return (this.displayLogIn())
+        }
+        else {
+            return(<div></div>)
+        }
     }
 }
 export default Profile
