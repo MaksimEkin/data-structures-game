@@ -2,6 +2,8 @@ import React, {Component} from 'react'
 import Swal from "sweetalert2"
 import Cookies from "universal-cookie"
 import Particles from "react-particles-js"
+import {TextField} from "@material-ui/core";
+import {Link} from "react-router-dom";
 
 //Fix XSS security issues when developing locally
 //this allows us to test separately locally and on Heroku by changing just one line
@@ -202,55 +204,54 @@ class Profile extends Component {
                       },
                      }}
                     />
-                    <div className="w-full md:max-w-md mt-6 md:justify-items-center flex mx-auto my-auto">
+                <div className="flex items-center justify-center h-screen">
+                <div className="w-full md:max-w-md mt-6">
+            <span>
+            <div className="card bg-gray-200 shadow-2xl rounded-2xl px-4 py-4 mb-4 ">
 
-                  <span>
+            <div className="space-y-10 flex justify-center">
+              <h1 className="space-y-20 text-3xl text-center font-semibold text-gray-800 mb-2">Login to view your profile!</h1>
+          </div>
 
-                    <div className="bg-blue-200 shadow-2xl rounded-2xl px-4 py-4 space-y-20 space-x-20">
-                        <form>
-                            <div class="font-thin space-y-12 space-x-12">
+        <form>
 
-                            {/*Header*/}
-                            <h1 class="text-3xl text-center py-2">
-                                Login to view your profile!
-                            </h1>
+        <div className="space-y-2 p-3 items-center">
+        <label className="text-xl text-center font-semibold text-gray-800 mb-2 px-3">
+            Username:
+        </label>
+                <input
+                    className="bg-gray-200 shadow border-blue-500 border rounded py-2 px-2 text-gray-700"
+                    id="username" type="text" value={this.state.username}
+                    onChange={this.handleUserChange}>
+                </input>
+        </div>
+Re
+        <div className="space-y-2 px-3 items-center">
+        <label className="text-xl text-center font-semibold text-gray-800 mb-2 px-4">
+            Password:
+        </label>
+                <input
+                    className="bg-gray-200 shadow border-blue-500 border rounded py-2 px-2 text-gray-700"
+                    id="password" type="password" placeholder="******************"
+                    value={this.state.password}
+                    onChange={this.handlePassChange}>
+                </input>
+        </div>
 
-                            {/*Username and password boxes*/}
-                            <div class="space-x-2 space-y-2 md:justify-items-center">
-                                <label class="text-xl px-3 justify-center">
-                                    Username:
-                                </label>
-                            <input
-                                class="bg-gray-200 shadow border-blue-500 border rounded py-2 px-2 text-gray-700"
-                                id="username" type="text" value={this.state.username}
-                                onChange={this.handleUserChange}>
-                            </input>
+            <div className="space-y-10"><br></br></div>
+            {/*When user clicks "Sign in", make api call*/}
+               <button
+                   class="shadow transition duration-500 ease-in-out bg-blue-500 hover:bg-red-500 transform hover:-translate-y-1 hover:scale-105 bg-blue-300 border-blue-350 border-opacity-50 rounded-lg shadow-xl mx-32 px-10 py-3 rounded spacing-y-3 spacing-x-10 text-xl font-bold"
+                   id="login-btn" type="button"
+                   onClick={() => this.loginFxn()}>
+                   Sign in
+               </button>
 
-                            <div class="space-x-1 space-y-2">
-                                <label className="text-xl py-4 px-3 justify-center">
-                                    Password:
-                                </label>
-                                <input
-                                    className="bg-gray-200 shadow border-blue-500 border rounded py-2 px-2 text-gray-700"
-                                    id="password" type="password" placeholder="******************"
-                                    value={this.state.password}
-                                    onChange={this.handlePassChange}>
-                                </input>
-                            </div>
+             <div className="space-y-10"><br></br></div>
 
-                            <div class="py-8 px-16">
-                                {/*When user clicks "Sign in", make api call*/}
-                                <button
-                                    class="bg-blue-500 text-white hover:bg-blue-700 w-32 font-bold rounded py-2 px-4"
-                                    id="login-btn" type="button"
-                                    onClick={() => this.loginFxn()}>
-                                    Sign in
-                                </button>
-                            </div>
-                            </div>
-                        </div>
-                        </form>
-                    </div></span></div></div>
+                </form>
+
+            </div></span></div></div></div>
         )
     }
 
