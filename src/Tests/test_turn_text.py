@@ -15,12 +15,12 @@ How to run:
     2) Run the test: python -m unittest test_player_display_text.py
 """
 import json
-import requests
 import unittest
+from time import sleep
+import requests
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import Select
-from time import sleep
 
 
 class TestStringMethods(unittest.TestCase):
@@ -107,9 +107,11 @@ class TestStringMethods(unittest.TestCase):
     def test_cards(self):
         """Tests if the displayed cards match the expected."""
 
+        # go through each player's cards
         for index, cards in enumerate(self.cards):
             player = self.players[index]
 
+            # check each card
             for cc in cards:
                 cc = cc.strip()
                 self.assertIn(cc, self.check_cards[player])
