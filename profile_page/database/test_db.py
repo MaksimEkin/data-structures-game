@@ -745,3 +745,60 @@ class DBUserProfileGeneral( TestCase ):
         """ Removes users needed in tests """
         mongo.remove_user( self.user["user_id"] )
         mongo.remove_user( self.user2["user_id"] )
+
+
+
+class DBUserPoints( TestCase ):
+    """ Test for user profile points """
+
+    def setUp( self ):
+        """ creates user data needed for tests """
+
+        self.user = {"sharing": True, "auth_token":"cool!","user_id":"5f7d1b1d8fd2b816c48c148b",
+        "badges":[31,24,83],"current_story_level":9,"email":"ryanb777@umbc.edu",
+         "friends":["Kulsoom2","Nick2","Maksim2","Naomi2"],
+        "user_name":"ryan2","password_hash":"well,hello there","points":98274,"rank":"diamond",
+        "save_games":[{'game_id': '60afce36-085a-11eb-b6ab-acde48001122',
+        'graph': {'nodes': 'DID IT WRETITREE ???5))'},
+        'player_ids': ['id2', 'id3', 'id4', 'id5'],
+        'player_names': ['naomi', 'kulsoom', 'nick', 'ryan'],
+        'player_points': {'id2': 2, 'id3': 2, 'id4': 3, 'id5': 10}, 'turn': 'id2',
+        'cards': {'id2': ['card1', 'card2', 'card3'], 'id3': ['card1', 'card2', 'card3'],
+        'id4': ['card1', 'card2', 'card3'], 'id5': ['card1', 'card2', 'card3']},
+        'gold_node': False, 'difficulty': 'Medium', 'num_players': 4, 'online': True,
+        'curr_data_structure': 'AVL', 'selected_data_structures': ['AVL', 'Stack'],
+        'timed_game': False, 'seconds_until_next_ds': 60, 'time_created': '07/10/2020 00:05:47',
+        'end_game': False},"4(2(3)(1))(6(5))","4(2(3)(1))(6(5))"]}
+
+        mongo.save_user( self.user )
+
+    def test_get_user_points( self ):
+        """ The user's points are returned """
+        points = mongo.get_points(self.user["user_id"])
+
+        self.assertEqual( points, self.user["points"],
+            msg=f'{BColors.FAIL}\t[-]\tUser\'s points were incorrect!{BColors.ENDC}' + where() )
+        print( f"{BColors.OKGREEN}\t[+]\tPass User-Profile database get points.\
+            {BColors.ENDC}" )
+
+    def test_set_user_points( self ):
+        """ The user's points are changed """
+        is_success = mongo.set_points(self.user["user_id"], 2468)
+
+        self.assertEqual( is_success, True,
+            msg=f'{BColors.FAIL}\t[-]\tUser\'s points were not set!{BColors.ENDC}' + where() )
+        print( f"{BColors.OKGREEN}\t[+]\tPass User-Profile database set points.\
+            {BColors.ENDC}" )
+
+    def test_set_user_rank( self ):
+        """ The user's points are changed """
+        is_success = mongo.set_ranking(self.user["user_id"], 1357)
+
+        self.assertEqual( is_success, True,
+            msg=f'{BColors.FAIL}\t[-]\tUser\'s rank was not set!{BColors.ENDC}' + where() )
+        print( f"{BColors.OKGREEN}\t[+]\tPass User-Profile database set ranking.\
+            {BColors.ENDC}" )
+
+    def tearDown( self ):
+        """ Removes user needed in tests """
+        mongo.remove_user( self.user["user_id"] )
