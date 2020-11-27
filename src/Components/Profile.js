@@ -1,6 +1,7 @@
 import React, {Component} from 'react'
 import Swal from "sweetalert2"
 import Cookies from "universal-cookie"
+import Particles from "react-particles-js"
 
 //Fix XSS security issues when developing locally
 //this allows us to test separately locally and on Heroku by changing just one line
@@ -22,7 +23,12 @@ class Profile extends Component {
         //see if logged in when profile page called
         const cookies = new Cookies();
         let prevLogin //for checking if logged in already, true if already logged in
-        prevLogin = cookies.get('token') != ''
+        if ((cookies.get('token')) && (cookies.get('token') != '')){
+            prevLogin = true
+        }
+        else {
+            prevLogin = false
+        }
 
         //store the username and password that a user types in
         this.state = {
@@ -177,8 +183,29 @@ class Profile extends Component {
     //function for displaying the login screen
     displayLogIn = () => {
         return (
-            <div className="w-full md:max-w-md mt-6 md:justify-items-center flex mx-auto my-auto">
-                <span>
+            <div>
+                <Particles
+                        id="particles"
+                        params={{
+                        particles: {
+                            color:"#000000",
+                            line_linked: {
+                            color:"#000000",
+                        },
+                        number: {
+                        value: 80,
+                        density: {
+                            enable: true,
+                            value_area: 800,
+                        }
+                       },
+                      },
+                     }}
+                    />
+                    <div className="w-full md:max-w-md mt-6 md:justify-items-center flex mx-auto my-auto">
+
+                  <span>
+
                     <div className="bg-blue-200 shadow-2xl rounded-2xl px-4 py-4 space-y-20 space-x-20">
                         <form>
                             <div class="font-thin space-y-12 space-x-12">
@@ -223,13 +250,31 @@ class Profile extends Component {
                             </div>
                         </div>
                         </form>
-                    </div></span></div>
+                    </div></span></div></div>
         )
     }
 
     //display user profile and sign out button
     displayUserProfile = () => {
         return(<div>
+            <Particles
+                id="particles"
+                params={{
+                particles: {
+                    color:"#000000",
+                    line_linked: {
+                    color:"#000000",
+                    },
+                number: {
+                  value: 80,
+                  density: {
+                    enable: true,
+                    value_area: 800,
+                  }
+                },
+              },
+            }}
+            />
             {/*When user clicks "Sign out", make api call to log out*/}
             <button
                 className="bg-red-500 text-white hover:bg-red-700 font-bold w-32 rounded px-4 py-2 mt-6 ml-64"
@@ -241,12 +286,13 @@ class Profile extends Component {
     }
 
     render() {
-
         //display login screen if not logged in
         const cookies = new Cookies()
         if ((this.state.loggedIn === false) || (cookies.get('token') === '')){
             return (this.displayLogIn())
         }
+
+        //display user profile page with option to log out
         else {
             return(this.displayUserProfile())
         }
