@@ -9,7 +9,7 @@ const reactLocal = "http://localhost:3000/"
 const remote = "https://data-structures-game.herokuapp.com/";
 
 //can also be const url = local; or const url = reactLocal;
-const url = remote;
+const url = local;
 
 /* This class provides the functionality for logging in and out,
    registering a new account and (eventually) adding friends
@@ -19,11 +19,16 @@ class Profile extends Component {
     constructor(props) {
         super(props);
 
+        //see if logged in when profile page called
+        const cookies = new Cookies();
+        let prevLogin //for checking if logged in already, true if already logged in
+        prevLogin = cookies.get('token') != ''
+
         //store the username and password that a user types in
         this.state = {
             username: null,
             password: null,
-            loggedIn: false
+            loggedIn: prevLogin
         }
     }
 
@@ -72,9 +77,8 @@ class Profile extends Component {
             cookies.set('token', returned["token"], { path: '/' })
             cookies.set('username', this.state.username, { path: '/'})
 
-            if (cookies.get('token') == returned["token"]) {
-                this.setState({loggedIn: true})
-            }
+            //update state to reflect successful login
+            this.setState({loggedIn: true})
 
             //alert successful login
             Swal.fire({
@@ -108,12 +112,12 @@ class Profile extends Component {
     logoutFxn = async () => {
         const cookies = new Cookies()
 
+        console.log("In logout, printing token: ", cookies.get('token'))
+
         //format user_id and token as FormData
         let user_and_token = new FormData()
-        if (this.state.loggedIn) {
-            user_and_token.append("user_id", cookies.get('username'))
-            user_and_token.append("token", cookies.get('token'))
-        }
+        user_and_token.append("user_id", cookies.get('username'))
+        user_and_token.append("token", cookies.get('token'))
 
         //request options
         let requestOptions = {
@@ -133,8 +137,10 @@ class Profile extends Component {
             //remove cookies
             cookies.remove('username', { path: '/'})
             cookies.remove('token', { path: '/'})
+            cookies.set('username', '', { path: '/'})
+            cookies.set('token', '', { path: '/'})
 
-            console.log('in logout', cookies.get('username'))
+            this.setState({loggedIn: false})
 
             //show popup
             Swal.fire({
@@ -229,7 +235,8 @@ class Profile extends Component {
         const cookies = new Cookies()
         const cookieToken = cookies.get('token')
         console.log("cookieToken: ", cookieToken)
-        if ((this.state.loggedIn === false) || (cookieToken == '')){
+        if ((this.state.loggedIn === false) || (cookieToken === '')){
+            console.log("Logged in?", this.state.loggedIn)
             console.log("In if", cookieToken)
             return (this.displayLogIn())
         }
