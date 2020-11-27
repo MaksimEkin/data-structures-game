@@ -134,7 +134,7 @@ class Profile extends Component {
         //successful logout
         if (returned["status"] == "success"){
 
-            //remove cookies
+            //remove cookies and set to empty to double-check
             cookies.remove('username', { path: '/'})
             cookies.remove('token', { path: '/'})
             cookies.set('username', '', { path: '/'})
@@ -174,6 +174,7 @@ class Profile extends Component {
         })
     }
 
+    //function for displaying the login screen
     displayLogIn = () => {
         return (
             <form class="container mx-auto h-full flex justify-center items-center align-center">
@@ -232,12 +233,10 @@ class Profile extends Component {
     }
 
     render() {
+
+        //display login screen if not logged in
         const cookies = new Cookies()
-        const cookieToken = cookies.get('token')
-        console.log("cookieToken: ", cookieToken)
-        if ((this.state.loggedIn === false) || (cookieToken === '')){
-            console.log("Logged in?", this.state.loggedIn)
-            console.log("In if", cookieToken)
+        if ((this.state.loggedIn === false) || (cookies.get('token') === '')){
             return (this.displayLogIn())
         }
         else {
