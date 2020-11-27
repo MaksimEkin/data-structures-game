@@ -572,15 +572,20 @@ class GameBoard extends Component {
 
   // Create custom text content for the nodes: Node point and Node ID
   renderNodeText = (data) => {
+    // text location
     let x = '-20';
     let y = '-45';
+
+    // design class names
     let points_class_name = "text-4xl font-bold text-gray-900 dark:text-gray-200";
     let node_id_class_name =  "text-l font-semibold text-gray-800 dark:text-gray-200";
 
+    // if points is single digit re-adjust its x coordinate position
     if (data.points < 10) {
       x = '-10';
     }
 
+    // render the design
     return (
       <foreignObject x={x} y={y} width='200' height='250'>
         <div id="graph_node" className="flex items-center">
@@ -603,6 +608,7 @@ class GameBoard extends Component {
       layoutEngineType: 'VerticalTree',
       read_only: true
     })
+
   }
 
   // Function to display all of the players in the gameboard
@@ -611,15 +617,17 @@ class GameBoard extends Component {
     // class for the main background in player displays
     let class_name_box = "space-y-5 flex items-center p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800";
     let player_name = player;
+
+    // class for player points display
     let class_name_points = "p-3 mr-4 text-4xl text-green-600 bg-white rounded-full dark:text-green-100 font-bold";
 
-    // if points is less than 0
+    // if points is less than 0: displays red alert
     if (this.state.board["player_points"][player] < 0) {
       class_name_points = "p-3 mr-4 text-4xl text-red-700 bg-white rounded-full font-bold animate-pulse-once";
     }
 
 
-    // If it is the player who's turn it is to play
+    // If it is the player who's turn it is to play: makes the box blue
     if (this.state.turn == player) {
       class_name_box = "space-y-5 flex items-center p-4 bg-blue-500 rounded-lg shadow-xs dark:bg-gray-800 shadow-2xl";
       player_name = "* " + player;
@@ -635,7 +643,7 @@ class GameBoard extends Component {
         }
     });
 
-    // draw the winning player differently
+    // Put a glowing alert on the winning player's display
     if (winning_player == player) {
       if (winning_player_points > 0) {
         class_name_points = "p-3 mr-4 text-4xl text-blue-800 bg-white rounded-full dark:text-green-100 font-bold animate-wiggle";
@@ -656,14 +664,14 @@ class GameBoard extends Component {
     // Return HTML component cards with the information
     return (
           <div className={class_name_box}>
-            <div className={class_name_points}>
+            <div className={class_name_points} name="player_points_display">
                 {this.state.board["player_points"][player]}
             </div>
             <div>
-              <p  className="text-l text-center font-bold text-gray-800 mb-2" id="p_display">
+              <p  className="text-l text-center font-bold text-gray-800 mb-2" name="player_name_display">
                 {player_name}
               </p>
-              <p className="text-m font-semibold text-gray-800 dark:text-gray-200" id="p_points_display">
+              <p className="text-m font-semibold text-gray-800 dark:text-gray-200" name="player_cards_display">
                 {cardsDisplay}
               </p>
             </div>

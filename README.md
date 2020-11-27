@@ -66,5 +66,9 @@ Cross-origins calls are blocked due to a header that is in place to protect agai
     - Run using Cypress, which can be started with ```npx cypress open```
     - Once Cypress is running, select any tests that the Cypress-generated GUI displays to run them
     
+- **Front-end Text Diplay Tests:**
+    - Note: Developed to be run on Safari. In Safari under the Develop menu Allow Remote Automation. Then change the remote url variable to local in GameBoard.js. Build the project with ```npm run build```, and run Django ```python manage.py runserver```. Tests can be run from ```src/Tests```.
+    - Test 1: ```python -m unittest test_player_display_text.py```
+    - Test 2: ```python -m unittest test_node_text.py```
+    
 [See Wiki for details.](https://github.com/MaksimEkin/data-structures-game/wiki)
-
