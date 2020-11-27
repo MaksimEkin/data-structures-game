@@ -178,54 +178,66 @@ class Profile extends Component {
     displayLogIn = () => {
         return (
             <div className="w-full md:max-w-md mt-6 md:justify-items-center flex mx-auto my-auto">
-            <span>
-            <div className="bg-blue-200 shadow-2xl rounded-2xl px-4 py-4 space-y-20 space-x-20">
-            <form>
-                <div class="font-thin space-y-12 space-x-12">
+                <span>
+                    <div className="bg-blue-200 shadow-2xl rounded-2xl px-4 py-4 space-y-20 space-x-20">
+                        <form>
+                            <div class="font-thin space-y-12 space-x-12">
 
-                    {/*Header*/}
-                    <h1 class="text-3xl text-center py-2">
-                        Login to view your profile!
-                    </h1>
+                            {/*Header*/}
+                            <h1 class="text-3xl text-center py-2">
+                                Login to view your profile!
+                            </h1>
 
-                    {/*Username and password boxes*/}
-                    <div class="space-x-2 space-y-2 md:justify-items-center">
-                        <label class="text-xl px-3 justify-center">
-                            Username:
-                        </label>
-                        <input
-                            class="bg-gray-200 shadow border-blue-500 border rounded py-2 px-2 text-gray-700"
-                            id="username" type="text" value={this.state.username}
-                            onChange={this.handleUserChange}>
-                        </input>
-                        <div class="space-x-1 space-y-2">
-                            <label className="text-xl py-4 px-3 justify-center">
-                                Password:
-                            </label>
+                            {/*Username and password boxes*/}
+                            <div class="space-x-2 space-y-2 md:justify-items-center">
+                                <label class="text-xl px-3 justify-center">
+                                    Username:
+                                </label>
                             <input
-                                className="bg-gray-200 shadow border-blue-500 border rounded py-2 px-2 text-gray-700"
-                                id="password" type="password" placeholder="******************"
-                                value={this.state.password}
-                                onChange={this.handlePassChange}>
+                                class="bg-gray-200 shadow border-blue-500 border rounded py-2 px-2 text-gray-700"
+                                id="username" type="text" value={this.state.username}
+                                onChange={this.handleUserChange}>
                             </input>
+
+                            <div class="space-x-1 space-y-2">
+                                <label className="text-xl py-4 px-3 justify-center">
+                                    Password:
+                                </label>
+                                <input
+                                    className="bg-gray-200 shadow border-blue-500 border rounded py-2 px-2 text-gray-700"
+                                    id="password" type="password" placeholder="******************"
+                                    value={this.state.password}
+                                    onChange={this.handlePassChange}>
+                                </input>
+                            </div>
+
+                            <div class="py-8 px-16">
+                                {/*When user clicks "Sign in", make api call*/}
+                                <button
+                                    class="bg-blue-500 text-white hover:bg-blue-700 w-32 font-bold rounded py-2 px-4"
+                                    id="login-btn" type="button"
+                                    onClick={() => this.loginFxn()}>
+                                    Sign in
+                                </button>
+                            </div>
+                            </div>
                         </div>
-                    <div class="py-8 px-16">
-                        {/*When user clicks "Sign in", make api call*/}
-                        <button
-                            class="bg-blue-500 text-white hover:bg-blue-700 w-32 font-bold rounded py-2 px-4"
-                            id="login-btn" type="button"
-                            onClick={() => this.loginFxn()}>
-                            Sign in
-                        </button>
-                    </div>
-
-                    </div>
-
-                </div>
-            </form>
-
-            </div></span></div>
+                        </form>
+                    </div></span></div>
         )
+    }
+
+    //display user profile and sign out button
+    displayUserProfile = () => {
+        return(<div>
+            {/*When user clicks "Sign out", make api call to log out*/}
+            <button
+                className="bg-red-500 text-white hover:bg-red-700 font-bold w-32 rounded px-4 py-2 mt-6 ml-64"
+                id="logout-btn" type="button"
+                onClick={() => this.logoutFxn()}>
+                Sign out?
+            </button>
+        </div>)
     }
 
     render() {
@@ -236,7 +248,7 @@ class Profile extends Component {
             return (this.displayLogIn())
         }
         else {
-            return(<div></div>)
+            return(this.displayUserProfile())
         }
     }
 }
