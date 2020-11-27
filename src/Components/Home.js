@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import "./styles.css";
 import Particles from 'react-particles-js';
-import { Button} from '@material-ui/core';
 import GameInfo from './Modal/GameInfo.js'
 import { RankingTable } from './RankingTable'
 
@@ -47,13 +46,11 @@ class Home extends Component{
           />
 
             <div className="flex items-center justify-center h-screen">
-               <Button>
-                    <GameInfo className="flex items-center justify-center h-screen"
-                        level = {this.state.difficulty}
-                        playerList={this.state.players}
-                        gameDS={this.state.data_structure}
-                    />
-                </Button>
+                <GameInfo className="flex items-center justify-center h-screen"
+                    level = {this.state.difficulty}
+                    playerList={this.state.players}
+                    gameDS={this.state.data_structure}
+                />
             </div>
 
             <div className="space-y-30 flex justify-center">

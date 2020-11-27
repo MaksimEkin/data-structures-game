@@ -5,6 +5,11 @@
     z-index: -1;
 }
 
+#particles2 {
+    z-index: -1;
+    position:absolute;
+}
+
 .App {
   font-family: sans-serif;
   text-align: center;
@@ -23,12 +28,6 @@
   font-weight: bold;
 }
 
-#particles canvas{
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
-}
 
 .startButton{
   display: flex;

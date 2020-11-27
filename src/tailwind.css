@@ -19177,6 +19177,21 @@ video {
   }
 }
 
+@keyframes wiggle {
+    0%, 100% {
+        transform: rotate(-3deg);
+    }
+
+    50%  {
+        transform: rotate(3deg);
+
+    }
+}
+
+.animate-wiggle{
+    animation: wiggle 1s ease-in-out infinite;
+}
+
 .animate-none {
   animation: none;
 }
@@ -19189,8 +19204,16 @@ video {
   animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
 }
 
+.animate-ping-once {
+  animation: ping 1s cubic-bezier(0, 0, 0.2, 1) 1;
+}
+
 .animate-pulse {
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.animate-pulse-once {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) 1;
 }
 
 .animate-bounce {
