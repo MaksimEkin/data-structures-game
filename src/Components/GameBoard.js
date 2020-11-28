@@ -75,7 +75,8 @@ class GameBoard extends Component {
 
       //used in conjunction with the API's end_game returned in the JSON
       game_over: false,
-      rebalance_modal:false
+      rebalance_modal:false,
+      hideCards:false
     };
     
     
@@ -442,7 +443,16 @@ class GameBoard extends Component {
   };
 
   /* Define custom graph editing methods here */
+  userRebalance = () =>{
+    this.setState({ loading: true});
+    console.log('in userRebalance, loading true');
+    
+    console.log('user rebalances here');
+    this.rebalance()
+    
+    console.log('in userRebalance, loading FALSE');
 
+  }
   //checks if the current board is balanced and returns true or false
   checkRebalance = () => {
     let isBalanced = this.state.board.graph.balanced
@@ -474,8 +484,9 @@ class GameBoard extends Component {
 
     let made_graph = create_graph(this.state.board['graph'])
     this.setState({ graph: made_graph});
-    this.setState({loading: false})
 
+    this.setState({loading: false})
+    console.log('in rebalance, loading FALSE');
   }
 
   // arg: card chosen
@@ -488,7 +499,7 @@ class GameBoard extends Component {
     //make the API call to actually play the card the user chose
     this.apiCall()
     //check if rebalance needs to be done
-    this.rebalance()
+    /////////////////////////////////////////////this.rebalance()/////////////////
     //check if playing selected card ended the game
     //this.checkGameStatus()
   }
@@ -513,10 +524,16 @@ class GameBoard extends Component {
     this.setState({playerPointVal: newBoard['player_points'][this.state.turn]})
     this.setState({deckSize: newBoard['deck'].length});
 
-    //check if board is balanced then rebalance tree if fxn returned false
+    
     let made_graph = create_graph(this.state.board['graph'])
     this.setState({ graph: made_graph});
     this.setState({loading: false})
+    //check if board is balanced then allow user to rebalance themselves
+    if(!this.checkRebalance()){
+      //have user rebalance
+      this.userRebalance();
+    }
+
   }
 
   //AI api call
@@ -633,9 +650,11 @@ class GameBoard extends Component {
                 this.aiCall()
             }
         }
-        if(!this.checkRebalance() && !this.state.turn.replace(/\s+/g, "").toLowerCase().startsWith('bot')){
-            this.rebalance()
-        }
+        /*if(!this.checkRebalance() && !this.state.turn.replace(/\s+/g, "").toLowerCase().startsWith('bot')){
+            //this.rebalance()
+            
+        } */
+
     }
 
     //html returned to display page. When each card is played, the appropriate function is called, which in turn makes an API call
@@ -666,26 +685,26 @@ class GameBoard extends Component {
 
 
         <div style={{height: "10rem"}}>
+        {this.state.game_over ? <WinModal winner={this.state.turn} win_board={this.state.board}/> : <div> </div>}
         { (this.state.board != null && !this.state.board.graph.balanced) ? <RebalanceModal turn={this.state.turn}/> :  <div> </div> }
-          {this.state.game_over ? <WinModal winner={this.state.turn} win_board={this.state.board}/> : <div> </div>}
-          
+        
           <div className="bg-blue-800 flex items-center bg-gray-200 h-11">
 
             <div className="flex-1 text-gray-1000 text-center items-center bg-gray-200 px-4 py-2 m-2 rounded-lg">
               <div class="transition duration-500 ease-in-out bg-blue-500 hover:bg-red-500 transform hover:-translate-y-1 hover:scale-105 bg-blue-300 border-blue-350 border-opacity-50 rounded-lg shadow-lg flex-1 m-1 py-1">
-                <button onClick={() => this.playCard(card_1)}>{card_1}</button>
+                <button disabled={(this.state.board != null && !this.state.board.graph.balanced)? true : false} onClick={() => this.playCard(card_1)}>{card_1}</button>
               </div>
             </div>
 
             <div className="flex-1 text-gray-1000 text-center items-center bg-gray-200 px-4 py-2 m-2 rounded-lg">
               <div class="transition duration-500 ease-in-out bg-blue-500 hover:bg-red-500 transform hover:-translate-y-1 hover:scale-105 bg-blue-300 border-blue-350 border-opacity-50 rounded-lg shadow-lg flex-1 m-1 py-1">
-                <button onClick={() => this.playCard(card_2)}>{card_2}</button>
+                <button disabled={(this.state.board != null && !this.state.board.graph.balanced)? true : false}  onClick={() => this.playCard(card_2)}>{card_2}</button>
               </div>
             </div>
 
             <div className="flex-1 text-gray-1000 text-center items-center bg-gray-200 px-4 py-2 m-2 rounded-lg">
               <div class="transition duration-500 ease-in-out bg-blue-500 hover:bg-red-500 transform hover:-translate-y-1 hover:scale-105 bg-blue-300 border-blue-350 border-opacity-50 rounded-lg shadow-lg flex-1 m-1 py-1">
-                <button onClick={() => this.playCard(card_3)}>{card_3}</button>
+                <button disabled={(this.state.board != null && !this.state.board.graph.balanced)? true : false}  onClick={() => this.playCard(card_3)}>{card_3}</button>
               </div>
             </div>
             
