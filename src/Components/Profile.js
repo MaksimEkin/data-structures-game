@@ -2,8 +2,6 @@ import React, {Component} from 'react'
 import Swal from "sweetalert2"
 import Cookies from "universal-cookie"
 import Particles from "react-particles-js"
-import {TextField} from "@material-ui/core";
-import {Link} from "react-router-dom";
 
 //Fix XSS security issues when developing locally
 //this allows us to test separately locally and on Heroku by changing just one line
@@ -36,7 +34,9 @@ class Profile extends Component {
         this.state = {
             username: null,
             password: null,
-            loggedIn: prevLogin
+            loggedIn: prevLogin,
+            userPoints: null,
+            userRank: null
         }
     }
 
@@ -225,7 +225,7 @@ class Profile extends Component {
                     onChange={this.handleUserChange}>
                 </input>
         </div>
-Re
+
         <div className="space-y-2 px-3 items-center">
         <label className="text-xl text-center font-semibold text-gray-800 mb-2 px-4">
             Password:
@@ -257,6 +257,7 @@ Re
 
     //display user profile and sign out button
     displayUserProfile = () => {
+
         return(<div>
             <Particles
                 id="particles"
@@ -283,7 +284,49 @@ Re
                 onClick={() => this.logoutFxn()}>
                 Sign out?
             </button>
+            <div>
+                Hey {this.state.username}!
+                Rank: { this.state.user_rank }
+                Points: { this.state.user_points }
+            </div>
         </div>)
+    }
+
+    //api call to get user's rank and points
+    profileAPICall = async () => {
+
+        const cookies = new Cookies()
+
+        //store user input in FormData format
+        let apiData = new FormData()
+        apiData.append("user_id", cookies.get('username'))
+        apiData.append("token", cookies.get('token'))
+
+        //api call parameters
+        let requestOptions = {
+            method: 'POST',
+            body: apiData,
+            redirect: 'follow'
+        };
+
+        //make api call
+        let fetch_url = url + "profile_page/api/profile"
+        let response = await fetch(fetch_url, requestOptions)
+
+        //make sure api call was successful, display error message if not
+        if (!response.ok) {
+            Swal.fire({
+                title: 'User profile not found!',
+                icon: 'error',
+                text: "Please make sure you're signed in"
+            })
+            return
+        }
+
+        //otherwise, jsonify the api return
+        let returned = await response.json()
+        this.setState({ user_points: returned["user_profile"]["points"],
+                             user_rank: returned["user_profile"]["rank"]})
     }
 
     render() {
@@ -295,6 +338,7 @@ Re
 
         //display user profile page with option to log out
         else {
+            this.profileAPICall()
             return(this.displayUserProfile())
         }
     }
