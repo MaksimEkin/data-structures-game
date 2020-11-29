@@ -2,9 +2,9 @@
 python manage.py test game_board.database.test_db
 """
 
+import datetime as dt
 from django.test import TestCase
 from game_board.database import game_board_db as mongo
-import datetime as dt
 
 class BColors:
     """ Main test colors """
