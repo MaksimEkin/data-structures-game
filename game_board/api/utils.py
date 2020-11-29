@@ -5,8 +5,8 @@ import json
 import math
 import random
 import uuid
-from bson import json_util
 from datetime import datetime
+from bson import json_util
 
 from game_board import config
 from game_board import rules
