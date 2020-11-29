@@ -71,7 +71,7 @@ def update_board_db(board, user_id='-1', token='-1'):
             result['game_board'] = board
 
             # if user is authenticated
-            if user_id not in ['-1', -1] and token not in ['-1', -1]:
+            if user_id not in ['-1', -1, ''] and token not in ['-1', -1, '']:
 
                 # Here check if user_id matches the token with the database
                 if not profile_db.check_user(user_id, token):
@@ -79,16 +79,22 @@ def update_board_db(board, user_id='-1', token='-1'):
                     result['reason'] = "User is not authenticated"
                     return result
 
-                # if not negative points
-                if board['player_points'][board['turn']] > 0:
-                    # get user's current points
-                    curr_points = profile_db.get_points(str(user_id))
+                if str(user_id) in board['player_ids']:
 
-                    # get the target points
-                    target_points = curr_points + math.log(board['player_points'][board['turn']])
+                    # if not negative points board['turn']
+                    if board['player_points'][str(user_id)] > 0:
 
-                    # set the new points
-                    profile_db.set_points(str(user_id), target_points)
+                        # get user's current points
+                        curr_points = profile_db.get_points(str(user_id))
+
+                        # get the target points
+                        if user_id == board['turn']:
+                            target_points = curr_points + (math.log(board['player_points'][str(user_id)]) * 2)
+                        else:
+                            target_points = curr_points + math.log(board['player_points'][str(user_id)])
+
+                        # set the new points
+                        profile_db.set_points(str(user_id), target_points)
 
             # remove the game from the database
             db.remove_game(board['game_id'])
