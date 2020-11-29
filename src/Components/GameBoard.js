@@ -77,7 +77,9 @@ class GameBoard extends Component {
       initial_load:true,
 
       //used in conjunction with the API's end_game returned in the JSON
-      game_over: false
+      game_over: false,
+      rebalance_modal:false,
+      showModal:true
     };
     
     
@@ -88,7 +90,7 @@ class GameBoard extends Component {
   // access the DOM to make API calls and update the state and re-renders
   // component did mount to update the values of the state
   async componentDidMount() {
-
+    console.log('in ComponentDidMount');
         const cookies = new Cookies();
 
         //set state variables to these variables to be used in the url
@@ -112,7 +114,7 @@ class GameBoard extends Component {
        //get request to api and include the dynamic game_id
        response = await fetch(getGameURL + game_id['game_id']);
        let board_ = await response.json();
-
+      console.log('board_ fetched');
        //set the state values with respect to the dynamic json response
        this.setState({ board: board_, turn: board_['turn']});
        this.setState({playerPointVal: board_['player_points'][this.state.turn]});
@@ -445,7 +447,16 @@ class GameBoard extends Component {
   };
 
   /* Define custom graph editing methods here */
+  userRebalance = () =>{
+    this.setState({ loading: true});
+    console.log('in userRebalance, loading true');
+    
+    //console.log('user rebalances here');
+    //this.rebalance()
+    
+    console.log('in userRebalance, loading state is ',this.state.loading);
 
+  }
   //checks if the current board is balanced and returns true or false
   checkRebalance = () => {
     let isBalanced = this.state.board.graph.balanced
@@ -457,52 +468,57 @@ class GameBoard extends Component {
   //called if checkRebalance returns false
   //post request to get correct/balanced game board and sets gameboard to
   //return balanced board
-  rebalance = async () => {
+//  rebalance = async (balance_attempt) => {
+    rebalance = async () => {
     this.setState({loading:true})
-
-    let fetch_url = url+"game_board/api/rebalance/" + this.state.gameID
+    console.log('in rebalance, user turn is: ',this.state.turn);
+    let fetch_url = url+"game_board/api/rebalance/" + this.state.gameID + "/-1/-1"
     let balance_attempt={'adjacency_list':{'node2':['node0'],'node0':['node5','node3'],'node5':[],'node3':[]}}
     let requestOptions = {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json'},
       body: JSON.stringify(balance_attempt)
     };
     console.log("request option parameters: ", requestOptions)
     let response = await fetch(fetch_url, requestOptions);
     let newBoard = await response.json();
-
+    
     //player might lose points when re-balance occurs
     this.setState({playerPointVal: newBoard['player_points'][this.state.turn]})
     this.setState({ board: newBoard, turn: newBoard['turn']});
 
     let made_graph = create_graph(this.state.board['graph'])
     this.setState({ graph: made_graph});
-    this.setState({loading: false})
 
+    this.setState({loading: false})
+    console.log('in rebalance, loading ',this.state.loading);
   }
 
   // arg: card chosen
   // call action api which returns new board
   // sets the new board
   playCard = (card) => {
+    console.log('in playCard');
     const cookies = new Cookies()
     cookies.set('selectedCard', card, { path: '/' })
 
     //make the API call to actually play the card the user chose
     this.apiCall()
     //check if rebalance needs to be done
-    this.rebalance()
+    /////////////////////////////////////////////this.rebalance()/////////////////
     //check if playing selected card ended the game
     //this.checkGameStatus()
   }
 
   //modularize the api call for playing a card
   apiCall = async () => {
+    console.log('in API Call');
     const cookies = new Cookies();
 
     //form the URL that will be used
     let selectedCard = cookies.get('selectedCard');
     let fetch_url = url+"game_board/api/action/" + selectedCard + '/'
+    console.log('in apiCall, turn is ',this.state.turn);
     fetch_url = fetch_url + this.state.board['game_id']
 
     this.setState({ loading: true});
@@ -516,19 +532,22 @@ class GameBoard extends Component {
     this.setState({playerPointVal: newBoard['player_points'][this.state.turn]})
     this.setState({deckSize: newBoard['deck'].length});
 
-    //check if board is balanced then rebalance tree if fxn returned false
-    if(!this.checkRebalance()){
-      //this.rebalance()
-      
-    }
-    this.setState({loading: false})
+    
     let made_graph = create_graph(this.state.board['graph'])
     this.setState({ graph: made_graph});
     this.setState({loading: false})
+    //check if board is balanced then allow user to rebalance themselves
+    /*if(!this.checkRebalance()){
+      //have user rebalance
+      //this.userRebalance();
+      this.setState({ loading: true});
+    } */
+
   }
 
   //AI api call
   aiCall = async () => {
+    console.log('in AI CALL');
     let ai_url = url+"game_board/api/ai_pick/" + this.state.board['game_id']
 
     this.setState({ loading: true});
@@ -546,6 +565,7 @@ class GameBoard extends Component {
     let made_graph = create_graph(this.state.board['graph'])
     this.setState({ graph: made_graph});
     this.setState({loading: false})
+    console.log('exiting AI call, board is balanced: ',this.state.board.graph.balanced);
   }
 
   //check if game is over (ie: is golden node at the root of the tree/does API end_game == true?)
@@ -604,11 +624,14 @@ class GameBoard extends Component {
     );
   };
 
-  repositionNodes = () =>{
+  repositionNodes = () =>{console.log('board b4 repositioning: ', this.state.board['graph']);
+
     this.setState({
       layoutEngineType: 'SnapToGrid',
-      read_only: false
+      read_only: false,
     })
+    
+    console.log('in repositionNode, graph is read_only: ',this.state.read_only);
   }
 
   checkNodes = () => {
@@ -616,7 +639,13 @@ class GameBoard extends Component {
       layoutEngineType: 'VerticalTree',
       read_only: true
     })
-
+    console.log('in checkNode, graph is read_only: ',this.state.read_only);
+    console.log('AFTER repositioning: ', this.state.board['graph']);
+    let user_graph = create_adjacency(this.state.graph)
+    console.log(user_graph);
+    //this.rebalance(user_graph)
+    this.rebalance()
+    
   }
 
   // Function to display all of the players in the gameboard
@@ -726,9 +755,11 @@ class GameBoard extends Component {
                 this.aiCall()
             }
         }
-        if(!this.checkRebalance() && !this.state.turn.replace(/\s+/g, "").toLowerCase().startsWith('bot')){
-            this.rebalance()
-        }
+        /*if(!this.checkRebalance() && !this.state.turn.replace(/\s+/g, "").toLowerCase().startsWith('bot')){
+            //this.rebalance()
+            
+        } */
+            //////&& !this.state.showModal
     }
 
     //html returned to display page. When each card is played, the appropriate function is called, which in turn makes an API call
@@ -807,7 +838,7 @@ class GameBoard extends Component {
                   className="transition duration-500 ease-in-out bg-orange-500 hover:bg-orange-600  transform hover:-translate-y-1 hover:scale-105   border-orange-500  border-opacity-50 rounded-lg shadow-2xl flex-1 m-1 py-1 flex justify-center font-bold text-xl text-gray-800" onClick={() =>this.checkNodes()}>Check Nodes</button>
 
         </div>
-
+        
         <ReactTooltip />
         {/*from react digraph library to format graph */}
         <div id = "graph" style={{ height: "60rem"}}>
@@ -837,6 +868,7 @@ class GameBoard extends Component {
           layoutEngineType={this.state.layoutEngineType}
         />
         </div>
+        
 
         </div>
       </div>
