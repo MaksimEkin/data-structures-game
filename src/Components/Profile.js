@@ -279,18 +279,33 @@ class Profile extends Component {
             />
             {/*When user clicks "Sign out", make api call to log out*/}
             <button
-                className="bg-red-500 text-white hover:bg-red-700 font-bold w-32 rounded px-4 py-2 mt-6 ml-64"
+                style={{
+                    position: 'absolute',
+                    right: 40,
+                    top: -18,
+                }}
+                className="bg-red-500 text-white hover:bg-red-700 font-bold w-32 rounded px-4 py-2 mt-6 align-right"
                 id="logout-btn" type="button"
                 onClick={() => this.logoutFxn()}>
                 Sign out?
             </button>
-            <div>
-                Hey {this.state.username}!
-                Rank: { this.state.user_rank }
+
+            <div class="rounded rounded-t-lg border-2 bg-gray-200 card shadow w-1/3 mx-64 justify-center pb-3">
+                <h1 class="text-center px-3 pb-6 pt-2"> Hey {this.state.username}! </h1>
+
+                <div className="flex justify-center pb-3 text-grey-dark">
+                    <div className="text-center mr-3 border-r pr-3">
+                        <h2> {this.state.user_rank}</h2>
+                        <span> Rank </span>
+                    </div>
                 Points: { this.state.user_points }
+            </div>
             </div>
         </div>)
     }
+
+
+
 
     //api call to get user's rank and points
     profileAPICall = async () => {
@@ -330,7 +345,10 @@ class Profile extends Component {
     }
 
     render() {
-        //display login screen if not logged in
+
+        return(this.displayUserProfile())
+
+        /*//display login screen if not logged in
         const cookies = new Cookies()
         if ((this.state.loggedIn === false) || (cookies.get('token') === '')){
             return (this.displayLogIn())
@@ -340,7 +358,7 @@ class Profile extends Component {
         else {
             this.profileAPICall()
             return(this.displayUserProfile())
-        }
+        } */
     }
 }
 export default Profile
