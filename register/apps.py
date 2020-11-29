@@ -1,3 +1,6 @@
+"""
+    Views for Register Page application.
+"""
 from django.apps import AppConfig
 
 

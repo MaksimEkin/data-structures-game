@@ -1,3 +1,6 @@
-from django.db import models
+"""
+    Views for Register Page application.
+"""
+#from django.db import models
 
 # Create your models here.
