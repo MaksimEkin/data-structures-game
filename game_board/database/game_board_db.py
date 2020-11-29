@@ -2,7 +2,8 @@
 Allows the game data to be stored, and interacted with through the Pandamic game API
 """
 
-import os, datetime as dt
+import os
+import datetime as dt
 from pymongo import MongoClient
 
 # Gets database & it's authorization from the environment
