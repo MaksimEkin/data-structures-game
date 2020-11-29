@@ -35,7 +35,7 @@ const reactLocal = "http://localhost:3000/"
 const remote = "https://data-structures-game.herokuapp.com/";
 
 //can also be const url = local; or const url = reactLocal;
-const url = remote;
+const url = local;
 
 //define sample node
 const sample = {
@@ -97,8 +97,10 @@ class GameBoard extends Component {
     let players = cookies.get('playerList');
 
     if (cookies.get('username') != null && cookies.get('token') != null) {
-      this.setState({ username: cookies.get('username'), token: cookies.get('token') })
-      players = players + "," + cookies.get('username');
+      if (cookies.get('username') != "" && cookies.get('token') != "") {
+        this.setState({ username: cookies.get('username'), token: cookies.get('token') })
+        players = players + "," + cookies.get('username');
+      }
     }
 
     this.setState({ playersArray: players.split(',') })
@@ -716,7 +718,7 @@ class GameBoard extends Component {
         Swal.fire({
           title: 'Failed to save game!',
           icon: 'error',
-          text: "Please make sure you're signed in"
+          text: "This game has already been saved."
         })
       }
     }
