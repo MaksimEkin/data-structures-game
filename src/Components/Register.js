@@ -1,6 +1,7 @@
 import React, {Component} from 'react'
 import Swal from "sweetalert2"
 import Cookies from "universal-cookie"
+import { BrowserRouter as Router, Link } from "react-router-dom";
 
 const local = "http://127.0.0.1:8000/";
 const reactLocal = "http://localhost:3000/"
@@ -77,7 +78,7 @@ class Register extends Component {
 
             //alert successful login
             Swal.fire({
-                title: 'Successfully logged in as ' + this.state.username + '!',
+                title: 'Successfully registered!',
                 icon: 'success',
                 confirmButtonText: 'Return to Home Page'
 
