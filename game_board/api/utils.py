@@ -4,11 +4,13 @@
 import random
 import uuid
 import json
+import math
 from datetime import datetime
 from bson import json_util
 from game_board import config
 from game_board import rules
 from game_board.database import game_board_db as db
+from profile_page.database import profile_page_db as profile_db
 from game_board.avl import avl_handler as avl
 
 
@@ -41,7 +43,7 @@ def create_board_db(new_board):
     return result
 
 
-def update_board_db(board):
+def update_board_db(board, user_id='-1', token='-1'):
     """
     Update the game board in the database with the new state.
     Returns the board itself unless the game ended.
@@ -49,7 +51,9 @@ def update_board_db(board):
     and deletes the game from database. Otherwise, changes
     turn to the next player.
 
-    :param board:
+    :param board: game board
+    :param user_id: username
+    :param token: authentication token
     :return result, {'error': bool, 'reason': string, 'game_board': dict}:
     """
     result = {'error': False, 'reason': '', 'game_board': board}
@@ -59,10 +63,35 @@ def update_board_db(board):
         # Game ended
         if (board['graph']['root_node'] == board['graph']['gold_node'] or
                 len(board['deck']) == 0):
-            db.remove_game(board['game_id'])
+
+            # update the board
             board['end_game'] = True
             board['turn'] = max(board['player_points'], key=board['player_points'].get)  # get player w/ max points
             result['game_board'] = board
+
+            # if user is authenticated
+            if (user_id != '-1' and user_id != -1) and (token != '-1' and token != -1):
+                # Here check if user_id matches the token with the database
+                if not profile_db.check_user(user_id, token):
+                    result['error'] = True
+                    result['reason'] = "User is not authenticated"
+                    return result
+
+                # if not negative points
+                if board['player_points'][board['turn']] > 0:
+
+                    # get user's current points
+                    curr_points = profile_db.get_points(str(user_id))
+
+                    # get the target points
+                    target_points = curr_points + math.log(board['player_points'][board['turn']])
+
+                    # set the new points
+                    profile_db.set_points(str(user_id), target_points)
+
+            # remove the game from the database
+            db.remove_game(board['game_id'])
+
 
         # Game continues
         else:
