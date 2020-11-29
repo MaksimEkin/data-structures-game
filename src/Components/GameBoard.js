@@ -76,7 +76,7 @@ class GameBoard extends Component {
       //used in conjunction with the API's end_game returned in the JSON
       game_over: false,
       rebalance_modal:false,
-      hideCards:false
+      showModal:true
     };
     
     
@@ -87,7 +87,7 @@ class GameBoard extends Component {
   // access the DOM to make API calls and update the state and re-renders
   // component did mount to update the values of the state
   async componentDidMount() {
-
+    console.log('in ComponentDidMount');
         const cookies = new Cookies();
 
         //set state variables to these variables to be used in the url
@@ -110,7 +110,7 @@ class GameBoard extends Component {
        //get request to api and include the dynamic game_id
        response = await fetch(getGameURL + game_id['game_id']);
        let board_ = await response.json();
-
+      console.log('board_ fetched');
        //set the state values with respect to the dynamic json response
        this.setState({ board: board_, turn: board_['turn']});
        this.setState({playerPointVal: board_['player_points'][this.state.turn]});
@@ -450,7 +450,7 @@ class GameBoard extends Component {
     console.log('user rebalances here');
     this.rebalance()
     
-    console.log('in userRebalance, loading FALSE');
+    console.log('in userRebalance, loading ',this.state.loading);
 
   }
   //checks if the current board is balanced and returns true or false
@@ -466,7 +466,7 @@ class GameBoard extends Component {
   //return balanced board
   rebalance = async () => {
     this.setState({loading:true})
-
+    console.log('in rebalance, user turn is: ',this.state.turn);
     let fetch_url = url+"game_board/api/rebalance/" + this.state.gameID
     let balance_attempt={'adjacency_list':{'node2':['node0'],'node0':['node5','node3'],'node5':[],'node3':[]}}
     let requestOptions = {
@@ -486,13 +486,14 @@ class GameBoard extends Component {
     this.setState({ graph: made_graph});
 
     this.setState({loading: false})
-    console.log('in rebalance, loading FALSE');
+    console.log('in rebalance, loading ',this.state.loading);
   }
 
   // arg: card chosen
   // call action api which returns new board
   // sets the new board
   playCard = (card) => {
+    console.log('in playCard');
     const cookies = new Cookies()
     cookies.set('selectedCard', card, { path: '/' })
 
@@ -506,11 +507,13 @@ class GameBoard extends Component {
 
   //modularize the api call for playing a card
   apiCall = async () => {
+    console.log('in API Call');
     const cookies = new Cookies();
 
     //form the URL that will be used
     let selectedCard = cookies.get('selectedCard');
     let fetch_url = url+"game_board/api/action/" + selectedCard + '/'
+    console.log('in apiCall, turn is ',this.state.turn);
     fetch_url = fetch_url + this.state.board['game_id']
 
     this.setState({ loading: true});
@@ -538,6 +541,7 @@ class GameBoard extends Component {
 
   //AI api call
   aiCall = async () => {
+    console.log('in AI CALL');
     let ai_url = url+"game_board/api/ai_pick/" + this.state.board['game_id']
 
     this.setState({ loading: true});
@@ -555,6 +559,7 @@ class GameBoard extends Component {
     let made_graph = create_graph(this.state.board['graph'])
     this.setState({ graph: made_graph});
     this.setState({loading: false})
+    console.log('exiting AI call, board is balanced: ',this.state.board.graph.balanced);
   }
 
   //check if game is over (ie: is golden node at the root of the tree/does API end_game == true?)
@@ -604,6 +609,7 @@ class GameBoard extends Component {
       layoutEngineType: 'SnapToGrid',
       read_only: false
     })
+    console.log('in repositionNode, graph is read_only: ',this.state.read_only);
   }
 
   checkNodes = () => {
@@ -611,6 +617,7 @@ class GameBoard extends Component {
       layoutEngineType: 'VerticalTree',
       read_only: true
     })
+    console.log('in checkNode, graph is read_only: ',this.state.read_only);
   }
 
   displayRebalanceModal = () =>{
@@ -654,7 +661,7 @@ class GameBoard extends Component {
             //this.rebalance()
             
         } */
-
+            //////&& !this.state.showModal
     }
 
     //html returned to display page. When each card is played, the appropriate function is called, which in turn makes an API call
@@ -686,7 +693,7 @@ class GameBoard extends Component {
 
         <div style={{height: "10rem"}}>
         {this.state.game_over ? <WinModal winner={this.state.turn} win_board={this.state.board}/> : <div> </div>}
-        { (this.state.board != null && !this.state.board.graph.balanced) ? <RebalanceModal turn={this.state.turn}/> :  <div> </div> }
+        { (this.state.board != null && !this.state.board.graph.balanced && !this.state.showModal) ? <RebalanceModal turn={this.state.turn}/> :  <div> </div> }
         
           <div className="bg-blue-800 flex items-center bg-gray-200 h-11">
 
