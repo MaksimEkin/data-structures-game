@@ -8,6 +8,8 @@ import Particles from "react-particles-js"
 const local = "http://127.0.0.1:8000/";
 const reactLocal = "http://localhost:3000/"
 const remote = "https://data-structures-game.herokuapp.com/";
+const gamesDiv = document.querySelector("div.games") // Find the game table div in source
+const tableHeaders = ["Game", "Type", "Difficulty", "Actions"]
 
 //can also be const url = local; or const url = reactLocal;
 const url = local;
@@ -42,6 +44,8 @@ class Profile extends Component {
     
     async componentDidMount() {
         
+        console.log("in componentDidMount()");
+
         //display login screen if not logged in
         const cookies = new Cookies()
         if ((this.state.loggedIn === false) || (cookies.get('token') === '')){
@@ -272,36 +276,36 @@ class Profile extends Component {
     //display user profile and sign out button
     displayUserProfile = () => {
 
-        return(
-            <body class="h-screen flex items-center justify-center" style="background: #edf2f7;">
-                <div class="grid grid-flow-row auto-rows-max">
-                    <div class="bg-white shadow-md rounded rounded-t-lg overflow-hidden shadow max-w-md my-3">
-                        <img src="https://www.cariloha.com/pub/media/wysiwyg/bamboo-forest.jpg" class="w-full" />
-                        <div class="flex justify-center -mt-8">
-                            <img src="bohemian_panda.png" class="rounded-full border-solid border-white border-2 -mt-3 h-32 w-32" />
-                        </div>
-                        <div class="text-center px-3 pb-6 pt-2">
-                            <h3 class="text-black text-sm bold font-sans">@username</h3>
-                        </div>
-                        <div class="flex justify-center pb-3 text-grey-dark">
-                            <div class="text-center mr-3 border-r pr-3">
-                                <h2>@total_points</h2>
-                                <span>Total Points</span>
+        console.log("calling to show this");
+        return(<div>
+                <div class="h-screen flex items-center justify-center">
+                    <div class="grid grid-flow-row auto-rows-max">
+                        <div class="bg-white shadow-md rounded rounded-t-lg overflow-hidden shadow max-w-md my-3">
+                            <img src="https://www.cariloha.com/pub/media/wysiwyg/bamboo-forest.jpg" class="w-full" />
+                            <div class="flex justify-center -mt-8">
+                                <img src="/static/bohemian_panda.png" class="rounded-full border-solid border-white border-2 -mt-3 h-32 w-32" />
                             </div>
-                            <div class="text-center">
-                                <h2>#@ranking</h2>
-                                <span>Ranking</span>
+                            <div class="text-center px-3 pb-6 pt-2">
+                                <h3 class="text-black text-sm bold font-sans">@username</h3>
+                            </div>
+                            <div class="flex justify-center pb-3 text-grey-dark">
+                                <div class="text-center mr-3 border-r pr-3">
+                                    <h2>@total_points</h2>
+                                    <span>Total Points</span>
+                                </div>
+                                <div class="text-center">
+                                    <h2>#@ranking</h2>
+                                    <span>Ranking</span>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="bg-white shadow-md rounded my-6">
-                        <div class='games'></div>
-                        <script src="GamesTable.js"></script>
+                        <div class="bg-white shadow-md rounded my-6">
+                            <div class='games'></div>
+                        </div>
                     </div>
                 </div>
-            </body>
-        )
+            </div>)
     }
 
 
