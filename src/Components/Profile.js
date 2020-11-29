@@ -131,8 +131,6 @@ class Profile extends Component {
     logoutFxn = async () => {
         const cookies = new Cookies()
 
-        console.log("In logout, printing token: ", cookies.get('token'))
-
         //format user_id and token as FormData
         let user_and_token = new FormData()
         user_and_token.append("user_id", cookies.get('username'))
@@ -300,15 +298,6 @@ class Profile extends Component {
         // let fetch_url = url + "profile_page/api/load_board"
         // let response = await fetch(fetch_url, requestOptions)
 
-        // //make sure api call was successful, display error message if not
-        // if (!response.ok) {
-        //     Swal.fire({
-        //     title: 'Failed to save game!',
-        //     icon: 'error',
-        //     text: "This game has already been saved."
-        //     })
-        // }
-
         Swal.fire({
             title: 'Failed to load game!',
             icon: 'error',
@@ -335,11 +324,6 @@ class Profile extends Component {
             redirect: 'follow'
         };
 
-        console.log("user_id: " + cookies.get('username'));
-        console.log("game_id: " + id);
-        console.log("dest_user: " + dest_user);
-        console.log("token: " + cookies.get('token'));
-
         //make api call
         let fetch_url = url + "profile_page/api/share"
         let response = await fetch(fetch_url, requestOptions)
@@ -347,9 +331,6 @@ class Profile extends Component {
     }    
 
     shareCallback = (id) => {
-        /* Here we are going to call the view API call. This is a dummy callback for now as viewing will not make any change to user profile.
-            Need to have the user_id & token when on the real profile page */
-        console.log("shareCallback for id: " + id);
         Swal.fire({
             title: "Who would you like to share with?",
             input: 'text',
@@ -389,15 +370,7 @@ class Profile extends Component {
             }
         })
     }
-    //       }).then((result) => {
-    //         if (result.isConfirmed) {
-    //           Swal.fire({
-    //             title: `${result.value.login}'s avatar`,
-    //             imageUrl: result.value.avatar_url
-    //           })
-    //         }
-    //       })
-    // }
+
 
     deleteCallbackHelper = async (id) => {
         
@@ -456,7 +429,6 @@ class Profile extends Component {
 
     // The function below will accept a single game and its index to add it to the table
     appendGame = (singleGame) => {
-        console.log("appendGames");
 
         let blueButtonStyle = "text-grey-lighter font-bold py-1 px-3 mx-1 rounded text-xs bg-blue hover:bg-blue-dark"
         let redButtonStyle = "text-grey-lighter font-bold py-1 px-3 mx-1 space-x-4 rounded text-xs bg-red hover:bg-red-dark"
@@ -508,7 +480,6 @@ class Profile extends Component {
     //display user profile and sign out button
     displayUserProfile = () => {
 
-        console.log("calling to show this");
         return (<div>
             
              <link href="https://unpkg.com/tailwindcss@0.3.0/dist/tailwind.min.css" rel="stylesheet"></link> {/* link to stylesheet for profile */}
@@ -588,7 +559,7 @@ class Profile extends Component {
             user_points: returned["user_profile"]["points"],
             user_rank: returned["user_profile"]["rank"],
         })
-        await sleep(100) // wait 100 ms
+        //await sleep(100) // wait 100 ms
         return true;
     }
 
