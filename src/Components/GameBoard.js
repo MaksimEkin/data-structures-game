@@ -35,7 +35,7 @@ const reactLocal = "http://localhost:3000/"
 const remote = "https://data-structures-game.herokuapp.com/";
 
 //can also be const url = local; or const url = reactLocal;
-const url = remote;
+const url = local;
 
 //define sample node
 const sample = {
@@ -720,6 +720,12 @@ class GameBoard extends Component {
           icon: 'error',
           text: "This game has already been saved."
         })
+      } else {
+        Swal.fire(
+          'Saved!',
+          'Game has been saved to your profile.',
+          'success'
+      )
       }
     }
   }

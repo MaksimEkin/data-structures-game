@@ -11,7 +11,7 @@ const remote = "https://data-structures-game.herokuapp.com/";
 const tableHeaders = ["Game", "Type", "Difficulty", "Actions"]
 
 //can also be const url = local; or const url = reactLocal;
-const url = remote;
+const url = local;
 
 /* This class provides the functionality for logging in and out,
    registering a new account and (eventually) adding friends
@@ -224,7 +224,7 @@ class Profile extends Component {
                                     <div className="space-y-2 p-3 items-center">
                                         <label className="text-xl text-center font-semibold text-gray-800 mb-2 px-3">
                                             Username:
-        </label>
+                                        </label>
                                         <input
                                             className="bg-gray-200 shadow border-blue-500 border rounded py-2 px-2 text-gray-700"
                                             id="username" type="text" value={this.state.username}
@@ -235,7 +235,7 @@ class Profile extends Component {
                                     <div className="space-y-2 px-3 items-center">
                                         <label className="text-xl text-center font-semibold text-gray-800 mb-2 px-4">
                                             Password:
-        </label>
+                                        </label>
                                         <input
                                             className="bg-gray-200 shadow border-blue-500 border rounded py-2 px-2 text-gray-700"
                                             id="password" type="password" placeholder="******************"
@@ -251,14 +251,30 @@ class Profile extends Component {
                                         id="login-btn" type="button"
                                         onClick={() => this.loginFxn()}>
                                         Sign in
-               </button>
-
+                                    </button>
                                     <div className="space-y-10"><br></br></div>
 
                                 </form>
 
                             </div></span></div></div></div>
         )
+    }
+
+    authError = () => {
+        Swal.fire({
+            title: 'User profile not found!',
+            icon: 'error',
+            text: "Make sure you're logged in",
+            confirmButtonText: 'Return to Home Page'
+
+            //return to home page if click on button
+        }).then((result) => {
+
+            //if player clicks "Return to Home Page" button, redirect there
+            if (result.isConfirmed) {
+                window.location.href = "/"
+            }
+        })
     }
 
     viewCallback = (id) => {
@@ -295,43 +311,88 @@ class Profile extends Component {
             })
         }
 
+
+    shareCallbackHelper = async (id, dest_user) => {
+    
+        const cookies = new Cookies()
+
+        //store user input in FormData format
+        let apiData = new FormData()
+        apiData.append("source_user_id", cookies.get('username'))
+        apiData.append("game_id", id)
+        apiData.append("dest_user_id", dest_user)
+        apiData.append("token", cookies.get('token'))
+
+        //api call parameters
+        let requestOptions = {
+            method: 'POST',
+            body: apiData,
+            redirect: 'follow'
+        };
+
+        console.log("user_id: " + cookies.get('username'));
+        console.log("game_id: " + id);
+        console.log("dest_user: " + dest_user);
+        console.log("token: " + cookies.get('token'));
+
+        //make api call
+        let fetch_url = url + "profile_page/api/share"
+        let response = await fetch(fetch_url, requestOptions)
+        return (response.ok)
+    }    
+
     shareCallback = (id) => {
         /* Here we are going to call the view API call. This is a dummy callback for now as viewing will not make any change to user profile.
             Need to have the user_id & token when on the real profile page */
         console.log("shareCallback for id: " + id);
-        // Swal.fire({
-        //     title: 'Submit the user who',
-        //     input: 'text',
-        //     inputAttributes: {
-        //       autocapitalize: 'off'
-        //     },
-        //     showCancelButton: true,
-        //     confirmButtonText: 'Look up',
-        //     showLoaderOnConfirm: true,
-        //     preConfirm: (login) => {
-        //       return fetch(`//api.github.com/users/${login}`)
-        //         .then(response => {
-        //           if (!response.ok) {
-        //             throw new Error(response.statusText)
-        //           }
-        //           return response.json()
-        //         })
-        //         .catch(error => {
-        //           Swal.showValidationMessage(
-        //             `Request failed: ${error}`
-        //           )
-        //         })
-        //     },
-        //     allowOutsideClick: () => !Swal.isLoading()
-        //   }).then((result) => {
-        //     if (result.isConfirmed) {
-        //       Swal.fire({
-        //         title: `${result.value.login}'s avatar`,
-        //         imageUrl: result.value.avatar_url
-        //       })
-        //     }
-        //   })
+        Swal.fire({
+            title: "Who would you like to share with?",
+            input: 'text',
+            inputAttributes: {
+              autocapitalize: 'off'
+            },
+            showCancelButton: true,
+            confirmButtonText: 'Share',
+            showLoaderOnConfirm: true,
+            preConfirm: (dest_user) => {}
+        }).then((result) => {
+            if (result.isConfirmed) {
+
+                if (result.value === "") {
+                    Swal.fire({
+                        title: 'Failed to share game!',
+                        icon: 'error',
+                        text: "You need to input something!"
+                    })
+                } else {
+                    //make api call
+                    let ok = this.shareCallbackHelper(id, result.value);
+                    if (!ok) {
+                        Swal.fire({
+                            title: 'Failed to share game!',
+                            icon: 'error',
+                            text: "Try again later."
+                        })
+                    } else {
+                        Swal.fire(
+                            'Shared!',
+                            'Your game has been shared.',
+                            'success'
+                        )
+                    }
+                }
+            }
+        })
     }
+    //       }).then((result) => {
+    //         if (result.isConfirmed) {
+    //           Swal.fire({
+    //             title: `${result.value.login}'s avatar`,
+    //             imageUrl: result.value.avatar_url
+    //           })
+    //         }
+    //       })
+    // }
 
     deleteCallbackHelper = async (id) => {
         
@@ -349,10 +410,6 @@ class Profile extends Component {
             body: apiData,
             redirect: 'follow'
         };
-
-        console.log("user_id: " + cookies.get('username'));
-        console.log("game_id: " + id);
-        console.log("token: " + cookies.get('token'));
 
         //make api call
         let fetch_url = url + "profile_page/api/delete_board"
@@ -374,7 +431,6 @@ class Profile extends Component {
 
                 //make api call
                 let ok = this.deleteCallbackHelper(id);
-                this.setState({is_loaded: false})
                 if (!ok) {
                     Swal.fire({
                         title: 'Failed to delete game!',
@@ -382,6 +438,7 @@ class Profile extends Component {
                         text: "Try again later."
                     })
                 } else {
+                    this.setState({is_loaded: false});
                     Swal.fire(
                         'Deleted!',
                         'Your file has been deleted.',
@@ -419,9 +476,7 @@ class Profile extends Component {
         </th>)
     }
 
-    buildGames = () => {
-        console.log("buildGames");
-        let games = this.state.user_games;
+    buildGames = (games) => {
         if (games == null || games.length == 0) {
             return <div></div>;
         } else {
@@ -451,7 +506,7 @@ class Profile extends Component {
         console.log("calling to show this");
         return (<div>
             
-             <link href="https://unpkg.com/tailwindcss@0.3.0/dist/tailwind.min.css" rel="stylesheet"></link>
+             <link href="https://unpkg.com/tailwindcss@0.3.0/dist/tailwind.min.css" rel="stylesheet"></link> {/* link to stylesheet for profile */}
             {/*When user clicks "Sign out", make api call to log out*/}
             <button
                 style={{
@@ -486,7 +541,7 @@ class Profile extends Component {
                             </div>
                         </div>
                     </div>
-                    {this.state.is_loaded && this.buildGames()}
+                    {this.state.is_loaded && this.buildGames(this.state.user_games)}
                 </div>
             </div>
         </div>)
@@ -515,25 +570,27 @@ class Profile extends Component {
         let fetch_url = url + "profile_page/api/profile"
         let response = await fetch(fetch_url, requestOptions)
 
-        //make sure api call was successful, display error message if not
+        //make sure api call was successful
         if (!response.ok) {
-            Swal.fire({
-                title: 'User profile not found!',
-                icon: 'error',
-                text: "Please make sure you're signed in"
-            })
-            return
+            return false;
         }
 
         //otherwise, jsonify the api return
         let returned = await response.json()
         this.setState({
+            user_games: returned["user_profile"]["saved_games"],
             user_name: returned["user_profile"]["user_name"],
             user_points: returned["user_profile"]["points"],
             user_rank: returned["user_profile"]["rank"],
-            user_games: returned["user_profile"]["saved_games"]
         })
+        return true;
     }
+
+    // checkUpdates = () => {
+    //     const { }
+
+
+    // }
 
 
     render() {
@@ -546,9 +603,10 @@ class Profile extends Component {
 
         //display user profile page with option to log out
         else {
+            let auth = true;
             if (!this.state.is_loaded) {
-                this.profileAPICall()
-                this.setState({ is_loaded: true })
+                auth = this.profileAPICall()
+                this.setState({is_loaded: true})
                 return (
                     <div className="w-full h-full fixed block top-0 left-0 bg-white opacity-75 z-50">
                         <span className="text-green-500 opacity-75 top-1/2 my-0 mx-auto block relative w-0 h-0">
@@ -557,7 +615,14 @@ class Profile extends Component {
                     </div>
                 )
             } else {
-                return (this.displayUserProfile())
+                auth = (auth && !(cookies.get('token') === ''))
+                if (!auth) {
+                    return(<div>
+                            {this.authError()}
+                          </div>)
+                } else {
+                    return (this.state.is_loaded && this.displayUserProfile())
+                }
             }
         }
     }
