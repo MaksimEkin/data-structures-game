@@ -46,7 +46,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'home_page',
     'game_board',
-    'profile_page'
+    'profile_page',
+    'register'
 ]
 
 MIDDLEWARE = [
