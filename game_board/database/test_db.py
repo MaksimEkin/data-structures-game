@@ -2,6 +2,7 @@
 python manage.py test game_board.database.test_db
 """
 
+import datetime as dt
 from django.test import TestCase
 from game_board.database import game_board_db as mongo
 
@@ -239,3 +240,65 @@ class DBList(TestCase):
     def tearDown(self):
         """ Removes game data needed in tests """
         mongo.remove_game(self.board["game_id"])
+
+
+class DBRemoveOldGames(TestCase):
+    """ Main test for removing old games from the database list """
+    def setUp(self):
+        """ creates game data needed for tests """
+
+        self.board = {"game_id": "oh look a new id, how novel",
+        "graph": {"nodes": "node4(node2(node3)(node1))(node6(node5))",
+        "node_points": {"node1": 1,"node2": 2,"node3": 3,"node4": 4,"node5": 5,"node6": 6},
+        "gold_node": "node5","balanced": True},"player_ids": ["id2","id3","id4","id5"],
+        "player_names": ["naomi","kulsoom","nick","ryan"],
+        "player_points": {"id2": 2,"id3": 2,"id4": 3,"id5": 10},"turn": "id2",
+        "cards": {"id2": ["card1","card2","card3"],"id3": ["card1","card2","card3"],
+        "id4":["card1","card2","card3"],"id5": ["card1","card2","card3"]},
+        "gold_node": False,"difficulty": "Medium","num_players": 4,"online": True,
+        "curr_data_structure": "AVL","selected_data_structures": ["AVL","Stack"],
+        "timed_game": False,"seconds_until_next_ds": 60,"time_created": "07/10/2020 00:05:47",
+        "end_game": False}
+        self.board2 = {"game_id": "i changed the id again",
+        "graph": {"nodes": "node4(node2(node3)(node1))(node6(node5))",
+        "node_points": {"node1": 1,"node2": 2,"node3": 3,"node4": 4,"node5": 5,"node6": 6},
+        "gold_node": "node5","balanced": True},"player_ids": ["id2","id3","id4","id5"],
+        "player_names": ["naomi","kulsoom","nick","ryan"],
+        "player_points": {"id2": 2,"id3": 2,"id4": 3,"id5": 10},"turn": "id2",
+        "cards": {"id2": ["card1","card2","card3"],"id3": ["card1","card2","card3"],
+        "id4":["card1","card2","card3"],"id5": ["card1","card2","card3"]},
+        "gold_node": False,"difficulty": "Medium","num_players": 4,"online": True,
+        "curr_data_structure": "AVL","selected_data_structures": ["AVL","Stack"],
+        "timed_game": False,"seconds_until_next_ds": 60,
+        "time_created": dt.datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
+        "end_game": False}
+        self.fail_phrase = 'nah bro idk about it'
+
+        mongo.create_game( self.board )
+        mongo.create_game( self.board2 )
+
+    def test_remove_old_games(self):
+        """ The old document was successfully deleted """
+
+        mongo.purge_old_games()
+        read_game = mongo.read_game( self.board["game_id"] )
+
+        self.assertEqual( read_game, self.fail_phrase,
+            msg=f'{BColors.FAIL}\t[-]\tStill found old game after purge!{BColors.ENDC}')
+        print(f"{BColors.OKGREEN}\t[+]\tPass gameboard database purge old games.{BColors.ENDC}")
+
+    def test_purge_new_games(self):
+        """ The new document was successfully retained """
+        mongo.purge_old_games()
+        read_game = mongo.read_game( self.board2["game_id"] )
+
+        self.assertEqual( read_game, self.board2,
+            msg=f'{BColors.FAIL}\t[-]\t New game not found after purge!{BColors.ENDC}')
+        print(f"{BColors.OKGREEN}\t[+]\tPass gameboard database purge, new game remains.{BColors.ENDC}")
+
+    def tearDown(self):
+        """ Removes game data needed in tests """
+        mongo.remove_game(self.board["game_id"])
+
+        # Called in case purge fails
+        mongo.remove_game(self.board2["game_id"])
