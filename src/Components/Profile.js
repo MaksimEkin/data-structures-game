@@ -11,7 +11,7 @@ const remote = "https://data-structures-game.herokuapp.com/";
 const tableHeaders = ["Game", "Type", "Difficulty", "Actions"]
 
 //can also be const url = local; or const url = reactLocal;
-const url = local;
+const url = remote;
 
 /* This class provides the functionality for logging in and out,
    registering a new account and (eventually) adding friends
@@ -129,6 +129,8 @@ class Profile extends Component {
 
     //make api call to log out
     logoutFxn = async () => {
+
+        this.setState({is_loaded: false})
         const cookies = new Cookies()
 
         //format user_id and token as FormData
@@ -496,8 +498,8 @@ class Profile extends Component {
                 Sign out?
                 </button>
 
-            <div class="h-screen flex items-center justify-center">
-                <div class="grid grid-flow-row auto-rows-max">
+            <div class="flex h-screen items-center justify-center mt-3">
+                <div class="grid grid-flow-row grid-rows-2">
                     <div class="bg-white shadow-2xl rounded rounded-t-lg overflow-hidden shadow max-w-md my-3">
                         <img src="/static/bamboo-forest.jpg" class="w-full" />
                         <div class="flex justify-center -mt-8">
