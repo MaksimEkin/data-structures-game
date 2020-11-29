@@ -86,7 +86,7 @@ def profile(request):
         'badges': user_profile_data['badges'],
         'current_story_level': user_profile_data['current_story_level'],
         'friends': user_profile_data['friends'],
-        'points': user_profile_data['points'],
+        'points': round(user_profile_data['points'], 2),
         'rank': user_profile_data['rank'],
         'saved_games': game_board_info
     }

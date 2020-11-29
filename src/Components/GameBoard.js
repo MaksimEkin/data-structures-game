@@ -6,6 +6,7 @@ import Cookies from 'universal-cookie';
 import WinModal from './Modal/WinModal.js';
 import ReactTooltip from "react-tooltip";
 import Particles from 'react-particles-js';
+import Swal from "sweetalert2"
 
 //Uber's digraph react folder
 import {
@@ -89,55 +90,59 @@ class GameBoard extends Component {
   // component did mount to update the values of the state
   async componentDidMount() {
 
-        const cookies = new Cookies();
+    const cookies = new Cookies();
 
-        //set state variables to these variables to be used in the url
-        let difficulty = cookies.get('level');
-        let players = cookies.get('playerList');
-        this.setState({playersArray:players.split(',')})
-        let ds = cookies.get('gameDS');
+    //set state variables to these variables to be used in the url
+    let difficulty = cookies.get('level');
+    let players = cookies.get('playerList');
 
-        // save the cookies if user is logged in
-        if (cookies.get('username') != null && cookies.get('token') != null) {
-          this.setState({username: cookies.get('username'),
-                         token: cookies.get('token')})
-        }
-
-       //get cookie variables from state and insert into url
-       let createGameURL = url+"game_board/api/start_game/" + difficulty + "/" + players + "/" + ds
-       let getGameURL = url+"game_board/api/board/";
-
-       //API call to start game
-       let response = await fetch(createGameURL);
-       let game_id = await response.json();
-
-       //save the get request response to state
-       this.setState({ gameID: game_id['game_id']});
-       cookies.set('game_id', game_id['game_id'], { path: '/' });
-
-       //get request to api and include the dynamic game_id
-       response = await fetch(getGameURL + game_id['game_id']);
-       let board_ = await response.json();
-
-       //set the state values with respect to the dynamic json response
-       this.setState({ board: board_, turn: board_['turn']});
-       this.setState({playerPointVal: board_['player_points'][this.state.turn]});
-       this.setState({deckSize: board_['deck'].length});
-
-       //pass the new board state into create_graph function and set the made_graph state
-       let made_graph = create_graph(this.state.board['graph'])
-       this.setState({ graph: made_graph});
-       this.setState({loading: false, initial_load: false});
-
-        if (!this.state.game_over) {
-            if (this.state.turn.replace(/\s+/g, "").toLowerCase().startsWith('bot')) {
-                if (!this.state.loading) {
-                    // if this is a bot, call AI action
-                    this.aiCall()
-                }
-            }
-        }
+    if (cookies.get('username') != null && cookies.get('token') != null) {
+      this.setState({ username: cookies.get('username'), token: cookies.get('token') })
+      players = players + "," + cookies.get('username');
     }
+
+    this.setState({ playersArray: players.split(',') })
+    let ds = cookies.get('gameDS');
+
+    console.log("players: " + players)
+    console.log("playersArray: " + this.state.playersArray)
+
+    //get cookie variables from state and insert into url
+    let createGameURL = url + "game_board/api/start_game/" + difficulty + "/" + players + "/" + ds
+    let getGameURL = url + "game_board/api/board/";
+
+
+    //API call to start game
+    let response = await fetch(createGameURL);
+    let game_id = await response.json();
+
+    //save the get request response to state
+    this.setState({ gameID: game_id['game_id'] });
+    cookies.set('game_id', game_id['game_id'], { path: '/' });
+
+    //get request to api and include the dynamic game_id
+    response = await fetch(getGameURL + game_id['game_id']);
+    let board_ = await response.json();
+
+    //set the state values with respect to the dynamic json response
+    this.setState({ board: board_, turn: board_['turn'] });
+    this.setState({ playerPointVal: board_['player_points'][this.state.turn] });
+    this.setState({ deckSize: board_['deck'].length });
+
+    //pass the new board state into create_graph function and set the made_graph state
+    let made_graph = create_graph(this.state.board['graph'])
+    this.setState({ graph: made_graph });
+    this.setState({ loading: false, initial_load: false });
+
+    if (!this.state.game_over) {
+      if (this.state.turn.replace(/\s+/g, "").toLowerCase().startsWith('bot')) {
+        if (!this.state.loading) {
+          // if this is a bot, call AI action
+          this.aiCall()
+        }
+      }
+    }
+  }
 
   //from imported digraph folder - function to display node
   renderNode = (nodeRef, data, id, selected, hovered) => {
@@ -506,8 +511,7 @@ class GameBoard extends Component {
 
     //form the URL that will be used
     let selectedCard = cookies.get('selectedCard');
-    let fetch_url = url+"game_board/api/action/" + selectedCard + '/' + this.state.username + '/' + this.state.token
-    fetch_url = fetch_url + this.state.board['game_id']
+    let fetch_url = url+"game_board/api/action/" + selectedCard + '/' + this.state.board['game_id'] + '/' + this.state.username + '/' + this.state.token
 
     this.setState({ loading: true});
 
@@ -687,6 +691,49 @@ class GameBoard extends Component {
     )
   }
 
+  saveGame = async () => {
+    if (!this.state.initial_load && this.state.username != "-1" && this.state.token != "-1") {
+
+      //store user input in FormData format
+      let apiData = new FormData()
+      apiData.append("user_id", this.state.username)
+      apiData.append("game_id", this.state.gameID)
+      apiData.append("token", this.state.token)
+
+      //api call parameters
+      let requestOptions = {
+        method: 'POST',
+        body: apiData,
+        redirect: 'follow'
+      };
+
+      //make api call
+      let fetch_url = url + "profile_page/api/save_board"
+      let response = await fetch(fetch_url, requestOptions)
+
+      //make sure api call was successful, display error message if not
+      if (!response.ok) {
+        Swal.fire({
+          title: 'Failed to save game!',
+          icon: 'error',
+          text: "Please make sure you're signed in"
+        })
+      }
+    }
+  }
+
+  buildSaveButton = () => {
+
+    if(!this.state.initial_load && this.state.username != "-1" && this.state.token != "-1") {
+      return (
+        <button data-delay-show='500' data-place="bottom" data-tip="Save the current game to profile" data-offset="{'top': -20}" data-text-color="yellow"
+        className="transition duration-500 ease-in-out bg-green-500 hover:bg-green-600  transform hover:-translate-y-1 hover:scale-105   border-green-500  border-opacity-50 rounded-lg shadow-2xl flex-1 m-1 py-1 flex justify-center font-bold text-xl text-gray-800" 
+        onClick={() =>this.saveGame()}>Save Game</button>
+
+
+      )
+    }
+  }
 
   //in react life cycle, code that is rendered occurs after constructor initialization
   //and component mounting and then reflects the change in state/prop values
@@ -800,7 +847,7 @@ class GameBoard extends Component {
               <button data-delay-show='500' data-place="bottom" data-tip="End's turn and determines rebalance correctness" data-offset="{'top': -20}" data-text-color="yellow"
                   className="transition duration-500 ease-in-out bg-orange-500 hover:bg-orange-600  transform hover:-translate-y-1 hover:scale-105   border-orange-500  border-opacity-50 rounded-lg shadow-2xl flex-1 m-1 py-1 flex justify-center font-bold text-xl text-gray-800" onClick={() =>this.checkNodes()}>Check Nodes</button>
 
-              {this.buildSaveButton}
+              {this.buildSaveButton()}
 
         </div>
 
