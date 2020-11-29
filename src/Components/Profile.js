@@ -290,7 +290,7 @@ class Profile extends Component {
                 Sign out?
             </button>
 
-            <div class="rounded rounded-t-lg border-2 bg-gray-200 card shadow w-1/3 mx-64 justify-center pb-3">
+            <div class="rounded rounded-t-lg border-2 bg-gray-200 card shadow w-1/3 mx-64 items-center h-full justify-center mt-24 pb-3">
                 <h1 class="text-center px-3 pb-6 pt-2"> Hey {this.state.username}! </h1>
 
                 <div className="flex justify-center pb-3 text-grey-dark">
@@ -346,9 +346,7 @@ class Profile extends Component {
 
     render() {
 
-        return(this.displayUserProfile())
-
-        /*//display login screen if not logged in
+        //display login screen if not logged in
         const cookies = new Cookies()
         if ((this.state.loggedIn === false) || (cookies.get('token') === '')){
             return (this.displayLogIn())
@@ -358,7 +356,7 @@ class Profile extends Component {
         else {
             this.profileAPICall()
             return(this.displayUserProfile())
-        } */
+        }
     }
 }
 export default Profile
