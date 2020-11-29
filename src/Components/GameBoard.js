@@ -447,7 +447,7 @@ class GameBoard extends Component {
   //checks if the current board is balanced and returns true or false
   checkRebalance = () => {
     let isBalanced = this.state.board.graph.balanced
-    console.log("balanced: ",this.state.board.graph.balanced)
+    //console.log("balanced: ",this.state.board.graph.balanced)
     return isBalanced
   }
 
@@ -464,7 +464,7 @@ class GameBoard extends Component {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(balance_attempt)
     };
-    console.log("request option parameters: ", requestOptions)
+    //console.log("request option parameters: ", requestOptions)
     let response = await fetch(fetch_url, requestOptions);
     let newBoard = await response.json();
 
