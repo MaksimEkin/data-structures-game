@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBars } from '@fortawesome/free-solid-svg-icons'
-import panda from './panda.png'
+import panda from './panda.jpg'
 
 //this child component is called in Header compoment to be displayed on every page
 function NavMenu(){
@@ -32,6 +32,7 @@ function NavMenu(){
         </div>
         <div class="col-lg-6 col-md-6" style={{'align-self':'flex-end'}}>
             <img src={panda} alt={"panda"} />
+            <a href="https://www.vecteezy.com/free-vector/material">Material Vectors by Vecteezy</a>
         </div>
         
         </div>
