@@ -14,6 +14,8 @@ from profile_page.database import profile_page_db as db
 from profile_page.api import mock as mock_db
 
 
+# TODO: RYAN, Import your code
+
 @api_view(['GET'])
 def api_overview(request):
     '''
@@ -576,3 +578,25 @@ def load_board(request):
     del response_status['game_board']['graph']['uid']
 
     return Response(response_status['game_board'])
+
+@api_view(['GET'])
+def scheduled_tasks(request):
+    """
+    GET request API call.
+    Starts the scheduled tasks
+
+    :param request: GET request
+    :return: success message, else error status.
+    """
+
+    # TODO: RYAN, here call schedule 1 (gameboard cleaner), don't forget to import it above
+    # ryan_code.destroy_games()
+    # IF ERROR EXAMPLE:
+    #         return Response({'error': 'Did not work because_!'},
+    #                         status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    # TODO: RYAN, here call schedule 2 (scores sorter to assign ranking to each user),  don't forget to import it above
+    # ryan_code2.set_rankings()
+
+    # TODO: RYAN, no code here but need to setup the CI on github to have URL to this API call
+    return Response({'Done'})

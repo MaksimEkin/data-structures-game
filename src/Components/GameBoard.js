@@ -635,8 +635,6 @@ class GameBoard extends Component {
       layoutEngineType: 'VerticalTree',
       read_only: true
     })
-    console.log('in checkNode, graph is read_only: ',this.state.read_only);
-    console.log('AFTER repositioning: ', this.state.board['graph']);
     let user_graph = create_adjacency(this.state.graph)
     //passes users balance attempt
     this.rebalance(user_graph)
@@ -899,10 +897,18 @@ class GameBoard extends Component {
             </div>
 
               <button data-delay-show='500' data-place="bottom" data-tip="Shift click to make edges, delete a selected node with the keyboard's delete key" data-offset="{'top': -20}" data-text-color="yellow"
-                  className="transition duration-500 ease-in-out bg-orange-500 hover:bg-orange-600  transform hover:-translate-y-1 hover:scale-105 border-orange-500 border-opacity-50 rounded-lg shadow-2xl flex-1 m-1 py-1 flex justify-center font-bold text-xl text-gray-800" onClick={() =>this.repositionNodes()}>Reposition Nodes</button>
+                  disabled={(this.state.board != null && !this.state.board.graph.balanced)? true : false}
+                  className="transition duration-500 ease-in-out bg-orange-500 hover:bg-orange-600  transform hover:-translate-y-1 hover:scale-105 border-orange-500 border-opacity-50 rounded-lg shadow-2xl flex-1 m-1 py-1 flex justify-center font-bold text-xl text-gray-800" 
+                  onClick={() =>this.repositionNodes()}>
+                  Reposition Nodes
+                </button>
 
               <button data-delay-show='500' data-place="bottom" data-tip="End's turn and determines rebalance correctness" data-offset="{'top': -20}" data-text-color="yellow"
-                  className="transition duration-500 ease-in-out bg-orange-500 hover:bg-orange-600  transform hover:-translate-y-1 hover:scale-105   border-orange-500  border-opacity-50 rounded-lg shadow-2xl flex-1 m-1 py-1 flex justify-center font-bold text-xl text-gray-800" onClick={() =>this.checkNodes()}>Check Nodes</button>
+                  disabled={(this.state.board != null && this.state.board.graph.balanced)? true : false}
+                  className="transition duration-500 ease-in-out bg-orange-500 hover:bg-orange-600  transform hover:-translate-y-1 hover:scale-105   border-orange-500  border-opacity-50 rounded-lg shadow-2xl flex-1 m-1 py-1 flex justify-center font-bold text-xl text-gray-800" 
+                  onClick={() =>this.checkNodes()}>
+                  Check Nodes
+              </button>
 
               {this.buildSaveButton()}
 
