@@ -498,8 +498,8 @@ class Profile extends Component {
                 Sign out?
                 </button>
 
-            <div class="flex h-screen items-center justify-center mt-3">
-                <div class="grid grid-flow-row grid-rows-2">
+            <div class="flex h-screen items-center justify-center">
+                <div class="grid grid-flow-row auto-rows-max">
                     <div class="bg-white shadow-2xl rounded rounded-t-lg overflow-hidden shadow max-w-md my-3">
                         <img src="/static/bamboo-forest.jpg" class="w-full" />
                         <div class="flex justify-center -mt-8">
