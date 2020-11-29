@@ -8,6 +8,7 @@ the Game Board API.
 To run this test, make the below changes first:
     1- Safari --> Allow Remote Automation
     2- Change the remote url variable to local in GameBoard.js
+    3- npm run build
 
 How to run:
     1) Run Django: python manage.py runserver
@@ -51,18 +52,18 @@ class TestStringMethods(unittest.TestCase):
 
         # Collect node points and ids
         node_points = self.driver.find_elements(By.XPATH, '//div[@id="root"]//div[@id="graph"]//div[@class="view-wrapper"]\
-        /*[name()="svg"]//*[@class="view"]//*[@class="entities"]//*[name()="g"]//*[@class="graph_node"]//*[@class="node_points_text"]')
+        /*[name()="svg"]//*[@class="view"]//*[@class="entities"]//*[name()="g"]//*[@id="graph_node"]//*[@id="node_points_text"]')
         node_ids = self.driver.find_elements(By.XPATH, '//div[@id="root"]//div[@id="graph"]//div[@class="view-wrapper"]\
-        /*[name()="svg"]//*[@class="view"]//*[@class="entities"]//*[name()="g"]//*[@class="graph_node"]//*[@class="node_id_text"]')
+        /*[name()="svg"]//*[@class="view"]//*[@class="entities"]//*[name()="g"]//*[@id="graph_node"]//*[@id="node_id_text"]')
 
         self.points = list()
         self.ids = list()
 
         # Extract each point and node ID from the website as text
         for point in node_points:
-            self.points.append(int(point.text))
+            self.points.append(int(point.text.strip()))
         for id_ in node_ids:
-            self.ids.append(id_.text)
+            self.ids.append(id_.text.strip())
 
         # Get cookies
         cookies = self.driver.get_cookies()

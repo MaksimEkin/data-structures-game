@@ -15,19 +15,16 @@ function NavMenu(){
     let menuMask
     if(showMenu){
         menu= <div
-        className="fixed bg-red-600 top-0 right-0 w-1/6 h-full z-50 shadow"
+        className="fixed bg-gray-200 top-0 right-0 w-1/6 h-full z-50 shadow-2xl rounded-2xl"
         > 
         <div class="dropdown">
   
   <ul class='nav-links'>
         <li>
-            <a className="text-gray-100 py-3 border-t border-b block" href='/'>Home</a>
+             <a className="space-y-20 text-lg py-3 border-t border-b block text-center font-semibold text-gray-800 mb-2" href='/'>Home</a>
         </li>
         <li>
-            <a className="text-gray-100 py-3 border-t border-b block" href='/game_board'>Game</a>
-        </li>
-        <li>
-            <a className="text-gray-100 py-3 border-t border-b block" href='/profile_page'>Profile & Login</a>
+            <a className="space-y-20 text-lg py-3 border-t border-b block text-center font-semibold text-gray-800 mb-2" href='/profile_page'>Profile & Login</a>
         </li>
   </ul>
 </div>
