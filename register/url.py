@@ -4,6 +4,6 @@ from . import views
 urlpatterns = [
 
     # Views
-    path('', views.register, name='profile-page')
+    path('', views.register, name='register')
 
 ]
