@@ -63,6 +63,8 @@ class GameBoard extends Component {
       //store state of board
       board: null,
       gameID: null,
+      token: "-1",
+      username: "-1",
       turn: "",
       deckSize: 1000,
       playerPointVal: null,
@@ -94,6 +96,12 @@ class GameBoard extends Component {
         let players = cookies.get('playerList');
         this.setState({playersArray:players.split(',')})
         let ds = cookies.get('gameDS');
+
+        // save the cookies if user is logged in
+        if (cookies.get('username') != null && cookies.get('token') != null) {
+          this.setState({username: cookies.get('username'),
+                         token: cookies.get('token')})
+        }
 
        //get cookie variables from state and insert into url
        let createGameURL = url+"game_board/api/start_game/" + difficulty + "/" + players + "/" + ds
@@ -457,7 +465,7 @@ class GameBoard extends Component {
   rebalance = async () => {
     this.setState({loading:true})
 
-    let fetch_url = url+"game_board/api/rebalance/" + this.state.gameID
+    let fetch_url = url+"game_board/api/rebalance/" + this.state.gameID + '/' + this.state.username + '/' + this.state.token
     let balance_attempt={'adjacency_list':{'node2':['node0'],'node0':['node5','node3'],'node5':[],'node3':[]}}
     let requestOptions = {
       method: 'POST',
@@ -498,7 +506,7 @@ class GameBoard extends Component {
 
     //form the URL that will be used
     let selectedCard = cookies.get('selectedCard');
-    let fetch_url = url+"game_board/api/action/" + selectedCard + '/'
+    let fetch_url = url+"game_board/api/action/" + selectedCard + '/' + this.state.username + '/' + this.state.token
     fetch_url = fetch_url + this.state.board['game_id']
 
     this.setState({ loading: true});
@@ -521,7 +529,7 @@ class GameBoard extends Component {
 
   //AI api call
   aiCall = async () => {
-    let ai_url = url+"game_board/api/ai_pick/" + this.state.board['game_id']
+    let ai_url = url+"game_board/api/ai_pick/" + this.state.board['game_id'] + '/' + this.state.username + '/' + this.state.token
 
     this.setState({ loading: true});
 
@@ -791,6 +799,8 @@ class GameBoard extends Component {
 
               <button data-delay-show='500' data-place="bottom" data-tip="End's turn and determines rebalance correctness" data-offset="{'top': -20}" data-text-color="yellow"
                   className="transition duration-500 ease-in-out bg-orange-500 hover:bg-orange-600  transform hover:-translate-y-1 hover:scale-105   border-orange-500  border-opacity-50 rounded-lg shadow-2xl flex-1 m-1 py-1 flex justify-center font-bold text-xl text-gray-800" onClick={() =>this.checkNodes()}>Check Nodes</button>
+
+              {this.buildSaveButton}
 
         </div>
 

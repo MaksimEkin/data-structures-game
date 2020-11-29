@@ -44,17 +44,6 @@ class Profile extends Component {
         }
     }
     
-    async componentDidMount() {
-        
-        console.log("in componentDidMount()");
-
-        //call the profile api call when user is logged in
-        const cookies = new Cookies()
-        if (!(this.state.loggedIn === false) && !(cookies.get('token') === '')){
-            this.profileAPICall()
-            this.setState({is_loaded:true})
-        }
-    }
 
     //api call to login
     //Note: api uses FormData for this call
@@ -384,6 +373,20 @@ class Profile extends Component {
 
         console.log("calling to show this");
         return(<div>
+
+                {/*When user clicks "Sign out", make api call to log out*/}
+                <button
+                    style={{
+                        position: 'absolute',
+                        right: 40,
+                        top: -18,
+                    }}
+                    className="bg-red-500 text-white hover:bg-red-700 font-bold w-32 rounded px-4 py-2 mt-6 align-right"
+                    id="logout-btn" type="button"
+                    onClick={() => this.logoutFxn()}>
+                    Sign out?
+                </button>
+
                 <div class="h-screen flex items-center justify-center">
                     <div class="grid grid-flow-row auto-rows-max">
                         <div class="bg-white shadow-md rounded rounded-t-lg overflow-hidden shadow max-w-md my-3">
@@ -464,16 +467,18 @@ class Profile extends Component {
 
         //display user profile page with option to log out
         else {
-            if (this.state.is_loaded) {
-                return(this.displayUserProfile())
-            } else {
+            if (!this.state.is_loaded) {
+                this.profileAPICall()
+                this.setState({is_loaded:true})
                 return(
-                     <div class="w-full h-full fixed block top-0 left-0 bg-white opacity-75 z-50">
-                       <span class="text-green-500 opacity-75 top-1/2 my-0 mx-auto block relative w-0 h-0">
-                        <i class="fas fa-circle-notch fa-spin fa-5x"></i>
-                      </span>
-                    </div>
-                )
+                    <div class="w-full h-full fixed block top-0 left-0 bg-white opacity-75 z-50">
+                      <span class="text-green-500 opacity-75 top-1/2 my-0 mx-auto block relative w-0 h-0">
+                       <i class="fas fa-circle-notch fa-spin fa-5x"></i>
+                     </span>
+                   </div>
+               )
+            } else {
+                return(this.displayUserProfile())
             }
         }
     }
