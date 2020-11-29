@@ -11,7 +11,7 @@ const remote = "https://data-structures-game.herokuapp.com/";
 const tableHeaders = ["Game", "Type", "Difficulty", "Actions"]
 
 //can also be const url = local; or const url = reactLocal;
-const url = local;
+const url = remote;
 
 /* This class provides the functionality for logging in and out,
    registering a new account and (eventually) adding friends
@@ -300,7 +300,7 @@ class Profile extends Component {
             Need to have the user_id & token when on the real profile page */
         console.log("shareCallback for id: " + id);
         // Swal.fire({
-        //     title: 'Submit your Github username',
+        //     title: 'Submit the user who',
         //     input: 'text',
         //     inputAttributes: {
         //       autocapitalize: 'off'
@@ -335,11 +335,13 @@ class Profile extends Component {
 
     deleteCallbackHelper = async (id) => {
         
+        const cookies = new Cookies()
+
         //store user input in FormData format
         let apiData = new FormData()
-        apiData.append("user_id", this.state.user_name)
+        apiData.append("user_id", cookies.get('username'))
         apiData.append("game_id", id)
-        apiData.append("token", this.state.token)
+        apiData.append("token", cookies.get('token'))
 
         //api call parameters
         let requestOptions = {
@@ -348,10 +350,14 @@ class Profile extends Component {
             redirect: 'follow'
         };
 
+        console.log("user_id: " + cookies.get('username'));
+        console.log("game_id: " + id);
+        console.log("token: " + cookies.get('token'));
+
         //make api call
         let fetch_url = url + "profile_page/api/delete_board"
         let response = await fetch(fetch_url, requestOptions)
-        return response
+        return (response.ok === true)
     }
 
     deleteCallback = (id) => {
@@ -367,15 +373,15 @@ class Profile extends Component {
             if (result.isConfirmed) {
 
                 //make api call
-                let response = this.deleteCallbackHelper(id);
-                if (!response.ok) {
+                let ok = this.deleteCallbackHelper(id);
+                this.setState({is_loaded: false})
+                if (!ok) {
                     Swal.fire({
                         title: 'Failed to delete game!',
                         icon: 'error',
                         text: "Try again later."
                     })
                 } else {
-                    this.setState({is_loaded: false})
                     Swal.fire(
                         'Deleted!',
                         'Your file has been deleted.',
