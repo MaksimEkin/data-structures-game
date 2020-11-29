@@ -1,11 +1,6 @@
-from game_board_db import *
+from game_board_db import purge_old_games
 
 if __name__ == '__main__':
+    """ Removes games older than a day from the mongo db"""
 
     purge_old_games()
-
-"""
-Big red button code- Dont use
-    #for game in list_games():
-       #remove_game(game['game_id'])
-"""
