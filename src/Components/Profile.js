@@ -17,6 +17,11 @@ const url = local;
    registering a new account and (eventually) adding friends
    and viewing user's profile info
  */
+
+const sleep = (milliseconds) => {
+    return new Promise(resolve => setTimeout(resolve, milliseconds))
+}
+
 class Profile extends Component {
     constructor(props) {
         super(props);
@@ -583,14 +588,9 @@ class Profile extends Component {
             user_points: returned["user_profile"]["points"],
             user_rank: returned["user_profile"]["rank"],
         })
+        await sleep(100) // wait 100 ms
         return true;
     }
-
-    // checkUpdates = () => {
-    //     const { }
-
-
-    // }
 
 
     render() {

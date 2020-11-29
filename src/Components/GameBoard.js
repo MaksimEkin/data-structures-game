@@ -35,7 +35,7 @@ const reactLocal = "http://localhost:3000/"
 const remote = "https://data-structures-game.herokuapp.com/";
 
 //can also be const url = local; or const url = reactLocal;
-const url = local;
+const url = remote;
 
 //define sample node
 const sample = {
@@ -105,9 +105,6 @@ class GameBoard extends Component {
 
     this.setState({ playersArray: players.split(',') })
     let ds = cookies.get('gameDS');
-
-    console.log("players: " + players)
-    console.log("playersArray: " + this.state.playersArray)
 
     //get cookie variables from state and insert into url
     let createGameURL = url + "game_board/api/start_game/" + difficulty + "/" + players + "/" + ds
@@ -462,7 +459,6 @@ class GameBoard extends Component {
   //checks if the current board is balanced and returns true or false
   checkRebalance = () => {
     let isBalanced = this.state.board.graph.balanced
-    console.log("balanced: ",this.state.board.graph.balanced)
     return isBalanced
   }
 
@@ -479,7 +475,6 @@ class GameBoard extends Component {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(balance_attempt)
     };
-    console.log("request option parameters: ", requestOptions)
     let response = await fetch(fetch_url, requestOptions);
     let newBoard = await response.json();
 
