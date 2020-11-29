@@ -680,16 +680,15 @@ class GameBoard extends Component {
   }
 
   afterRenderEdge = (id, element, viewEdge, edgeContainer,isEdgeSelected) => {
-
+    // TO CHANGE THE COLOR AND SIZE OF THE EDGES
     //afterRenderEdge?: (id: string, element: any, edge: IEdge, edgeContainer: any, isEdgeSelected: boolean) => void;
-    console.log("Start afterRenderEdge");
-    console.log("id= ",id);
-    console.log("element= ",element);
-    console.log("viewEdge= ",viewEdge);
-    console.log("edgeContainer= ",edgeContainer);
-    console.log("isEdgeSelected= ",isEdgeSelected);
-    console.log("end afterRenderEdge");
-
+    //console.log("Start afterRenderEdge");
+    //console.log("id= ",id);
+    //console.log("element= ",element);
+    //console.log("viewEdge= ",viewEdge);
+    //console.log("edgeContainer= ",edgeContainer);
+    //console.log("isEdgeSelected= ",isEdgeSelected);
+    //console.log("end afterRenderEdge");
   }
 
 
