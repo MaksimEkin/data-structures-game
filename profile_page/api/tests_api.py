@@ -139,6 +139,44 @@ class Register(TestCase):
                          msg=f'{BColors.FAIL}\t[-]\tAccepted non-matching password!{BColors.ENDC}')
         print(f"{BColors.OKGREEN}\t[+]\tPass not allowing non-matching password.{BColors.ENDC}")
 
+    def test_user_name_bot(self):
+        """Attempts to register username that starts with bot."""
+
+        post_data = {'user_name': 'botJohn',
+                     'password1': 'smith1',
+                     'password2': 'smith1',
+                     'email': 'test'}
+
+        response = self.client.post('/profile_page/api/register', post_data).data
+        self.assertEqual(response['error'], 'Username can not start with bot!',
+                         msg=f'{BColors.FAIL}\t[-]\tAccepted bot user name!{BColors.ENDC}')
+        print(f"{BColors.OKGREEN}\t[+]\tUser name bot did not allowed.{BColors.ENDC}")
+
+    def test_user_three_characters(self):
+        """Attempts to register username that starts with bot."""
+
+        post_data = {'user_name': 'jo',
+                     'password1': 'smith1',
+                     'password2': 'smith1',
+                     'email': 'test'}
+
+        response = self.client.post('/profile_page/api/register', post_data).data
+        self.assertEqual(response['error'], 'User name must be longer!',
+                         msg=f'{BColors.FAIL}\t[-]\tAccepted short user name!{BColors.ENDC}')
+        print(f"{BColors.OKGREEN}\t[+]\tShort user name was not allowed.{BColors.ENDC}")
+
+    def test_short_password_characters(self):
+        """Attempts to register with short password."""
+
+        post_data = {'user_name': 'joejoe',
+                     'password1': 'smi1',
+                     'password2': 'smi1',
+                     'email': 'test'}
+
+        response = self.client.post('/profile_page/api/register', post_data).data
+        self.assertEqual(response['error'], 'Password has to be longer than 5 characters!',
+                         msg=f'{BColors.FAIL}\t[-]\tAccepted short password!{BColors.ENDC}')
+        print(f"{BColors.OKGREEN}\t[+]\tShort password was not allowed.{BColors.ENDC}")
 
     def test_duplicate_user(self):
         """Attempts to register an existing user."""

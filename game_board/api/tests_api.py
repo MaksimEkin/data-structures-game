@@ -137,14 +137,14 @@ class Action(TestCase):
         created_game = self.client.get('/game_board/api/start_game/Easy/ID1,ID2/AVL')
 
         # play invalid card
-        response = self.client.get('/game_board/api/action/Insert -1/' + str(created_game.data['game_id']))
+        response = self.client.get('/game_board/api/action/Insert -1/' + str(created_game.data['game_id']) + '/-1/-1')
         self.assertEqual(response.data, {'invalid_action': 'Player does not have the card Insert -1!'},
                          msg=f'{BColors.FAIL}\t[-]\tAllowed playing an invalid card!{BColors.ENDC}')
         print(f"{BColors.OKGREEN}\t[+]\tPass attempting to play an invalid card.{BColors.ENDC}")
 
         # attempt to balance a balanced tree
         post_data = json.dumps({'adjacency_list': 'test'})
-        response = self.client.post('/game_board/api/rebalance/' + str(created_game.data['game_id']),
+        response = self.client.post('/game_board/api/rebalance/' + str(created_game.data['game_id']) + '/-1/-1',
                                     post_data, content_type='application/json')
         self.assertEqual(response.data, {'invalid_action': 'Tree is already balanced!'},
                          msg=f'{BColors.FAIL}\t[-]\tTree is already balanced!{BColors.ENDC}')
@@ -165,7 +165,7 @@ class AIPick(TestCase):
         created_game = self.client.get('/game_board/api/start_game/Easy/ID1,ID2/AVL')
 
         # play invalid card
-        response = self.client.get('/game_board/api/ai_pick/' + str(created_game.data['game_id']))
+        response = self.client.get('/game_board/api/ai_pick/' + str(created_game.data['game_id'])  + '/-1/-1')
         self.assertEqual(response.data, {'error': 'The current player is not a BOT'},
                          msg=f'{BColors.FAIL}\t[-]\tAllowed AI to make a move for a real player!{BColors.ENDC}')
         print(f"{BColors.OKGREEN}\t[+]\tPass attempting to let the AI make move as a real player.{BColors.ENDC}")
@@ -186,7 +186,7 @@ class Rebalance(TestCase):
 
         # attempt to balance a balanced tree
         post_data = json.dumps({'adjacency_list': 'test'})
-        response = self.client.post('/game_board/api/rebalance/' + str(created_game.data['game_id']),
+        response = self.client.post('/game_board/api/rebalance/' + str(created_game.data['game_id']) + '/-1/-1',
                                     post_data, content_type='application/json')
         self.assertEqual(response.data, {'invalid_action': 'Tree is already balanced!'},
                          msg=f'{BColors.FAIL}\t[-]\tTree is already balanced!{BColors.ENDC}')
@@ -220,7 +220,7 @@ class PlayGame(TestCase):
             # tree is balanced, play a card
             if board['graph']['balanced']:
                 picked_card = random.choice(board['cards'][board['turn']])
-                response = self.client.get('/game_board/api/action/' + picked_card + '/' + str(self.game['game_id'])).data
+                response = self.client.get('/game_board/api/action/' + picked_card + '/' + str(self.game['game_id']) + '/-1/-1').data
 
                 # game ended
                 if response['end_game']:
@@ -253,7 +253,7 @@ class PlayGame(TestCase):
             # balance tree action
             else:
                 post_data = json.dumps({'adjacency_list': 'test'})
-                response = self.client.post('/game_board/api/rebalance/' + str(self.game['game_id']),
+                response = self.client.post('/game_board/api/rebalance/' + str(self.game['game_id']) + '/-1/-1',
                                             post_data, content_type='application/json').data
 
                 self.assertEqual(response['graph']['balanced'], True,
@@ -291,7 +291,7 @@ class PlayGame(TestCase):
 
                 bot = board['turn']
                 original_hand = board['cards'][bot]
-                response = self.client.get('/game_board/api/ai_pick/' + str(self.game['game_id'])).data
+                response = self.client.get('/game_board/api/ai_pick/' + str(self.game['game_id']) + '/-1/-1').data
                 new_hand = board['cards'][bot]
                 picked_cards = list(set(original_hand) - set(new_hand))
 
@@ -326,7 +326,7 @@ class PlayGame(TestCase):
             # balance tree action
             else:
                 post_data = json.dumps({'adjacency_list': 'test'})
-                response = self.client.post('/game_board/api/rebalance/' + str(self.game['game_id']),
+                response = self.client.post('/game_board/api/rebalance/' + str(self.game['game_id']) + '/-1/-1',
                                             post_data, content_type='application/json').data
 
                 self.assertEqual(response['graph']['balanced'], True,
