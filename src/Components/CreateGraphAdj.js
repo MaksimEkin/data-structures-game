@@ -30,9 +30,10 @@ function create_graph(graph){
 	// Assign shape depending on the type of node
 	for (i = 0; i < adjacency_keys.length; i++) {
 		var type = CUSTOM_EMPTY_TYPE;
-		if  (adjacency_keys[i] == root_node) {
-			type = SPECIAL_TYPE;
-		} else if (adjacency_keys[i] == gold_node) {
+		//if  (adjacency_keys[i] == root_node) {
+		//	type = SPECIAL_TYPE;
+		//}
+		if (adjacency_keys[i] == gold_node) {
 		  type = GOLD_NODE;
 		}
 

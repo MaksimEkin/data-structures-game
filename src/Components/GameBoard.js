@@ -5,6 +5,7 @@ import {create_adjacency, create_graph} from './CreateGraphAdj.js';
 import Cookies from 'universal-cookie';
 import WinModal from './Modal/WinModal.js';
 import ReactTooltip from "react-tooltip";
+import Particles from 'react-particles-js';
 
 //Uber's digraph react folder
 import {
@@ -63,17 +64,21 @@ class GameBoard extends Component {
       board: null,
       gameID: null,
       turn: "",
-      deckSize: null,
+      deckSize: 1000,
       playerPointVal: null,
       playerCardChoice: null,
       playerBalanceAttempt: null,
       difficulty:null,
       players:null,
+      playersArray:[],
       data_structure:null,
+      initial_load:true,
 
       //used in conjunction with the API's end_game returned in the JSON
       game_over: false
     };
+    
+    
   }
 
   // Initialize component objects by setting state and props of the gameboard
@@ -81,11 +86,13 @@ class GameBoard extends Component {
   // access the DOM to make API calls and update the state and re-renders
   // component did mount to update the values of the state
   async componentDidMount() {
+
         const cookies = new Cookies();
 
         //set state variables to these variables to be used in the url
         let difficulty = cookies.get('level');
         let players = cookies.get('playerList');
+        this.setState({playersArray:players.split(',')})
         let ds = cookies.get('gameDS');
 
        //get cookie variables from state and insert into url
@@ -112,7 +119,7 @@ class GameBoard extends Component {
        //pass the new board state into create_graph function and set the made_graph state
        let made_graph = create_graph(this.state.board['graph'])
        this.setState({ graph: made_graph});
-       this.setState({loading: false});
+       this.setState({loading: false, initial_load: false});
 
         if (!this.state.game_over) {
             if (this.state.turn.replace(/\s+/g, "").toLowerCase().startsWith('bot')) {
@@ -565,11 +572,25 @@ class GameBoard extends Component {
 
   // Create custom text content for the nodes: Node point and Node ID
   renderNodeText = (data) => {
+    // text location
+    let x = '-20';
+    let y = '-45';
+
+    // design class names
+    let points_class_name = "text-4xl font-bold text-gray-900 dark:text-gray-200";
+    let node_id_class_name =  "text-l font-semibold text-gray-800 dark:text-gray-200";
+
+    // if points is single digit re-adjust its x coordinate position
+    if (data.points < 10) {
+      x = '-10';
+    }
+
+    // render the design
     return (
-      <foreignObject x='-20' y='-30' width='200' height='50'>
-        <div className="graph_node">
-          <p className="node_points_text">{data.points}</p>
-          <p className="node_id_text">{data.node_id}</p>
+      <foreignObject x={x} y={y} width='200' height='250'>
+        <div id="graph_node" className="flex items-center">
+          <p className={points_class_name} id="node_points_text">{data.points}</p>
+          <p className={node_id_class_name} id="node_id_text">   <br></br><br></br><br></br> {data.node_id}</p>
         </div>
       </foreignObject>
     );
@@ -587,6 +608,75 @@ class GameBoard extends Component {
       layoutEngineType: 'VerticalTree',
       read_only: true
     })
+
+  }
+
+  // Function to display all of the players in the gameboard
+  playersDisplay = (player) => {
+
+    // class for the main background in player displays
+    let class_name_box = "space-y-5 flex items-center p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800";
+    let player_name = player;
+
+    // class for player points display
+    let class_name_points = "p-3 mr-4 text-4xl text-green-600 bg-white rounded-full dark:text-green-100 font-bold";
+
+    // if points is less than 0: displays red alert
+    if (this.state.board["player_points"][player] < 0) {
+      class_name_points = "p-3 mr-4 text-4xl text-red-700 bg-white rounded-full font-bold animate-pulse-once";
+    }
+
+
+    // If it is the player who's turn it is to play: makes the box blue
+    if (this.state.turn == player) {
+      class_name_box = "space-y-5 flex items-center p-4 bg-blue-500 rounded-lg shadow-xs dark:bg-gray-800 shadow-2xl";
+      player_name = "* " + player;
+    }
+
+    // Find the player with the highest points
+    let winning_player = "";
+    let winning_player_points = 0;
+    this.state.board["player_ids"].map((curr_player, ii, arr) => {
+        if (this.state.board["player_points"][curr_player] > winning_player_points) {
+          winning_player_points = this.state.board["player_points"][curr_player];
+          winning_player = curr_player;
+        }
+    });
+
+    // Put a glowing alert on the winning player's display
+    if (winning_player == player) {
+      if (winning_player_points > 0) {
+        class_name_points = "p-3 mr-4 text-4xl text-blue-800 bg-white rounded-full dark:text-green-100 font-bold animate-wiggle";
+      }
+    }
+
+    // Get all of the cards as string to be displayed
+    let cardsDisplay = "";
+    this.state.board["cards"][player].map((card, ii, arr) => {
+        if (arr.length - 1 === ii) {
+            // last one
+           cardsDisplay += card
+        } else {
+           cardsDisplay += card + " - "
+        }
+    });
+
+    // Return HTML component cards with the information
+    return (
+          <div className={class_name_box}>
+            <div className={class_name_points} name="player_points_display">
+                {this.state.board["player_points"][player]}
+            </div>
+            <div>
+              <p  className="text-l text-center font-bold text-gray-800 mb-2" name="player_name_display">
+                {player_name}
+              </p>
+              <p className="text-m font-semibold text-gray-800 dark:text-gray-200" name="player_cards_display">
+                {cardsDisplay}
+              </p>
+            </div>
+          </div>
+    )
   }
 
 
@@ -605,6 +695,13 @@ class GameBoard extends Component {
     let card_1 = null;
     let card_2 = null;
     let card_3 = null;
+
+    // Deck size visual
+    let deck_size_visual = "text-xl font-semibold text-gray-800 dark:text-gray-200";
+    if (this.state.deckSize <= 5) {
+      deck_size_visual = "text-xl font-semibold text-red-700 animate-pulse";
+    }
+
 
     //if loading is completed, statically store cards
     if (!this.state.loading) {
@@ -630,26 +727,34 @@ class GameBoard extends Component {
     return (
 
       <div>
+        <Particles
+              id="particles2"
+              params={{
+                particles: {
+                  color:"#000000",
+                  line_linked: {
+                    color:"#000000",
+                    distance:50,
+                  },
+                  number: {
+                    value: 38,
+                    density: {
+                      enable: true,
+                      value_area: 500,
+                    }
+                  },
+                  move:{
+                    direction:"bottom",
+                    random:true,
+                    speed:1,
+                    out_mode:"out",
+                  }
+                },
+              }}
+        />
 
-        <div className="transition duration-500 ease-in-out transform hover:-translate-y-1 hover:scale-103 flex justify-center">
-          <div class="flex items-center p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800">
-            <div class="p-3 mr-4 text-orange-500 bg-orange-100 rounded-full dark:text-orange-100 dark:bg-orange-500">
-              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"></path>
-              </svg>
-            </div>
-            <div>
-              <p class="mb-2 text-xl font-medium text-gray-600 dark:text-gray-400" className="turn_display">
-                {this.state.turn}
-              </p>
-              <p class="text-2xl font-semibold text-gray-800 dark:text-gray-200" className="turn_points_display">
-                {this.state.playerPointVal}
-              </p>
-              <p class="text-2xl font-semibold text-gray-800 dark:text-gray-200" className="deck_size_display">
-                Deck: {this.state.deckSize}
-              </p>
-            </div>
-          </div>
+        <div className="flex mb-4 flex justify-center space-x-4">
+            { !this.state.initial_load && this.state.playersArray.map((player) => this.playersDisplay(player)) }
         </div>
 
 
@@ -657,39 +762,36 @@ class GameBoard extends Component {
 
           {this.state.game_over ? <WinModal winner={this.state.turn} win_board={this.state.board}/> : <div> </div>}
 
-          <div className="bg-blue-800 flex items-center bg-gray-200 h-11">
+          <div className="flex items-center bg-opacity-0 h-11">
 
-            <div className="flex-1 text-gray-1000 text-center items-center bg-gray-200 px-4 py-2 m-2 rounded-lg">
-              <div class="transition duration-500 ease-in-out bg-blue-500 hover:bg-red-500 transform hover:-translate-y-1 hover:scale-105 bg-blue-300 border-blue-350 border-opacity-50 rounded-lg shadow-lg flex-1 m-1 py-1">
-                <button onClick={() => this.playCard(card_1)}>{card_1}</button>
+            <button className="transition duration-500 ease-in-out bg-blue-500 hover:bg-red-500 transform hover:-translate-y-1 hover:scale-105 bg-blue-300 border-blue-350 border-opacity-50 rounded-lg shadow-2xl flex-1 m-1 py-1 flex justify-center font-bold text-xl text-gray-800" onClick={() => this.playCard(card_1)}>{card_1}</button>
+            <button className="transition duration-500 ease-in-out bg-blue-500 hover:bg-red-500 transform hover:-translate-y-1 hover:scale-105 bg-blue-300 border-blue-350 border-opacity-50 rounded-lg shadow-2xl flex-1 m-1 py-1 flex justify-center font-bold text-xl text-gray-800" onClick={() => this.playCard(card_2)}>{card_2}</button>
+            <button className="transition duration-500 ease-in-out bg-blue-500 hover:bg-red-500 transform hover:-translate-y-1 hover:scale-105 bg-blue-300 border-blue-350 border-opacity-50 rounded-lg shadow-2xl flex-1 m-1 py-1 flex justify-center font-bold text-xl text-gray-800" onClick={() => this.playCard(card_3)}>{card_3}</button>
+
+            <div
+                className="flex justify-center">
+              <div className="flex items-center p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800">
+                <div
+                    className="p-3 mr-4 text-orange-500 bg-orange-100 rounded-full dark:text-orange-100 dark:bg-orange-500">
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path
+                        d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"></path>
+                  </svg>
+                </div>
+                <div>
+                  <p className={deck_size_visual} id="deck_size_display">
+                    Remaining Turns: {this.state.deckSize}
+                  </p>
+                </div>
               </div>
             </div>
 
-            <div className="flex-1 text-gray-1000 text-center items-center bg-gray-200 px-4 py-2 m-2 rounded-lg">
-              <div class="transition duration-500 ease-in-out bg-blue-500 hover:bg-red-500 transform hover:-translate-y-1 hover:scale-105 bg-blue-300 border-blue-350 border-opacity-50 rounded-lg shadow-lg flex-1 m-1 py-1">
-                <button onClick={() => this.playCard(card_2)}>{card_2}</button>
-              </div>
-            </div>
+              <button data-delay-show='500' data-place="bottom" data-tip="Shift click to make edges, delete a selected node with the keyboard's delete key" data-offset="{'top': -20}" data-text-color="yellow"
+                  className="transition duration-500 ease-in-out bg-orange-500 hover:bg-orange-600  transform hover:-translate-y-1 hover:scale-105 border-orange-500 border-opacity-50 rounded-lg shadow-2xl flex-1 m-1 py-1 flex justify-center font-bold text-xl text-gray-800" onClick={() =>this.repositionNodes()}>Reposition Nodes</button>
 
-            <div className="flex-1 text-gray-1000 text-center items-center bg-gray-200 px-4 py-2 m-2 rounded-lg">
-              <div class="transition duration-500 ease-in-out bg-blue-500 hover:bg-red-500 transform hover:-translate-y-1 hover:scale-105 bg-blue-300 border-blue-350 border-opacity-50 rounded-lg shadow-lg flex-1 m-1 py-1">
-                <button onClick={() => this.playCard(card_3)}>{card_3}</button>
-              </div>
-            </div>
+              <button data-delay-show='500' data-place="bottom" data-tip="End's turn and determines rebalance correctness" data-offset="{'top': -20}" data-text-color="yellow"
+                  className="transition duration-500 ease-in-out bg-orange-500 hover:bg-orange-600  transform hover:-translate-y-1 hover:scale-105   border-orange-500  border-opacity-50 rounded-lg shadow-2xl flex-1 m-1 py-1 flex justify-center font-bold text-xl text-gray-800" onClick={() =>this.checkNodes()}>Check Nodes</button>
 
-          <div className="flex-1 text-gray-1000 text-center items-center bg-gray-200 px-4 py-2 m-2 rounded-lg">
-            <div data-delay-show='500' data-place="bottom" data-tip="Shift click to make edges, delete a selected node with the keyboard's delete key" data-offset="{'top': -20}" data-text-color="yellow"
-            class="transition duration-500 ease-in-out bg-yellow-300 hover:bg-orange-500 transform hover:-translate-y-1 hover:scale-105 bg-yellow-300 border-yellow-350 border-opacity-50 rounded-lg shadow-lg flex-1 m-1 py-1">
-              <button onClick={() =>this.repositionNodes()}>Reposition Nodes</button>
-            </div>
-          </div>
-
-          <div className="flex-1 text-gray-1000 text-center items-center bg-gray-200 px-4 py-2 m-2 rounded-lg">
-            <div data-delay-show='500' data-place="bottom" data-tip="End's turn and determines rebalance correctness" data-offset="{'top': -20}" data-text-color="yellow"
-            class="transition duration-500 ease-in-out bg-yellow-300 hover:bg-orange-500 transform hover:-translate-y-1 hover:scale-105 bg-yellow-300 border-yellow-350 border-opacity-50 rounded-lg shadow-lg flex-1 m-1 py-1">
-              <button onClick={() =>this.checkNodes()}>Check Nodes</button>
-            </div>
-          </div>
         </div>
 
         <ReactTooltip />
@@ -728,5 +830,5 @@ class GameBoard extends Component {
   }
 }
 export default GameBoard;
-const rootElement = document.getElementById("root");
-ReactDOM.render(<GameBoard />, rootElement);
+//const rootElement = document.getElementById("root");
+//ReactDOM.render(<GameBoard />, rootElement);
