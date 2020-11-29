@@ -5,6 +5,8 @@ import Profile from './Components/Profile'
 import Header from './Components/Header';
 import {Route, Switch} from "react-router-dom";
 import { BrowserRouter as Router } from 'react-router-dom'
+import Register from "./Components/Register";
+
 
 //react router used to make this web app multiple pages instead of single page application
 export default function App() {
@@ -23,6 +25,9 @@ export default function App() {
           </Route>
           <Route path="/">
             <Home />
+          </Route>
+          <Route path="/register">
+            <Register />
           </Route>
         </Switch>
       </div>
