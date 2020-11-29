@@ -39,6 +39,20 @@ class Profile extends Component {
             userRank: null
         }
     }
+    
+    async componentDidMount() {
+        
+        //display login screen if not logged in
+        const cookies = new Cookies()
+        if ((this.state.loggedIn === false) || (cookies.get('token') === '')){
+            return (this.displayLogIn())
+        }
+        //display user profile page with option to log out
+        else {
+            this.profileAPICall()
+            return(this.displayUserProfile())
+        }
+    }
 
     //api call to login
     //Note: api uses FormData for this call
@@ -258,50 +272,36 @@ class Profile extends Component {
     //display user profile and sign out button
     displayUserProfile = () => {
 
-        return(<div>
-            <Particles
-                id="particles"
-                params={{
-                particles: {
-                    color:"#000000",
-                    line_linked: {
-                    color:"#000000",
-                    },
-                number: {
-                  value: 80,
-                  density: {
-                    enable: true,
-                    value_area: 800,
-                  }
-                },
-              },
-            }}
-            />
-            {/*When user clicks "Sign out", make api call to log out*/}
-            <button
-                style={{
-                    position: 'absolute',
-                    right: 40,
-                    top: -18,
-                }}
-                className="bg-red-500 text-white hover:bg-red-700 font-bold w-32 rounded px-4 py-2 mt-6 align-right"
-                id="logout-btn" type="button"
-                onClick={() => this.logoutFxn()}>
-                Sign out?
-            </button>
-
-            <div class="rounded rounded-t-lg border-2 bg-gray-200 card shadow w-1/3 mx-64 items-center h-full justify-center mt-24 pb-3">
-                <h1 class="text-center px-3 pb-6 pt-2"> Hey {this.state.username}! </h1>
-
-                <div className="flex justify-center pb-3 text-grey-dark">
-                    <div className="text-center mr-3 border-r pr-3">
-                        <h2> {this.state.user_rank}</h2>
-                        <span> Rank </span>
+        return(
+            <body class="h-screen flex items-center justify-center" style="background: #edf2f7;">
+                <div class="grid grid-flow-row auto-rows-max">
+                    <div class="bg-white shadow-md rounded rounded-t-lg overflow-hidden shadow max-w-md my-3">
+                        <img src="https://www.cariloha.com/pub/media/wysiwyg/bamboo-forest.jpg" class="w-full" />
+                        <div class="flex justify-center -mt-8">
+                            <img src="bohemian_panda.png" class="rounded-full border-solid border-white border-2 -mt-3 h-32 w-32" />
+                        </div>
+                        <div class="text-center px-3 pb-6 pt-2">
+                            <h3 class="text-black text-sm bold font-sans">@username</h3>
+                        </div>
+                        <div class="flex justify-center pb-3 text-grey-dark">
+                            <div class="text-center mr-3 border-r pr-3">
+                                <h2>@total_points</h2>
+                                <span>Total Points</span>
+                            </div>
+                            <div class="text-center">
+                                <h2>#@ranking</h2>
+                                <span>Ranking</span>
+                            </div>
+                        </div>
                     </div>
-                Points: { this.state.user_points }
-            </div>
-            </div>
-        </div>)
+
+                    <div class="bg-white shadow-md rounded my-6">
+                        <div class='games'></div>
+                        <script src="GamesTable.js"></script>
+                    </div>
+                </div>
+            </body>
+        )
     }
 
 
@@ -344,6 +344,7 @@ class Profile extends Component {
                              user_rank: returned["user_profile"]["rank"]})
     }
 
+
     render() {
 
         //display login screen if not logged in
@@ -354,7 +355,6 @@ class Profile extends Component {
 
         //display user profile page with option to log out
         else {
-            this.profileAPICall()
             return(this.displayUserProfile())
         }
     }
