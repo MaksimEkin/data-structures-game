@@ -80,8 +80,8 @@ class GameBoard extends Component {
       //used in conjunction with the API's end_game returned in the JSON
       game_over: false
     };
-    
-    
+
+
   }
 
   // Initialize component objects by setting state and props of the gameboard
@@ -475,6 +475,7 @@ class GameBoard extends Component {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(balance_attempt)
     };
+
     let response = await fetch(fetch_url, requestOptions);
     let newBoard = await response.json();
 
@@ -687,7 +688,7 @@ class GameBoard extends Component {
           </div>
     )
   }
-
+  
   saveGame = async () => {
     if (!this.state.initial_load && this.state.username != "-1" && this.state.token != "-1") {
 
@@ -736,8 +737,30 @@ class GameBoard extends Component {
 
       )
     }
+  afterRenderEdge = (id, element, viewEdge, edgeContainer,isEdgeSelected) => {
+    // TO CHANGE THE COLOR AND SIZE OF THE EDGES
+    //afterRenderEdge?: (id: string, element: any, edge: IEdge, edgeContainer: any, isEdgeSelected: boolean) => void;
+    //console.log("Start afterRenderEdge");
+    //console.log("id= ",id);
+    //console.log("element= ",element);
+    //console.log("viewEdge= ",viewEdge);
+    //console.log("edgeContainer= ",edgeContainer);
+    //console.log("isEdgeSelected= ",isEdgeSelected);
+    //console.log("end afterRenderEdge");
   }
 
+
+  renderBackground = (gridSize) => {
+    return (
+      <rect className="background"
+        x={-(gridSize || 0) / 4}
+        y={-(gridSize || 0) / 4}
+        width={gridSize}
+        height={gridSize}
+        fill={"#eae7dc"}
+      />
+    );
+  };
   //in react life cycle, code that is rendered occurs after constructor initialization
   //and component mounting and then reflects the change in state/prop values
   //then it checks if the change needs to be re-rendered
@@ -859,7 +882,7 @@ class GameBoard extends Component {
         <div id = "graph" style={{ height: "60rem"}}>
           <GraphView
           showGraphControls={true}
-          gridSize="100rem"
+          gridSize={20000}
           gridDotSize={1}
           renderNodeText={this.renderNodeText}
           ref="GraphView"
@@ -881,6 +904,16 @@ class GameBoard extends Component {
           readOnly={this.state.read_only}
           dark={true}
           layoutEngineType={this.state.layoutEngineType}
+
+          afterRenderEdge={this.afterRenderEdge}
+          centerNodeOnMove={true}
+          layoutEngineType={this.state.layoutEngineType}
+          edgeHandleSize={10}
+          edgeArrowSize={10}
+          nodeSize={110}
+          gridSpacing={5}
+          rotateEdgeHandle={true}
+          renderBackground={this.renderBackground}
         />
         </div>
 
