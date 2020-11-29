@@ -165,6 +165,19 @@ class Register(TestCase):
                          msg=f'{BColors.FAIL}\t[-]\tAccepted short user name!{BColors.ENDC}')
         print(f"{BColors.OKGREEN}\t[+]\tShort user name was not allowed.{BColors.ENDC}")
 
+    def test_short_password_characters(self):
+        """Attempts to register with short password."""
+
+        post_data = {'user_name': 'joejoe',
+                     'password1': 'smi1',
+                     'password2': 'smi1',
+                     'email': 'test'}
+
+        response = self.client.post('/profile_page/api/register', post_data).data
+        self.assertEqual(response['error'], 'Password has to be longer than 5 characters!',
+                         msg=f'{BColors.FAIL}\t[-]\tAccepted short password!{BColors.ENDC}')
+        print(f"{BColors.OKGREEN}\t[+]\tShort password was not allowed.{BColors.ENDC}")
+
     def test_duplicate_user(self):
         """Attempts to register an existing user."""
 

@@ -242,6 +242,10 @@ def register(request):
     if data['password1'] != data['password2']:
         return Response({'error': str('Passwords does not match!')}, status=status.HTTP_400_BAD_REQUEST)
 
+    # Check minimum password length
+    if len(str(data['password1'])) < 5:
+        return Response({'error': str('Password has to be longer than 5 characters!')}, status=status.HTTP_400_BAD_REQUEST)
+
     # check if user name is less than 3 characters
     if len(str(data['user_name'])) < 3:
         return Response({'error': str('User name must be longer!')}, status=status.HTTP_400_BAD_REQUEST)
