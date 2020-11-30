@@ -96,11 +96,12 @@ def board(request, game_id):
 
 
 @api_view(['POST'])
-def rebalance(request, game_id):
+def rebalance(request, game_id, user_id, token):
     """
     Re-balance a un-balanced AVL tree.
 
-    :param request:
+    :param user_id: username
+    :param token: authentication token
     :param game_id: unique identifier of the board
     :return game board JSON:
     """
@@ -143,7 +144,7 @@ def rebalance(request, game_id):
         board['player_points'][board['turn']] += config.GAIN[str(board['difficulty'])]
 
     # Update board
-    response_status = utils.update_board_db(board)
+    response_status = utils.update_board_db(board, user_id, token)
     if response_status['error']:
         return Response({'error': response_status['reason']},
                         status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -154,11 +155,12 @@ def rebalance(request, game_id):
 
 
 @api_view(['GET'])
-def action(request, card, game_id):
+def action(request, card, game_id, user_id, token):
     """
     Perform action on the Data Structure using a card
 
-    :param request:
+    :param user_id: username
+    :param token: authentication token
     :param card: what action to be performed
     :param game_id: unique identifier of the board
     :return game board JSON:
@@ -203,7 +205,7 @@ def action(request, card, game_id):
         board['cards'][board['turn']].append(new_card)
 
     # Update the board on database
-    response_status = utils.update_board_db(board)
+    response_status = utils.update_board_db(board, user_id, token)
     if response_status['error']:
         return Response({'error': response_status['reason']},
                         status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -213,11 +215,12 @@ def action(request, card, game_id):
 
 
 @api_view(['GET'])
-def ai_pick(request, game_id):
+def ai_pick(request, game_id, user_id, token):
     """
     Have an AI pick a move to execute
 
-    :param request:
+    :param user_id: username
+    :param token: authentication token
     :param game_id: unique identifier of the board
     :return card: string that represents a valid action for current player to take
     """
@@ -287,7 +290,7 @@ def ai_pick(request, game_id):
             board['cards'][board['turn']].append(new_card)
 
     # Update the board on database
-    response_status = utils.update_board_db(board)
+    response_status = utils.update_board_db(board, user_id, token)
     if response_status['error']:
         return Response({'error': response_status['reason']},
                         status=status.HTTP_500_INTERNAL_SERVER_ERROR)
