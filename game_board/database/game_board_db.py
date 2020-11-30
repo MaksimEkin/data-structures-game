@@ -3,6 +3,7 @@ Allows the game data to be stored, and interacted with through the Pandamic game
 """
 
 import os
+import datetime as dt
 from pymongo import MongoClient
 
 # Gets database & it's authorization from the environment
@@ -112,3 +113,27 @@ def list_games():
         cursor: to iterate game ids
     """
     return client.InitialDB.Active_Games.find({},{'_id':0, 'game_id': 1})
+
+def purge_old_games():
+    """
+    Checks the datetime of games, deletes anything older than 1 day
+
+    Parameters:
+    None
+
+    Returns:
+        int: 0
+    """
+    yesterday = (dt.datetime.now() - dt.timedelta(days=1))
+
+    mongo_cursor = client.InitialDB.Active_Games.find({},{'_id':0, 'game_id': 1, 'time_created':1})
+
+    for game in mongo_cursor:
+        try:
+            game_date = game['time_created']
+            game_datetime_obj = dt.datetime.strptime(game_date,"%d/%m/%Y %H:%M:%S")
+            if game_datetime_obj < yesterday:
+                remove_game(game['game_id'])
+        except:
+            pass
+    return 0
