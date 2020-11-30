@@ -11,7 +11,7 @@ const remote = "https://data-structures-game.herokuapp.com/";
 const tableHeaders = ["Game", "Type", "Difficulty", "Actions"]
 
 //can also be const url = local; or const url = reactLocal;
-const url = remote;
+const url = local;
 
 /* This class provides the functionality for logging in and out,
    registering a new account and (eventually) adding friends
@@ -45,7 +45,8 @@ class Profile extends Component {
             user_points: null,
             user_rank: null,
             user_games: null,
-            is_loaded: false,
+            show_profile: false,
+            auth_error: false,
         }
     }
 
@@ -130,7 +131,6 @@ class Profile extends Component {
     //make api call to log out
     logoutFxn = async () => {
 
-        this.setState({is_loaded: false})
         const cookies = new Cookies()
 
         //format user_id and token as FormData
@@ -418,12 +418,12 @@ class Profile extends Component {
                         text: "Try again later."
                     })
                 } else {
-                    this.setState({is_loaded: false});
                     Swal.fire(
                         'Deleted!',
                         'Your file has been deleted.',
                         'success'
                     )
+                    this.requestProfileUpdate()
                 }
             }
         })
@@ -506,26 +506,30 @@ class Profile extends Component {
                             <img src="/static/bohemian_panda.png" class="rounded-full border-solid border-white border-2 -mt-3 h-32 w-32" />
                         </div>
                         <div class="text-center px-3 pb-6 pt-2">
-                            <h3 class="text-black text-md bold font-bold">{this.state.is_loaded && this.state.user_name}</h3>
+                            <h3 class="text-black text-md bold font-bold">{this.state.user_name}</h3>
                         </div>
                         <div class="flex justify-center pb-3 text-grey-dark">
                             <div class="text-center mr-3 border-r pr-3">
-                                <h2 className="space-y-5 text-md text-center font-semibold text-gray-800 mb-2">{this.state.is_loaded && this.state.user_points}</h2>
+                                <h2 className="space-y-5 text-md text-center font-semibold text-gray-800 mb-2">{this.state.user_points}</h2>
                                 <span>Total Points</span>
                             </div>
                             <div class="text-center">
-                                <h2 className="space-y-5 text-md text-center font-semibold text-gray-800 mb-2">{this.state.is_loaded && this.state.user_rank}</h2>
+                                <h2 className="space-y-5 text-md text-center font-semibold text-gray-800 mb-2">{this.state.user_rank}</h2>
                                 <span>Ranking</span>
                             </div>
                         </div>
                     </div>
-                    {this.state.is_loaded && this.buildGames(this.state.user_games)}
+                    {this.buildGames(this.state.user_games)}
                 </div>
             </div>
         </div>)
 
     }
 
+    // confirm profile is ready to show
+    loadProfile = () => {
+        this.setState({ show_profile: true})
+    }
 
     //api call to get user's rank and points
     profileAPICall = async () => {
@@ -547,22 +551,39 @@ class Profile extends Component {
         //make api call
         let fetch_url = url + "profile_page/api/profile"
         let response = await fetch(fetch_url, requestOptions)
+        return response;
+    }
 
-        //make sure api call was successful
-        if (!response.ok) {
-            return false;
+    // set state based off of API success
+    updateProfile = async () => {
+        
+        // call to API
+        let response = this.profileAPICall()
+        
+        // check if response fails
+        if(!response.ok) {
+            this.setState({
+                auth_error: true},
+                () => { this.loadProfile();
+            })
+
+        // api call good, save user profile info
+        } else {
+            let returned = await response.json()
+            this.setState({
+                auth_error: false,
+                user_games: returned["user_profile"]["saved_games"],
+                user_name: returned["user_profile"]["user_name"],
+                user_points: returned["user_profile"]["points"],
+                user_rank: returned["user_profile"]["rank"]},
+                () => { this.loadProfile();
+            })
         }
+    }
 
-        //otherwise, jsonify the api return
-        let returned = await response.json()
-        this.setState({
-            user_games: returned["user_profile"]["saved_games"],
-            user_name: returned["user_profile"]["user_name"],
-            user_points: returned["user_profile"]["points"],
-            user_rank: returned["user_profile"]["rank"],
-        })
-        //await sleep(100) // wait 100 ms
-        return true;
+    // a change has been made, update profile
+    requestProfileUpdate = () => {
+        this.setState({ show_profile: false}, () => {this.updateProfile();})
     }
 
 
@@ -576,26 +597,29 @@ class Profile extends Component {
 
         //display user profile page with option to log out
         else {
-            let auth = true;
-            if (!this.state.is_loaded) {
-                auth = this.profileAPICall()
-                this.setState({is_loaded: true})
-                return (
-                    <div className="w-full h-full fixed block top-0 left-0 bg-white opacity-75 z-50">
-                        <span className="text-green-500 opacity-75 top-1/2 my-0 mx-auto block relative w-0 h-0">
-                            <i className="fas fa-circle-notch fa-spin fa-5x"></i>
-                        </span>
-                    </div>
-                )
-            } else {
-                auth = (auth && !(cookies.get('token') === ''))
-                if (!auth) {
-                    return(<div>
-                            {this.authError()}
-                          </div>)
+            if(this.state.show_profile) {
+                if (this.auth_error) {
+                    return(
+                      <div>
+                        {this.authError()}
+                      </div>)
                 } else {
-                    return (this.state.is_loaded && this.displayUserProfile())
+                    return (this.displayUserProfile())
                 }
+
+            // display loading screen while user waits
+            } else {
+                return ( 
+                    <div>
+                      <link rel="stylesheet" href="https://pagecdn.io/lib/font-awesome/5.10.0-11/css/all.min.css"></link>
+                      <div className="w-full h-full fixed block top-0 left-0 bg-white opacity-75 z-50">
+                        <span
+                          style={{top: '50%'}} 
+                          className="text-blue-400 opacity-75 top-1/2 my-0 mx-auto block relative w-0 h-0">
+                          <i className="fas fa-circle-notch fa-spin fa-5x"></i>
+                        </span>
+                      </div>
+                    </div>)                
             }
         }
     }
