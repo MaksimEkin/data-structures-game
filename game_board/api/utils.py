@@ -1,15 +1,18 @@
 """
     Helper functions for the Game Board API.
 """
+import json
+import math
 import random
 import uuid
-import json
 from datetime import datetime
 from bson import json_util
+
 from game_board import config
 from game_board import rules
-from game_board.database import game_board_db as db
 from game_board.avl import avl_handler as avl
+from game_board.database import game_board_db as db
+from profile_page.database import profile_page_db as profile_db
 
 
 def create_board_db(new_board):
@@ -41,7 +44,7 @@ def create_board_db(new_board):
     return result
 
 
-def update_board_db(board):
+def update_board_db(board, user_id='-1', token='-1'):
     """
     Update the game board in the database with the new state.
     Returns the board itself unless the game ended.
@@ -49,7 +52,9 @@ def update_board_db(board):
     and deletes the game from database. Otherwise, changes
     turn to the next player.
 
-    :param board:
+    :param board: game board
+    :param user_id: username
+    :param token: authentication token
     :return result, {'error': bool, 'reason': string, 'game_board': dict}:
     """
     result = {'error': False, 'reason': '', 'game_board': board}
@@ -59,10 +64,41 @@ def update_board_db(board):
         # Game ended
         if (board['graph']['root_node'] == board['graph']['gold_node'] or
                 len(board['deck']) == 0):
-            db.remove_game(board['game_id'])
+
+            # update the board
             board['end_game'] = True
             board['turn'] = max(board['player_points'], key=board['player_points'].get)  # get player w/ max points
             result['game_board'] = board
+
+            # if user is authenticated
+            if user_id not in ['-1', -1, ''] and token not in ['-1', -1, '']:
+
+                # Here check if user_id matches the token with the database
+                if not profile_db.check_user(user_id, token):
+                    result['error'] = True
+                    result['reason'] = "User is not authenticated"
+                    return result
+
+                if str(user_id) in board['player_ids']:
+
+                    # if not negative points board['turn']
+                    if board['player_points'][str(user_id)] > 0:
+
+                        # get user's current points
+                        curr_points = profile_db.get_points(str(user_id))
+
+                        # get the target points
+                        if user_id == board['turn']:
+                            target_points = curr_points + (math.log(board['player_points'][str(user_id)]) * 2)
+                        else:
+                            target_points = curr_points + math.log(board['player_points'][str(user_id)])
+
+                        # set the new points
+                        profile_db.set_points(str(user_id), target_points)
+
+            # remove the game from the database
+            db.remove_game(board['game_id'])
+
 
         # Game continues
         else:
@@ -94,7 +130,7 @@ def load_board_db(game_id):
     :param game_id: board's ID
     :return: game board
     """
-    result =  {'error': False, 'reason':'', 'game_board': {}}
+    result = {'error': False, 'reason': '', 'game_board': {}}
 
     try:
         game_board = db.read_game(str(game_id))
@@ -137,7 +173,7 @@ def new_board(difficulty, player_ids, data_structures):
 
     deck = create_card_deck(list(graph['node_points'].keys()), data_structures[0], difficulty, graph['gold_node'])
     cards, deck = distribute_cards(player_ids, deck)
-    #real_players = [player for player in player_ids if not player.lower().startswith(config.BOT_NAME_PREFIX)]
+    # real_players = [player for player in player_ids if not player.lower().startswith(config.BOT_NAME_PREFIX)]
 
     board = {
         'game_id': str(uuid.uuid1()),
@@ -147,7 +183,7 @@ def new_board(difficulty, player_ids, data_structures):
         'player_points': {str(id): 0 for id in player_ids},
         'turn': random.choice(player_ids),
         'deck': deck,
-        'cards' : cards,
+        'cards': cards,
         'difficulty': difficulty,
         'num_players': len(player_ids),
         'curr_data_structure': data_structures[0],
@@ -198,7 +234,7 @@ def create_card_deck(nodes, data_structure, difficulty, gold_node):
     # Minimum and maximum possible node value
     min_point = config.POINTS[str(difficulty)]['min']
     max_point = config.POINTS[str(difficulty)]['max']
-    card_diversity = list(range(min_point, max_point+1))
+    card_diversity = list(range(min_point, max_point + 1))
 
     # Card types for the DS
     card_types = config.CARDS[str(data_structure)]
