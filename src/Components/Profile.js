@@ -98,7 +98,7 @@ class Profile extends Component {
             cookies.set('username', this.state.username, { path: '/' })
 
             //update state to reflect successful login
-            this.setState({ loggedIn: true })
+            this.setState({ loggedIn: true, show_profile: false })
 
             //alert successful login
             Swal.fire({
@@ -423,7 +423,7 @@ class Profile extends Component {
                         'Your file has been deleted.',
                         'success'
                     )
-                    this.requestProfileUpdate()
+                    this.setState({ show_profile: false })
                 }
             }
         })
@@ -457,7 +457,10 @@ class Profile extends Component {
 
     buildGames = (games) => {
         if (games == null || games.length == 0) {
-            return <div></div>;
+            return(                            
+            <div class="text-center mr-3 border-r pr-3">
+                <h2 className="space-y-10 text-md text-center text-gray-500 mb-2"> No game history... Go play some games! </h2>
+            </div>)
         } else {
 
             let header = []
@@ -506,20 +509,20 @@ class Profile extends Component {
                             <img src="/static/bohemian_panda.png" class="rounded-full border-solid border-white border-2 -mt-3 h-32 w-32" />
                         </div>
                         <div class="text-center px-3 pb-6 pt-2">
-                            <h3 class="text-black text-md bold font-bold">{this.state.user_name}</h3>
+                            <h3 class="text-black text-md bold font-bold">{this.state.show_profile && this.state.user_name}</h3>
                         </div>
                         <div class="flex justify-center pb-3 text-grey-dark">
                             <div class="text-center mr-3 border-r pr-3">
-                                <h2 className="space-y-5 text-md text-center font-semibold text-gray-800 mb-2">{this.state.user_points}</h2>
+                                <h2 className="space-y-5 text-md text-center font-semibold text-gray-800 mb-2">{this.state.show_profile && this.state.user_points}</h2>
                                 <span>Total Points</span>
                             </div>
                             <div class="text-center">
-                                <h2 className="space-y-5 text-md text-center font-semibold text-gray-800 mb-2">{this.state.user_rank}</h2>
+                                <h2 className="space-y-5 text-md text-center font-semibold text-gray-800 mb-2">{this.state.show_profile && this.state.user_rank}</h2>
                                 <span>Ranking</span>
                             </div>
                         </div>
                     </div>
-                    {this.buildGames(this.state.user_games)}
+                    {this.state.show_profile && this.buildGames(this.state.user_games)}
                 </div>
             </div>
         </div>)
@@ -527,13 +530,12 @@ class Profile extends Component {
     }
 
     // confirm profile is ready to show
-    loadProfile = () => {
+    updateProfile = () => {
         this.setState({ show_profile: true})
     }
 
-    //api call to get user's rank and points
+    // set state based off of API success
     profileAPICall = async () => {
-
         const cookies = new Cookies()
 
         //store user input in FormData format
@@ -551,23 +553,13 @@ class Profile extends Component {
         //make api call
         let fetch_url = url + "profile_page/api/profile"
         let response = await fetch(fetch_url, requestOptions)
-        return response;
-    }
 
-    // set state based off of API success
-    updateProfile = async () => {
-        
-        // call to API
-        let response = this.profileAPICall()
-        
-        // check if response fails
-        if(!response.ok) {
+        //make sure api call was successful
+        if (response.status == 401) {
             this.setState({
                 auth_error: true},
-                () => { this.loadProfile();
+                () => { this.updateProfile();
             })
-
-        // api call good, save user profile info
         } else {
             let returned = await response.json()
             this.setState({
@@ -576,14 +568,9 @@ class Profile extends Component {
                 user_name: returned["user_profile"]["user_name"],
                 user_points: returned["user_profile"]["points"],
                 user_rank: returned["user_profile"]["rank"]},
-                () => { this.loadProfile();
+                () => { this.updateProfile();
             })
         }
-    }
-
-    // a change has been made, update profile
-    requestProfileUpdate = () => {
-        this.setState({ show_profile: false}, () => {this.updateProfile();})
     }
 
 
@@ -598,7 +585,7 @@ class Profile extends Component {
         //display user profile page with option to log out
         else {
             if(this.state.show_profile) {
-                if (this.auth_error) {
+                if (this.auth_error) { // whoops auth error! don't show anything!
                     return(
                       <div>
                         {this.authError()}
@@ -609,6 +596,7 @@ class Profile extends Component {
 
             // display loading screen while user waits
             } else {
+                this.profileAPICall()
                 return ( 
                     <div>
                       <link rel="stylesheet" href="https://pagecdn.io/lib/font-awesome/5.10.0-11/css/all.min.css"></link>
