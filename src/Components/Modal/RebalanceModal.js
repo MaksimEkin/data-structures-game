@@ -11,9 +11,13 @@ class WinModal extends Component {
 
         //props sent over are winner and the state of the game board at time of win
         this.state = {
-            
+            modal: this.props.modal,
             turn: this.props.winner
         }
+    }
+    hideModal(){
+        this.setState({modal:false})
+
     }
 
     render() {
@@ -21,12 +25,16 @@ class WinModal extends Component {
         //Display win message
         Swal.fire({
             //display winner score
-            title: "UNBALANCED BOARD, PLAYER: " + this.state.winner,
-
+            title: "UNBALANCED BOARD, PLAYER: " + this.state.turn,
+            
             //display other players' scores
-            text: "TIMEE TO REEBALANCEE",
-            confirmButtonText: "Return to Home Page"
-        
+            text: "TIME TO REBALANCE",
+            confirmButtonText: "Start",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                this.props.parentCallback(false);
+                console.log('in rebalanceModal, parentCallback is ',this.props.parentCallback)
+            }
         })
         return (<div> </div>)
     }
