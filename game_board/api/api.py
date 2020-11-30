@@ -57,6 +57,10 @@ def start_game(request, difficulty, player_ids, data_structures):
     player_ids = player_ids.split(',')
     data_structures = data_structures.split(',')
 
+    # If empty player_ids is passed
+    if len(str(player_ids[0])) == 0:
+        player_ids = ['Red Panda']
+
     # Check if the number of players request is valid
     if len(player_ids) > config.MAX_NUM_PLAYERS:
         return Response({'error': 'Too many players requested!',
