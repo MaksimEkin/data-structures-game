@@ -6,6 +6,7 @@ import Cookies from 'universal-cookie';
 import WinModal from './Modal/WinModal.js';
 import ReactTooltip from "react-tooltip";
 import Particles from 'react-particles-js';
+import RebalanceModal from './Modal/RebalanceModal.js'
 import Swal from "sweetalert2"
 
 //Uber's digraph react folder
@@ -28,6 +29,7 @@ import {
 } from "./config";
 
 import "./styles.css";
+
 //Fix XSS security issues when developing locally
 //this allows us to test separately locally and on Heroku by changing just one line
 const local = "http://127.0.0.1:8000/";
@@ -78,7 +80,9 @@ class GameBoard extends Component {
       initial_load:true,
 
       //used in conjunction with the API's end_game returned in the JSON
-      game_over: false
+      game_over: false,
+      rebalance_modal:false,
+      showModal:true
     };
 
 
@@ -455,7 +459,7 @@ class GameBoard extends Component {
   };
 
   /* Define custom graph editing methods here */
-
+ 
   //checks if the current board is balanced and returns true or false
   checkRebalance = () => {
     let isBalanced = this.state.board.graph.balanced
@@ -465,28 +469,29 @@ class GameBoard extends Component {
   //called if checkRebalance returns false
   //post request to get correct/balanced game board and sets gameboard to
   //return balanced board
-  rebalance = async () => {
+  
+    rebalance = async (attempt) => {
     this.setState({loading:true})
-
+    let rebalance_attempt={'adjacency_list':attempt}
     let fetch_url = url+"game_board/api/rebalance/" + this.state.gameID + '/' + this.state.username + '/' + this.state.token
-    let balance_attempt={'adjacency_list':{'node2':['node0'],'node0':['node5','node3'],'node5':[],'node3':[]}}
     let requestOptions = {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(balance_attempt)
+      headers: {Accept: 'application/json', 'Content-Type': 'application/json'},
+      body: JSON.stringify(rebalance_attempt)
     };
 
     let response = await fetch(fetch_url, requestOptions);
     let newBoard = await response.json();
-
+    
     //player might lose points when re-balance occurs
     this.setState({playerPointVal: newBoard['player_points'][this.state.turn]})
     this.setState({ board: newBoard, turn: newBoard['turn']});
 
     let made_graph = create_graph(this.state.board['graph'])
     this.setState({ graph: made_graph});
-    this.setState({loading: false})
 
+    this.setState({loading: false})
+   
   }
 
   // arg: card chosen
@@ -498,9 +503,10 @@ class GameBoard extends Component {
 
     //make the API call to actually play the card the user chose
     this.apiCall()
-
-    //check if playing selected card ended the game
-    //this.checkGameStatus()
+    
+    if(this.state.board != null && !this.state.board.graph.balanced){
+      this.rebalanceAlert()
+    }
   }
 
   //modularize the api call for playing a card
@@ -522,11 +528,12 @@ class GameBoard extends Component {
     this.setState({playerPointVal: newBoard['player_points'][this.state.turn]})
     this.setState({deckSize: newBoard['deck'].length});
 
-    //check if board is balanced then rebalance tree if fxn returned false
-
+    
     let made_graph = create_graph(this.state.board['graph'])
     this.setState({ graph: made_graph});
     this.setState({loading: false})
+ 
+
   }
 
   //AI api call
@@ -548,6 +555,11 @@ class GameBoard extends Component {
     let made_graph = create_graph(this.state.board['graph'])
     this.setState({ graph: made_graph});
     this.setState({loading: false})
+    //rebalance alert after bot's turn
+    if(this.state.board != null && !this.state.board.graph.balanced && !this.state.game_over){
+      this.rebalanceAlert()
+    }
+          
   }
 
   //check if game is over (ie: is golden node at the root of the tree/does API end_game == true?)
@@ -607,10 +619,12 @@ class GameBoard extends Component {
   };
 
   repositionNodes = () =>{
+    
     this.setState({
       layoutEngineType: 'SnapToGrid',
-      read_only: false
+      read_only: false,
     })
+
   }
 
   checkNodes = () => {
@@ -618,7 +632,12 @@ class GameBoard extends Component {
       layoutEngineType: 'VerticalTree',
       read_only: true
     })
-
+    let user_graph = create_adjacency(this.state.graph)
+    //passes users balance attempt in adjaceny form to rebalance
+    this.rebalance(user_graph)
+    
+    this.setState({ showModal: !this.state.showModal})
+    
   }
 
   // Function to display all of the players in the gameboard
@@ -725,6 +744,15 @@ class GameBoard extends Component {
       }
     }
   }
+  rebalanceAlert = () =>{
+      Swal.fire({
+      //display winner score
+      title: "UNBALANCED BOARD, PLAYER: " + this.state.turn,
+      text: "TIME TO REBALANCE"
+    })
+    this.setState({ showModal: !this.state.showModal})
+    
+  }
 
   buildSaveButton = () => {
 
@@ -739,7 +767,6 @@ class GameBoard extends Component {
       )
     }
   }
-
   afterRenderEdge = (id, element, viewEdge, edgeContainer,isEdgeSelected) => {
     // TO CHANGE THE COLOR AND SIZE OF THE EDGES
     //afterRenderEdge?: (id: string, element: any, edge: IEdge, edgeContainer: any, isEdgeSelected: boolean) => void;
@@ -763,6 +790,7 @@ class GameBoard extends Component {
         fill={"#eae7dc"}
       />
     );
+   
   };
   //in react life cycle, code that is rendered occurs after constructor initialization
   //and component mounting and then reflects the change in state/prop values
@@ -802,9 +830,7 @@ class GameBoard extends Component {
                 this.aiCall()
             }
         }
-        if(!this.checkRebalance() && !this.state.turn.replace(/\s+/g, "").toLowerCase().startsWith('bot')){
-            this.rebalance()
-        }
+      
     }
 
     //html returned to display page. When each card is played, the appropriate function is called, which in turn makes an API call
@@ -844,13 +870,18 @@ class GameBoard extends Component {
 
         <div style={{height: "10rem"}}>
 
-          {this.state.game_over ? <WinModal winner={this.state.turn} win_board={this.state.board}/> : <div> </div>}
-
+          {this.state.game_over ? <WinModal winner={this.state.turn} win_board={this.state.board} /> : <div> </div>}
           <div className="flex items-center bg-opacity-0 h-11">
 
-            <button className="transition duration-500 ease-in-out bg-blue-500 hover:bg-red-500 transform hover:-translate-y-1 hover:scale-105 bg-blue-300 border-blue-350 border-opacity-50 rounded-lg shadow-2xl flex-1 m-1 py-1 flex justify-center font-bold text-xl text-gray-800" onClick={() => this.playCard(card_1)}>{card_1}</button>
-            <button className="transition duration-500 ease-in-out bg-blue-500 hover:bg-red-500 transform hover:-translate-y-1 hover:scale-105 bg-blue-300 border-blue-350 border-opacity-50 rounded-lg shadow-2xl flex-1 m-1 py-1 flex justify-center font-bold text-xl text-gray-800" onClick={() => this.playCard(card_2)}>{card_2}</button>
-            <button className="transition duration-500 ease-in-out bg-blue-500 hover:bg-red-500 transform hover:-translate-y-1 hover:scale-105 bg-blue-300 border-blue-350 border-opacity-50 rounded-lg shadow-2xl flex-1 m-1 py-1 flex justify-center font-bold text-xl text-gray-800" onClick={() => this.playCard(card_3)}>{card_3}</button>
+            <button className="transition duration-500 ease-in-out bg-blue-500 hover:bg-red-500 transform hover:-translate-y-1 hover:scale-105 bg-blue-300 border-blue-350 border-opacity-50 rounded-lg shadow-2xl flex-1 m-1 py-1 flex justify-center font-bold text-xl text-gray-800" 
+            disabled={(this.state.board != null && !this.state.board.graph.balanced)? true : false}
+            onClick={() => this.playCard(card_1)}>{card_1}</button>
+            <button className="transition duration-500 ease-in-out bg-blue-500 hover:bg-red-500 transform hover:-translate-y-1 hover:scale-105 bg-blue-300 border-blue-350 border-opacity-50 rounded-lg shadow-2xl flex-1 m-1 py-1 flex justify-center font-bold text-xl text-gray-800" 
+            disabled={(this.state.board != null && !this.state.board.graph.balanced)? true : false}
+            onClick={() => this.playCard(card_2)}>{card_2}</button>
+            <button className="transition duration-500 ease-in-out bg-blue-500 hover:bg-red-500 transform hover:-translate-y-1 hover:scale-105 bg-blue-300 border-blue-350 border-opacity-50 rounded-lg shadow-2xl flex-1 m-1 py-1 flex justify-center font-bold text-xl text-gray-800" 
+            disabled={(this.state.board != null && !this.state.board.graph.balanced)? true : false}
+            onClick={() => this.playCard(card_3)}>{card_3}</button>
 
             <div
                 className="flex justify-center">
@@ -871,15 +902,23 @@ class GameBoard extends Component {
             </div>
 
               <button data-delay-show='500' data-place="bottom" data-tip="Shift click to make edges, delete a selected node with the keyboard's delete key" data-offset="{'top': -20}" data-text-color="yellow"
-                  className="transition duration-500 ease-in-out bg-orange-500 hover:bg-orange-600  transform hover:-translate-y-1 hover:scale-105 border-orange-500 border-opacity-50 rounded-lg shadow-2xl flex-1 m-1 py-1 flex justify-center font-bold text-xl text-gray-800" onClick={() =>this.repositionNodes()}>Reposition Nodes</button>
+                  disabled={(this.state.board != null && this.state.board.graph.balanced)? true : false}
+                  className="transition duration-500 ease-in-out bg-orange-500 hover:bg-orange-600  transform hover:-translate-y-1 hover:scale-105 border-orange-500 border-opacity-50 rounded-lg shadow-2xl flex-1 m-1 py-1 flex justify-center font-bold text-xl text-gray-800" 
+                  onClick={() =>this.repositionNodes()}>
+                  Reposition Nodes
+                </button>
 
               <button data-delay-show='500' data-place="bottom" data-tip="End's turn and determines rebalance correctness" data-offset="{'top': -20}" data-text-color="yellow"
-                  className="transition duration-500 ease-in-out bg-orange-500 hover:bg-orange-600  transform hover:-translate-y-1 hover:scale-105   border-orange-500  border-opacity-50 rounded-lg shadow-2xl flex-1 m-1 py-1 flex justify-center font-bold text-xl text-gray-800" onClick={() =>this.checkNodes()}>Check Nodes</button>
+                  disabled={(this.state.board != null && this.state.board.graph.balanced)? true : false}
+                  className="transition duration-500 ease-in-out bg-orange-500 hover:bg-orange-600  transform hover:-translate-y-1 hover:scale-105   border-orange-500  border-opacity-50 rounded-lg shadow-2xl flex-1 m-1 py-1 flex justify-center font-bold text-xl text-gray-800" 
+                  onClick={() =>this.checkNodes()}>
+                  Check Nodes
+              </button>
 
               {this.buildSaveButton()}
 
         </div>
-
+        
         <ReactTooltip />
         {/*from react digraph library to format graph */}
         <div id = "graph" style={{ height: "60rem"}}>
@@ -919,6 +958,7 @@ class GameBoard extends Component {
           renderBackground={this.renderBackground}
         />
         </div>
+        
 
         </div>
       </div>
