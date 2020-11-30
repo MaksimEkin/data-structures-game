@@ -1,13 +1,13 @@
 """
-    Views for Profile Page application.
+    Views for Register Page application.
 """
 
 #from django.shortcuts import render
 # Create your views here.
 from django.shortcuts import render
 
-def profile_page(request):
-    """Redirect to the profile page view."""
+def register(request):
+    """Redirect to the register view."""
 
     # Change this to the actual React frontend for game board when ready.
     return render(request, 'index.html')

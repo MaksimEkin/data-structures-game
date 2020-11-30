@@ -14,6 +14,8 @@ from profile_page.database import profile_page_db as db
 from profile_page.api import mock as mock_db
 
 
+# TODO: RYAN, Import your code
+
 @api_view(['GET'])
 def api_overview(request):
     '''
@@ -240,19 +242,19 @@ def register(request):
 
     # Check if passwords match
     if data['password1'] != data['password2']:
-        return Response({'error': str('Passwords does not match!')}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'error': str('Passwords do not match!')}, status=status.HTTP_400_BAD_REQUEST)
 
     # Check minimum password length
-    if len(str(data['password1'])) < 5:
+    if len(str(data['password1'])) <= 5:
         return Response({'error': str('Password has to be longer than 5 characters!')}, status=status.HTTP_400_BAD_REQUEST)
 
     # check if user name is less than 3 characters
-    if len(str(data['user_name'])) < 3:
-        return Response({'error': str('User name must be longer!')}, status=status.HTTP_400_BAD_REQUEST)
+    if len(str(data['user_name'])) <= 3:
+        return Response({'error': str('Username must be longer than 3 characters!')}, status=status.HTTP_400_BAD_REQUEST)
 
     # Check if user name does not start with bot
     if str(data['user_name'])[0:3].lower() == 'bot':
-        return Response({'error': str('Username can not start with bot!')}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'error': str('Username can not start with "bot"!')}, status=status.HTTP_400_BAD_REQUEST)
 
     # Here ask db to create a new user with its token
     token = str(uuid.uuid1())
@@ -294,7 +296,7 @@ def login(request):
     # Here let db know of the new token that user owns
     token = str(uuid.uuid1())
     if not db.update_token(data['user_id'], token):
-        return Response({'error': str('Error when updating logging in!')}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response({'error': str('Error when updating log-in token!')}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     return Response({'status': 'success', 'token': token})
 
@@ -555,10 +557,12 @@ def load_board(request):
     # Load the game from user's saved profile
     game_board = db.load_board(data['user_id'], data['game_id'])
 
+    # indicate that this board is being loaded from the profile
+    game_board['profile_load'] = True
+
     # Here I am just going to move this board to active games using the api we already have.
     # Note that board is still saved on user's profile, but we are just creating a new active game.
     response_status = game_utils.create_board_db(game_board)
-    print(response_status)
     if response_status['error']:
         return Response({'error': response_status['reason']},
                         status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -576,3 +580,25 @@ def load_board(request):
     del response_status['game_board']['graph']['uid']
 
     return Response(response_status['game_board'])
+
+@api_view(['GET'])
+def scheduled_tasks(request):
+    """
+    GET request API call.
+    Starts the scheduled tasks
+
+    :param request: GET request
+    :return: success message, else error status.
+    """
+
+    # TODO: RYAN, here call schedule 1 (gameboard cleaner), don't forget to import it above
+    # ryan_code.destroy_games()
+    # IF ERROR EXAMPLE:
+    #         return Response({'error': 'Did not work because_!'},
+    #                         status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    # TODO: RYAN, here call schedule 2 (scores sorter to assign ranking to each user),  don't forget to import it above
+    # ryan_code2.set_rankings()
+
+    # TODO: RYAN, no code here but need to setup the CI on github to have URL to this API call
+    return Response({'Done'})
