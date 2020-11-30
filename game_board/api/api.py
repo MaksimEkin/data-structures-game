@@ -61,6 +61,9 @@ def start_game(request, difficulty, player_ids, data_structures):
     if len(str(player_ids[0])) == 0:
         player_ids = ['Red Panda']
 
+    # Shuffle players
+    random.shuffle(player_ids)
+
     # Check if the number of players request is valid
     if len(player_ids) > config.MAX_NUM_PLAYERS:
         return Response({'error': 'Too many players requested!',
