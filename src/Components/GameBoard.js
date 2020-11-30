@@ -555,6 +555,11 @@ class GameBoard extends Component {
     this.setState({ graph: made_graph});
     this.setState({loading: false})
     console.log('exiting AI call, board is balanced: ',this.state.board.graph.balanced);
+    if(this.state.board != null && !this.state.board.graph.balanced && !this.state.game_over){
+      this.rebalanceAlert()
+    }
+    //{ (this.state.board != null && !this.state.board.graph.balanced && this.state.showModal && !this.state.turn.replace(/\s+/g, "").toLowerCase().startsWith('bot') ) ? this.rebalanceAlert() :  <div> </div> }
+          
   }
 
   //check if game is over (ie: is golden node at the root of the tree/does API end_game == true?)
@@ -630,7 +635,8 @@ class GameBoard extends Component {
     let user_graph = create_adjacency(this.state.graph)
     //passes users balance attempt in adjaceny form to rebalance
     this.rebalance(user_graph)
-    
+    this.setState({ showModal: !this.state.showModal})
+    console.log('exiting checknodes after rebalance, showModal is: ', this.state.showModal);
   }
 
   // Function to display all of the players in the gameboard
@@ -738,7 +744,7 @@ class GameBoard extends Component {
     }
   }
   rebalanceAlert = () =>{
-    console.log('in rebalanceAlert');
+    console.log('in rebalanceAlert, turn is: ',this.state.turn);
     
     console.log('showModal: ',this.state.showModal);
     Swal.fire({
@@ -746,7 +752,7 @@ class GameBoard extends Component {
       title: "UNBALANCED BOARD, PLAYER: " + this.state.turn,
       text: "TIME TO REBALANCE"
     })
-    this.setState({ showModal: false})
+    this.setState({ showModal: !this.state.showModal})
     
     console.log('exiting rebalanceAlert showModal: ',this.state.showModal);
   }
@@ -867,7 +873,6 @@ class GameBoard extends Component {
         <div style={{height: "10rem"}}>
 
           {this.state.game_over ? <WinModal winner={this.state.turn} win_board={this.state.board} /> : <div> </div>}
-          { (this.state.board != null && !this.state.board.graph.balanced && this.state.showModal ) ? this.rebalanceAlert() :  <div> </div> }
           <div className="flex items-center bg-opacity-0 h-11">
 
             <button className="transition duration-500 ease-in-out bg-blue-500 hover:bg-red-500 transform hover:-translate-y-1 hover:scale-105 bg-blue-300 border-blue-350 border-opacity-50 rounded-lg shadow-2xl flex-1 m-1 py-1 flex justify-center font-bold text-xl text-gray-800" 
