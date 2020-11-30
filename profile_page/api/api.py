@@ -242,7 +242,7 @@ def register(request):
 
     # Check if passwords match
     if data['password1'] != data['password2']:
-        return Response({'error': str('Passwords does not match!')}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'error': str('Passwords do not match!')}, status=status.HTTP_400_BAD_REQUEST)
 
     # Check minimum password length
     if len(str(data['password1'])) < 5:
@@ -250,11 +250,11 @@ def register(request):
 
     # check if user name is less than 3 characters
     if len(str(data['user_name'])) < 3:
-        return Response({'error': str('User name must be longer!')}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'error': str('Username must be longer than 3 characters!')}, status=status.HTTP_400_BAD_REQUEST)
 
     # Check if user name does not start with bot
     if str(data['user_name'])[0:3].lower() == 'bot':
-        return Response({'error': str('Username can not start with bot!')}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'error': str('Username can not start with "bot"!')}, status=status.HTTP_400_BAD_REQUEST)
 
     # Here ask db to create a new user with its token
     token = str(uuid.uuid1())
@@ -296,7 +296,7 @@ def login(request):
     # Here let db know of the new token that user owns
     token = str(uuid.uuid1())
     if not db.update_token(data['user_id'], token):
-        return Response({'error': str('Error when updating logging in!')}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response({'error': str('Error when updating log-in token!')}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     return Response({'status': 'success', 'token': token})
 
