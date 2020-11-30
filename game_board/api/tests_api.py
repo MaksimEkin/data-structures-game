@@ -343,7 +343,7 @@ class PlayGame(TestCase):
                     self.assertTrue(root_is_gold or deck_is_empty,
                                     msg=f'{BColors.FAIL}\t[-]\tGame ended without valid game ending condition!{BColors.ENDC}')
 
-                    self.assertEqual(response['turn'], board['turn'],
+                    self.assertEqual(response['turn'], max(board['player_points'], key=board['player_points'].get),
                                      msg=f'{BColors.FAIL}\t[-]\tWrong winner!{BColors.ENDC}')
                     break
 
