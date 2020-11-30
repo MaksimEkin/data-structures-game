@@ -100,10 +100,13 @@ class Profile extends Component {
             this.setState({ loggedIn: true })
 
             //alert successful login
-            Swal.fire({
-                title: 'Successfully logged in as ' + this.state.username + '!',
-                icon: 'success'
-            })
+            //added this conditional so that don't see alert for cypress testing
+            if (!window.top.Cypress) {
+                Swal.fire({
+                    title: 'Successfully logged in as ' + this.state.username + '!',
+                    icon: 'success'
+                })
+            }
         }
 
         //if login did not succeed, show error message

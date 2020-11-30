@@ -17,9 +17,20 @@ context('Logout Testing', () => {
         cy.url().should('contain', '/profile_page')
     })
 
-    //logging out before logging in should fail
-    it('Logout without logging in', () => {
+   //login & verify logout takes you back to login page
+    it("Test Username on User Profile", () => {
+        cy.get("input[id=username]")
+            .type('user1').should('have.value', 'user1')
+        cy.get("input[id=password")
+            .type('pass1').should('have.value', 'pass1')
+        cy.contains('Sign in').click()
+
+        //logout, verify correct popup, and that no longer on user profile page
         cy.contains('Sign out').click()
+        cy.contains('table').should('not.exist')
+
+        //verify that back at login page
+        cy.get("input[id=username]")
     })
 
 })
