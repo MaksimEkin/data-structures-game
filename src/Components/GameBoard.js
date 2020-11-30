@@ -482,7 +482,7 @@ class GameBoard extends Component {
 
     let response = await fetch(fetch_url, requestOptions);
     let newBoard = await response.json();
-    console.log('newBoard: ',newBoard)
+    
     //player might lose points when re-balance occurs
     this.setState({playerPointVal: newBoard['player_points'][this.state.turn]})
     this.setState({ board: newBoard, turn: newBoard['turn']});
@@ -498,18 +498,19 @@ class GameBoard extends Component {
   // call action api which returns new board
   // sets the new board
   playCard = (card) => {
-    console.log('in playCard');
     const cookies = new Cookies()
     cookies.set('selectedCard', card, { path: '/' })
 
     //make the API call to actually play the card the user chose
     this.apiCall()
-   
+    
+    if(this.state.board != null && !this.state.board.graph.balanced){
+      this.rebalanceAlert()
+    }
   }
 
   //modularize the api call for playing a card
   apiCall = async () => {
-    console.log('in API Call');
     const cookies = new Cookies();
 
     //form the URL that will be used
@@ -554,11 +555,10 @@ class GameBoard extends Component {
     let made_graph = create_graph(this.state.board['graph'])
     this.setState({ graph: made_graph});
     this.setState({loading: false})
-    console.log('exiting AI call, board is balanced: ',this.state.board.graph.balanced);
+    //rebalance alert after bot's turn
     if(this.state.board != null && !this.state.board.graph.balanced && !this.state.game_over){
       this.rebalanceAlert()
     }
-    //{ (this.state.board != null && !this.state.board.graph.balanced && this.state.showModal && !this.state.turn.replace(/\s+/g, "").toLowerCase().startsWith('bot') ) ? this.rebalanceAlert() :  <div> </div> }
           
   }
 
@@ -618,8 +618,8 @@ class GameBoard extends Component {
     );
   };
 
-  repositionNodes = () =>{console.log('board b4 repositioning: ', this.state.board['graph']);
-
+  repositionNodes = () =>{
+    
     this.setState({
       layoutEngineType: 'SnapToGrid',
       read_only: false,
@@ -635,8 +635,9 @@ class GameBoard extends Component {
     let user_graph = create_adjacency(this.state.graph)
     //passes users balance attempt in adjaceny form to rebalance
     this.rebalance(user_graph)
+    
     this.setState({ showModal: !this.state.showModal})
-    console.log('exiting checknodes after rebalance, showModal is: ', this.state.showModal);
+    
   }
 
   // Function to display all of the players in the gameboard
@@ -744,17 +745,13 @@ class GameBoard extends Component {
     }
   }
   rebalanceAlert = () =>{
-    console.log('in rebalanceAlert, turn is: ',this.state.turn);
-    
-    console.log('showModal: ',this.state.showModal);
-    Swal.fire({
+      Swal.fire({
       //display winner score
       title: "UNBALANCED BOARD, PLAYER: " + this.state.turn,
       text: "TIME TO REBALANCE"
     })
     this.setState({ showModal: !this.state.showModal})
     
-    console.log('exiting rebalanceAlert showModal: ',this.state.showModal);
   }
 
   buildSaveButton = () => {
