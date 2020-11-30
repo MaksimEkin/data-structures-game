@@ -470,9 +470,9 @@ class GameBoard extends Component {
   //post request to get correct/balanced game board and sets gameboard to
   //return balanced board
   
-    rebalance = async (rebalance_attempt) => {
+    rebalance = async (attempt) => {
     this.setState({loading:true})
-    console.log('rebalance attempt: ',rebalance_attempt);
+    let rebalance_attempt={'adjacency_list':attempt}
     let fetch_url = url+"game_board/api/rebalance/" + this.state.gameID + '/' + this.state.username + '/' + this.state.token
     let requestOptions = {
       method: 'POST',
