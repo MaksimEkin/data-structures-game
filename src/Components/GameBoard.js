@@ -811,31 +811,35 @@ class GameBoard extends Component {
     return (
 
       <div>
-        <Particles
+
+        {
+          // Dynamically render particles effect
+          <Particles
               id="particles2"
               params={{
                 particles: {
-                  color:"#000000",
+                  color: !(this.state.deckSize <= 13) ? "#000000" : !(this.state.deckSize <= 7) ? "#0080ff"  : !(this.state.deckSize <= 5) ? "#8000ff" : !(this.state.deckSize <= 3) ? "#358f17" : "#ff0080",
                   line_linked: {
-                    color:"#000000",
-                    distance:50,
+                    color: !(this.state.deckSize <= 13) ? "#000000" : !(this.state.deckSize <= 7) ? "#0080ff"  : !(this.state.deckSize <= 5) ? "#8000ff" : !(this.state.deckSize <= 3) ? "#358f17" : "#ff0080",
+                    distance: 50,
                   },
                   number: {
-                    value: 38,
+                    value: 185,
                     density: {
                       enable: true,
                       value_area: 500,
                     }
                   },
-                  move:{
-                    direction:"bottom",
+                  move: {
+                    direction: !(this.state.deckSize <= 7) ? "bottom" : "none",
                     random:true,
-                    speed:1,
-                    out_mode:"out",
+                    speed: !(this.state.deckSize <= 13) ? 1 : !(this.state.deckSize <= 7) ? 1.5  : !(this.state.deckSize <= 5) ? 2 : !(this.state.deckSize <= 3) ? 2.5 : 3,
+                    out_mode:!(this.state.deckSize <= 5) ? "out" : "bounce",
                   }
-                },
+               },
               }}
-        />
+          />
+        }
 
         <div className="flex mb-4 flex justify-center space-x-4">
             { !this.state.initial_load && this.state.playersArray.map((player) => this.playersDisplay(player)) }
