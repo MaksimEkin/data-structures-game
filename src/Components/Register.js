@@ -2,6 +2,8 @@ import React, {Component} from 'react'
 import Swal from "sweetalert2"
 import Cookies from "universal-cookie"
 import { BrowserRouter as Router, Link } from "react-router-dom";
+import Particles from "react-particles-js"
+
 
 const local = "http://127.0.0.1:8000/";
 const reactLocal = "http://localhost:3000/"
@@ -33,7 +35,7 @@ class Register extends Component {
     registerFxn = async () => {
 
         //if either field is blank, prompt user for input
-        if (!this.state.username || !this.state.password1 || this.state.password2 || this.state.email){
+        if (!this.state.username || !this.state.password1 || !this.state.password2 || !this.state.email){
             Swal.fire("Please fill in both the username and password fields")
             return
         }
@@ -80,14 +82,14 @@ class Register extends Component {
             Swal.fire({
                 title: 'Successfully registered!',
                 icon: 'success',
-                confirmButtonText: 'Return to Home Page'
+                confirmButtonText: 'User Profile'
 
                 //return to home page if click on button
             }).then((result) => {
 
-                //if player clicks "Return to Home Page" button, redirect there
+                //if player clicks "User Profile" button, redirect there
                 if (result.isConfirmed) {
-                    window.location.href = "/"
+                    window.location.href = "/profile_page"
                 }
             })
         }
@@ -109,83 +111,111 @@ class Register extends Component {
         await this.setState({ [e.target.name]: e.target.value })
     }
 
-    //update stored username when user types
-    handleUserChange = (event) => {
-        this.setState({
-            username: event.target.value
-        })
-    }
-
-    //update stored password when user types
-    handlePassChange = (event) => {
-        this.setState({
-            password: event.target.value
-        })
-    }
 
     render() {
         return (
-            <form class="container mx-auto h-full flex justify-center items-center align-center">
-                <div class="w-1/2 font-thin">
+            <div>
+            <Particles
+                id="particles"
+                params={{
+                    particles: {
+                        color: "#000000",
+                        line_linked: {
+                            color: "#000000",
+                        },
+                        number: {
+                            value: 80,
+                            density: {
+                                enable: true,
+                                value_area: 800,
+                            }
+                        },
+                    },
+                }}
+            />
+            <div className="flex items-center justify-center h-screen">
+                <div className="w-full md:max-w-md mt-6">
+                    <span>
+                        <div className="card bg-gray-200 shadow-2xl rounded-2xl px-4 py-4 mb-4 ">
 
-                    {/*Header*/}
-                    <h1 class="mt-12 mb-6 text-3xl text-center">
-                        Create a new profile
-                    </h1>
+                            <div className="space-y-10 flex justify-center">
+                                <h1 className="space-y-20 text-3xl text-center font-semibold text-gray-800 mb-2">Register to create your profile!</h1>
+                            </div>
 
-                    {/*Username and password boxes*/}
-                    <div class="align-center items-center">
-                    <div class="py-4 px-3">
-                        <label class="text-xl ml-32 px-4">
-                            Username:
-                        </label>
-                        <input class="bg-gray-200 shadow border-blue-500 border rounded w-48 py-2 px-2 text-gray-700"
-                               name="username" id="username1" type="text" value={this.state.username}
-                               onChange={this.handleInput}>
-                        </input>
-                        </div>
-                        <div class="py-4 px-3">
-                        <label className="text-xl ml-32 px-3">
-                            Email:
-                        </label>
-                        <input className="bg-gray-200 shadow border-blue-500 border rounded w-48 py-2 px-2 text-gray-700"
-                               name="email" id="email" type="text" value = {this.state.email}
-                               onChange={this.handleInput}>
-                        </input>
-                        </div>
+                            <form>
+
+                                <div className="space-y-2 p-3 items-center">
+                                    <label className="text-xl text-left font-semibold text-gray-800 mb-2 px-3">
+                                        Username:
+                                    </label>
+                                    <input
+                                        className="bg-gray-200 shadow border-blue-500 border rounded py-2 pl-40  text-gray-700"
+                                        name="username" id="username" type="text" value={this.state.username}
+                                        onChange={this.handleInput}>
+                                    </input>
+                                </div>
 
 
-                        <div class="py-4 px-3">
-                        <label className="text-xl ml-32 px-3">
-                            Password:
-                        </label>
-                        <input className="bg-gray-200 shadow border-blue-500 border rounded w-48 py-2 px-2 text-gray-700"
-                               name="password1" id="password1" type="password" placeholder="******************" value = {this.state.password1}
-                               onChange={this.handleInput}>
-                        </input>
-                        </div>
+                                <div className="space-y-2 p-3 items-center">
+                                    <label className="text-xl text-left font-semibold text-gray-800 mb-2 px-3">
+                                        Email:
+                                    </label>
+                                    <input
+                                        className="bg-gray-200 shadow border-blue-500 border rounded py-2 pl-40  text-gray-700"
+                                        name="email" id="email" type="text" value={this.state.email}
+                                        onChange={this.handleInput}>
+                                    </input>
+                                </div>
 
-                        <div class="py-4 px-3">
-                        <label className="text-xl ml-32 px-3">
-                            Re-Enter Password:
-                        </label>
-                        <input className="bg-gray-200 shadow border-blue-500 border rounded w-48 py-2 px-2 text-gray-700"
-                               name="password2" id="password2" type="password" placeholder="******************" value = {this.state.password2}
-                               onChange={this.handleInput}>
-                        </input>
-                        </div>
-                    </div>
+                                <div className="space-y-2 px-3 items-center">
+                                    <label className="text-xl text-left font-semibold text-gray-800 mb-2 px-4">
+                                        Password:
+                                    </label>
+                                    <input
+                                        className="bg-gray-200 shadow border-blue-500 border rounded py-2 pl-40 text-gray-700"
+                                        name="password1" id="password1" type="password" placeholder="******************"
+                                        value={this.state.password1}
+                                        onChange={this.handleInput}>
+                                    </input>
+                                </div>
 
-                    <div>
-                        {/*When user clicks "Sign in", make api call*/}
-                        <button class="bg-blue-500 text-white hover:bg-blue-700 ml-64 w-32 font-bold rounded py-2 px-4"
-                            id="login-btn" type="button"
-                            onClick={() => this.registerFxn()}>
-                            Register
-                        </button>
-                    </div>
-                </div>
-            </form>
+
+
+                                <div className="space-y-2 px-3 items-center">
+                                    <label className="text-xl text-left font-semibold text-gray-800 mb-2 px-4">
+                                        Verify Password:
+                                    </label>
+                                    <input
+                                        className="bg-gray-200 shadow border-blue-500 border rounded py-2 pl-40  text-gray-700"
+                                        name="password2" id="password2" type="password" placeholder="******************"
+                                        value={this.state.password2}
+                                        onChange={this.handleInput}>
+                                    </input>
+                                </div>
+
+
+
+
+
+                                <div className="space-y-10"><br></br></div>
+                                {/*When user clicks "Register", make api call*/}
+                                <button
+                                    className="shadow transition duration-500 ease-in-out bg-blue-500 hover:bg-red-500 transform hover:-translate-y-1 hover:scale-105 bg-blue-300 border-blue-350 border-opacity-50 rounded-lg shadow-xl mx-32 px-10 py-3 rounded spacing-y-3 spacing-x-10 text-xl font-bold"
+                                    id="login-btn" type="button"
+                                    onClick={() => this.registerFxn()}>
+                                    Register
+                                </button>
+                                <div className="space-y-10"><br></br></div>
+
+                            </form>
+
+                        </div></span></div></div></div>
+
+
+
+
+
+
         )
     }
 }

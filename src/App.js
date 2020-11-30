@@ -23,12 +23,11 @@ export default function App() {
           <Route path="/profile_page">
             <Profile />
           </Route>
+          <Route path="/register" exact component= {Register} />
           <Route path="/">
             <Home />
           </Route>
-          <Route path="/register">
-            <Register />
-          </Route>
+            
         </Switch>
       </div>
     </Router>
