@@ -6,6 +6,7 @@
     game board sharing and saving.
 """
 import uuid
+import re
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
@@ -61,6 +62,11 @@ def profile(request):
 
     # POST Request content
     data = request.data
+
+    # check for bad characters
+    if check_special_characters(str(data['user_id'])) or check_special_characters(str(data['token'])):
+        return Response({'error': str('Unaccepted character passed!')},
+                        status=status.HTTP_400_BAD_REQUEST)
 
     # Here check if user_id matches the token with the database
     if not db.check_user(data['user_id'], data['token']):
@@ -234,16 +240,30 @@ def register(request):
         return Response({'error': str('Passwords do not match!')}, status=status.HTTP_400_BAD_REQUEST)
 
     # Check minimum password length
-    if len(str(data['password1'])) <= 5:
-        return Response({'error': str('Password has to be longer than 5 characters!')}, status=status.HTTP_400_BAD_REQUEST)
+    if len(str(data['password1'])) <= 8:
+        return Response({'error': str('Password has to be longer than 8 characters!')}, status=status.HTTP_400_BAD_REQUEST)
 
     # check if user name is less than 3 characters
-    if len(str(data['user_name'])) <= 3:
-        return Response({'error': str('Username must be longer than 3 characters!')}, status=status.HTTP_400_BAD_REQUEST)
+    if len(str(data['user_name'])) <= 5:
+        return Response({'error': str('Username must be longer than 5 characters!')}, status=status.HTTP_400_BAD_REQUEST)
 
     # Check if user name does not start with bot
     if str(data['user_name'])[0:3].lower() == 'bot':
         return Response({'error': str('Username can not start with "bot"!')}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Check if username has space
+    if str(data['user_name']).isspace() or str(data['password1']).isspace() or str(data['email']).isspace():
+        return Response({'error': str('Username, password, and email can not have space!')}, status=status.HTTP_400_BAD_REQUEST)
+
+    # check for valid e-mail
+    if not bool(re.search(r"^[\w\.\+\-]+\@[\w]+\.[a-z]{2,3}$", str(data['email']))):
+        return Response({'error': str('Invalid e-mail!')},
+                        status=status.HTTP_400_BAD_REQUEST)
+
+    # check for not allowed characters
+    if check_special_characters(str(data['user_name'])) or check_special_characters(str(data['password1'])):
+        return Response({'error': str('Unaccepted character passed!')},
+                        status=status.HTTP_400_BAD_REQUEST)
 
     # Here ask db to create a new user with its token
     token = str(uuid.uuid1())
@@ -273,6 +293,11 @@ def login(request):
 
     # POST Request content
     data = request.data
+
+    # check for not allowed characters
+    if check_special_characters(str(data['user_id'])) or check_special_characters(str(data['password'])):
+        return Response({'error': str('Unaccepted character passed!')},
+                        status=status.HTTP_400_BAD_REQUEST)
 
     # Here ask db if username and password works out
     # if db says nope, return error. else proceed.
@@ -308,6 +333,11 @@ def logout(request):
     # POST Request content
     data = request.data
 
+    # check for not allowed characters
+    if check_special_characters(str(data['user_id'])) or check_special_characters(str(data['token'])):
+        return Response({'error': str('Unaccepted character passed!')},
+                        status=status.HTTP_400_BAD_REQUEST)
+
     # Here check if user_id matches the token with the database
     if not db.check_user(data['user_id'], data['token']):
         return Response({'error': str('UNAUTHORIZED')}, status=status.HTTP_401_UNAUTHORIZED)
@@ -338,6 +368,11 @@ def delete(request):
 
     # POST Request content
     data = request.data
+
+    # check for not allowed characters
+    if check_special_characters(str(data['user_id'])) or check_special_characters(str(data['token'])):
+        return Response({'error': str('Unaccepted character passed!')},
+                        status=status.HTTP_400_BAD_REQUEST)
 
     # Here check if user_id matches the token with the database
     if not db.check_user(data['user_id'], data['token']):
@@ -372,6 +407,12 @@ def save_board(request):
 
     # POST Request content
     data = request.data
+
+    # check for not allowed characters
+    if check_special_characters(str(data['user_id'])) or check_special_characters(str(data['game_id']))  \
+            or check_special_characters(str(data['token'])):
+        return Response({'error': str('Unaccepted character passed!')},
+                        status=status.HTTP_400_BAD_REQUEST)
 
     # Here check if user_id matches the token with the database
     if not db.check_user(data['user_id'], data['token']):
@@ -412,6 +453,12 @@ def delete_board(request):
     # POST Request content
     data = request.data
 
+    # check for not allowed characters
+    if check_special_characters(str(data['user_id'])) or check_special_characters(str(data['game_id']))  \
+            or check_special_characters(str(data['token'])):
+        return Response({'error': str('Unaccepted character passed!')},
+                        status=status.HTTP_400_BAD_REQUEST)
+
     # Here check if user_id matches the token with the database
     if not db.check_user(data['user_id'], data['token']):
         return Response({'error': str('UNAUTHORIZED')}, status=status.HTTP_401_UNAUTHORIZED)
@@ -448,6 +495,12 @@ def share(request):
 
     # POST Request content
     data = request.data
+
+    # check for not allowed characters
+    if check_special_characters(str(data['source_user_id'])) or check_special_characters(str(data['dest_user_id']))  \
+            or check_special_characters(str(data['game_id'])) or check_special_characters(str(data['token'])):
+        return Response({'error': str('Unaccepted character passed!')},
+                        status=status.HTTP_400_BAD_REQUEST)
 
     # Here check if user_id matches the token with the database
     if not db.check_user(data['source_user_id'], data['token']):
@@ -519,6 +572,11 @@ def load_board(request):
     # POST Request content
     data = request.data
 
+    if check_special_characters(str(data['user_id'])) or check_special_characters(str(data['game_id']))  \
+            or check_special_characters(str(data['token'])):
+        return Response({'error': str('Unaccepted character passed!')},
+                        status=status.HTTP_400_BAD_REQUEST)
+
     # Here check if user_id matches the token with the database
     if not db.check_user(data['user_id'], data['token']):
         return Response({'error': str('UNAUTHORIZED')}, status=status.HTTP_401_UNAUTHORIZED)
@@ -570,3 +628,9 @@ def scheduled_tasks(request):
 
     # TODO: RYAN, no code here but need to setup the CI on github to have URL to this API call
     return Response({'Done'})
+
+def check_special_characters(string):
+    """Check if string has the target special character"""
+
+    regex = re.compile('[@_!#$%^&*()<>?/\|}{~:]\'')
+    return not (regex.search(string) == None)
