@@ -20,7 +20,6 @@ from profile_page.api import mock as mock_db
 def api_overview(request):
     '''
     Overview of the API calls exist.
-
     :param request:
     :return: Response, list of API URLs for the user profile.
     '''
@@ -50,7 +49,6 @@ def profile(request):
     POST request API call.
     Returns all of the user's profile information if the user is authenticated.
     Else, UNAUTHORIZED error is returned.
-
     :param request: POST request with fields 'user_id', 'token'.
     :return: success message, else error status.
     """
@@ -101,11 +99,9 @@ def add_friend(request):
     POST request API call.
     Sends a friend request to the destination user if the source user is authenticated.
     Else, UNAUTHORIZED error is returned.
-
     source_user_id: user who is adding a friend.
     dest_user_id: friend who is being added.
     token: authentication token that allow access to the user's account.
-
     :param request: POST request with fields 'source_user_id', 'dest_user_id', 'token'
     :return: success message or error status.
     """
@@ -136,12 +132,10 @@ def accept_decline_friend(request):
     POST request API call.
     Accepts the friend request if the source user is authenticated.
     Else, UNAUTHORIZED error is returned.
-
     source_user_id: user who recieved the friend request.
     dest_user_id: user who initiated friend request.
     accept: indicate acceptence or decline of the request.
     token: authentication token that allow access to the user's account.
-
     :param request: POST request with fields 'source_user_id', 'dest_user_id', 'accept', 'token'
     :return: success message or error status.
     """
@@ -184,11 +178,9 @@ def remove_friend(request):
     POST request API call.
     Removes the friend from user's profile if the source user is authenticated.
     Else, UNAUTHORIZED error is returned.
-
     source_user_id: user who is deleting a friend.
     dest_user_id: friend that is being deleted.
     token: authentication token that allow access to the user's account.
-
     :param request: POST request with fields 'source_user_id', 'dest_user_id', 'token'
     :return: success message or error status.
     """
@@ -267,10 +259,8 @@ def login(request):
     Checks the database for matching username and password.
     If match is found, returns an authentication token.
     If match is not found, UNAUTHORIZED is returned.
-
     user_id: unique user identifier (same as username).
     password: user's password.
-
     :param request: POST request with fields 'user_id', 'password'.
     :return: user token for the authentcation if sucesfull, else error message.
     """
@@ -303,10 +293,8 @@ def logout(request):
     If the username has the given token, logout action is performed
     by removing user's token from the database.
     Else, UNAUTHORIZED error is returned.
-
     user_id: unique user identifier (same as username).
     token: authentication token that allow access to the user's account.
-
     :param request: POST request with fields 'user_id', 'token'.
     :return: success message, else error status.
     """
@@ -336,10 +324,8 @@ def delete(request):
     """
     If the username has the given token, user's account is deleted.
     Else, UNAUTHORIZED error is returned.
-
     user_id: unique user identifier (same as username).
     token: authentication token that allow access to the user's account.
-
     :param request: POST request with fields 'user_id', 'token'.
     :return: success message, else error status.
     """
@@ -371,13 +357,10 @@ def save_board(request):
     to the user's profile. Game is only saved if the user is
     authenticated, i.e. if the user has the matching token, else
     UNAUTHORIZED error is returned.
-
     Game that is being saved must exist in the list of active games.
-
     user_id: unique user identifier (same as username).
     token: authentication token that allow access to the user's account.
     game_id: ID of the saved game.
-
     :param request: POST request with fields 'user_id', 'game_id', 'token'.
     :return: success message, or error status.
     """
@@ -414,11 +397,9 @@ def delete_board(request):
     Removes the saved game board from user's profile.
     User must be authenticated, i.e. must have the matching token.
     Game board in the user's profile identified by game_id must exist.
-
     user_id: unique user identifier (same as username).
     token: authentication token that allow access to the user's account.
     game_id: ID of the saved game.
-
     :param request: POST request with fields 'user_id', 'game_id', 'token'.
     :return: success message, or error status.
     """
@@ -450,15 +431,12 @@ def share(request):
     the user must have the matching token. The game board
     identified by game_id must exist in user's profile.
     Destination user must have the accept shared games setting turned on.
-
     Share action is performed by creating a copy of the game board in the
     user's profile identified by dest_user_id.
-
     source_user_id: unique user identifier of user initiating share (same as username).
     dest_user_id: unique user identifier of user recieving the game (same as username).
     token: authentication token that allow access to the user's account.
     game_id: ID of the saved game.
-
     :param request: POST request with fields 'source_user_id', 'dest_user_id', 'game_id', 'token'
     :return: success message or error status.
     """
@@ -487,10 +465,8 @@ def share(request):
 def saved_boards(request, user_id, token):
     """
     GET request API call to aquire the saved games in the user's profile.
-
     user_id: unique user identifier (same as username).
     token: authentication token that allow access to the user's account.
-
     :param request: GET request
     :param user_id: username who is performing the action
     :param token: authentication token
@@ -527,13 +503,10 @@ def load_board(request):
     User must be authenticated, i.e. token must match with user's profile.
     Once the game loaded, i.e. moved to the active games, board can be
     interacted with using the Game Board API.
-
     User must have the claimed game board defined by the game_id.
-
     user_id: unique user identifier (same as username).
     token: authentication token that allow access to the user's account.
     game_id: ID of the saved game.
-
     :param request: POST request with fields 'user_id', 'game_id', 'token'
     :return: Game Board instance
     """
@@ -582,7 +555,6 @@ def scheduled_tasks(request):
     """
     GET request API call.
     Starts the scheduled tasks
-
     :param request: GET request
     :return: success message, else error status.
     """

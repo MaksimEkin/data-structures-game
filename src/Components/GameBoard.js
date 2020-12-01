@@ -759,11 +759,15 @@ class GameBoard extends Component {
 
   buildSaveButton = () => {
 
-    if(!this.state.initial_load && this.state.username != "-1" && this.state.token != "-1") {
+    if (!this.state.initial_load && this.state.username != "-1" && this.state.token != "-1") {
       return (
-        <button data-delay-show='500' data-place="bottom" data-tip="Save the current game to profile" data-offset="{'top': -20}" data-text-color="yellow"
-        className="transition duration-500 ease-in-out bg-green-500 hover:bg-green-600  transform hover:-translate-y-1 hover:scale-105   border-green-500  border-opacity-50 rounded-lg shadow-2xl flex-1 m-1 py-1 flex justify-center font-bold text-xl text-gray-800" 
-        onClick={() =>this.saveGame()}>Save Game</button>
+
+          <button data-delay-show='500' data-place="bottom" data-tip="Save the current game to profile"
+                  data-offset="{'top': -20}" data-text-color="yellow"
+                  className="transition duration-500 ease-in-out bg-green-500 hover:bg-green-600  transform hover:-translate-y-1 hover:scale-105   border-green-500  border-opacity-50 rounded-lg shadow-2xl flex-1 m-1 py-1 flex justify-center font-bold text-xl text-gray-800"
+                  onClick={() => this.saveGame()}>Save Game</button>
+
+
       )
     }
   }
