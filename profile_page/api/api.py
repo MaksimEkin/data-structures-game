@@ -630,7 +630,14 @@ def scheduled_tasks(request):
     return Response({'Done'})
 
 def check_special_characters(string):
-    """Check if string has the target special character"""
+    """
+    Check if string has the target special character.
+    Return True if unwanted character is in the string.
+    """
 
     regex = re.compile('[@_!#$%^&*()<>?/\|}{~:]\'')
-    return not (regex.search(string) == None)
+
+    if regex.search(string) is None:
+        return False
+    else:
+        return True
