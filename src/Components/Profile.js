@@ -11,7 +11,7 @@ const remote = "https://data-structures-game.herokuapp.com/";
 const tableHeaders = ["Game", "Type", "Difficulty", "Actions"]
 
 //can also be const url = local; or const url = reactLocal;
-const url = remote;
+const url = local;
 
 /* This class provides the functionality for logging in and out,
    registering a new account and (eventually) adding friends

@@ -5,6 +5,7 @@ import { BrowserRouter as Router, Link } from "react-router-dom";
 import Particles from "react-particles-js"
 
 
+
 const local = "http://127.0.0.1:8000/";
 const reactLocal = "http://localhost:3000/"
 const remote = "https://data-structures-game.herokuapp.com/";
@@ -12,7 +13,7 @@ const remote = "https://data-structures-game.herokuapp.com/";
 //can also be const url = local; or const url = reactLocal;
 const url = local;
 
-/* This class provides the functionality for logging in and out,
+/* This class provides the functionality for registering only,
    registering a new account and (eventually) adding friends
    and viewing user's profile info
  */
@@ -36,7 +37,7 @@ class Register extends Component {
 
         //if either field is blank, prompt user for input
         if (!this.state.username || !this.state.password1 || !this.state.password2 || !this.state.email){
-            Swal.fire("Please fill in both the username and password fields")
+            Swal.fire("Please fill all fields")
             return
         }
 
@@ -69,7 +70,7 @@ class Register extends Component {
         let fetch_url = url + "profile_page/api/register"
         let response = await fetch(fetch_url, requestOptions);
         let returned = await response.json();
-
+      
         //if login attempt was successful
         if (returned["status"] == "success") {
 
@@ -78,13 +79,13 @@ class Register extends Component {
             cookies.set('token', returned["token"], { path: '/' })
             cookies.set('username', this.state.username, { path: '/'})
 
-            //alert successful login
+            //alert successful registration
             Swal.fire({
                 title: 'Successfully registered!',
                 icon: 'success',
                 confirmButtonText: 'User Profile'
 
-                //return to home page if click on button
+                //return to profile page if click on button
             }).then((result) => {
 
                 //if player clicks "User Profile" button, redirect there
@@ -94,21 +95,22 @@ class Register extends Component {
             })
         }
 
-        //if login did not succeed, show error message
+        //if registration did not succeed, show error message
         else {
+
             Swal.fire({
                 title: 'User Registration Failed',
                 icon: 'error',
-
-                //may add "Forgot password" option later
-                text: 'If you believe this is a mistake, please try authenticating again'
+                text: returned['error']
             })
         }
+
     }
 
     //make api call to log out
     handleInput = async (e) => {
         await this.setState({ [e.target.name]: e.target.value })
+        console.log(e.target.value)
     }
 
 
