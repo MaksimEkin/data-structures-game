@@ -636,7 +636,5 @@ def check_special_characters(string):
     """
     check = ["[", "@", "_", "!", "#", "$", "%", "^", "&", "*", "(", ")", "<", ">",
              "?", "/", "\\", "|", "}", "{", "~", ":", "]", "'"]
-    if any(ext in string for ext in check):
-        return True
-    else:
-        return False
+
+    return any(ext in string for ext in check)
