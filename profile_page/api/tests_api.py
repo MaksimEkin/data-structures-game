@@ -149,6 +149,7 @@ class Register(TestCase):
 
         response = self.client.post('/profile_page/api/register', post_data).data
         self.assertEqual(response['error'], 'Username can not start with "bot"!',
+
                          msg=f'{BColors.FAIL}\t[-]\tAccepted bot user name!{BColors.ENDC}')
         print(f"{BColors.OKGREEN}\t[+]\tUser name bot did not allowed.{BColors.ENDC}")
 
@@ -162,6 +163,7 @@ class Register(TestCase):
 
         response = self.client.post('/profile_page/api/register', post_data).data
         self.assertEqual(response['error'], 'Username must be longer than 3 characters!',
+
                          msg=f'{BColors.FAIL}\t[-]\tAccepted short user name!{BColors.ENDC}')
         print(f"{BColors.OKGREEN}\t[+]\tShort user name was not allowed.{BColors.ENDC}")
 

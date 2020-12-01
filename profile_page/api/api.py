@@ -218,15 +218,12 @@ def register(request):
     """
     POST request API call.
     Registers a new user by creating a new account in the databse.
-
     Two passwords that are being passed must match.
     Username or e-mail should not exist already.
-
     user_name: User's unique name.
     password1: Password.
     password2: Password match.
     email: User's email.
-
     :param request: POST request with fields 'user_name', 'password1', 'password2', 'email'
     :return: user token for the authentcation if sucesfull, else error message.
     """
@@ -262,7 +259,6 @@ def register(request):
         return Response({'error': str('Error when creating the account!')}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     return Response({'status': 'success', 'token': token})
-
 
 @api_view(['POST'])
 def login(request):

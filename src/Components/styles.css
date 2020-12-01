@@ -43,3 +43,10 @@
   padding: 15px 32px;
   font-weight: bold;
 }
+
+button:disabled,
+button[disabled]{
+  border: 1px solid #999999;
+  background-color: #cccccc;
+  color: #666666;
+}
