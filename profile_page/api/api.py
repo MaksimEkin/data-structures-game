@@ -252,7 +252,6 @@ def register(request):
 
     return Response({'status': 'success', 'token': token})
 
-
 @api_view(['POST'])
 def login(request):
     """

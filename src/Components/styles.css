@@ -8,6 +8,9 @@
 #particles2 {
     z-index: -1;
     position:absolute;
+    width: 100%;
+    height: 100%;
+    background-color:#eae7dc;
 }
 
 .App {
