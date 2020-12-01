@@ -6,7 +6,7 @@ import Cookies from 'universal-cookie';
 import WinModal from './Modal/WinModal.js';
 import ReactTooltip from "react-tooltip";
 import Particles from 'react-particles-js';
-import RebalanceModal from './Modal/RebalanceModal.js'
+
 import Swal from "sweetalert2"
 
 //Uber's digraph react folder
