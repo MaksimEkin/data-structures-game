@@ -1,45 +1,49 @@
 #particles canvas{
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
 }
 
 #particles2 {
-    z-index: -1;
-    position:absolute;
-    width: 100%;
-    height: 100%;
-    background-color:#eae7dc;
+  z-index: -1;
+  position:absolute;
 }
 
 .App {
-  font-family: sans-serif;
-  text-align: center;
-  height: 50rem;
+font-family: sans-serif;
+text-align: center;
+height: 50rem;
 }
 
 .startButton{
-  display: flex;
-  justify-content: center;
-  width: 30%;
-  margin: auto;
-  background-color: #555555;
-  color: white;
-  font-size: 15px;
-  padding: 15px 32px;
-  font-weight: bold;
+display: flex;
+justify-content: center;
+width: 30%;
+margin: auto;
+background-color: #555555;
+color: white;
+font-size: 15px;
+padding: 15px 32px;
+font-weight: bold;
 }
 
 
 .startButton{
-  display: flex;
-  justify-content: center;
-  width: 10%;
-  margin: auto;
-  background-color: #555555;
-  color: white;
-  font-size: 15px;
-  padding: 15px 32px;
-  font-weight: bold;
+display: flex;
+justify-content: center;
+width: 10%;
+margin: auto;
+background-color: #555555;
+color: white;
+font-size: 15px;
+padding: 15px 32px;
+font-weight: bold;
+}
+
+button:disabled,
+button[disabled]{
+border: 1px solid #999999;
+background-color: #cccccc;
+color: #666666;
 }
