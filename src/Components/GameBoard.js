@@ -6,7 +6,6 @@ import Cookies from 'universal-cookie';
 import WinModal from './Modal/WinModal.js';
 import ReactTooltip from "react-tooltip";
 import Particles from 'react-particles-js';
-import RebalanceModal from './Modal/RebalanceModal.js'
 import Swal from "sweetalert2"
 
 //Uber's digraph react folder
@@ -37,7 +36,7 @@ const reactLocal = "http://localhost:3000/"
 const remote = "https://data-structures-game.herokuapp.com/";
 
 //can also be const url = local; or const url = reactLocal;
-const url = local;
+const url = remote;
 
 //define sample node
 const sample = {

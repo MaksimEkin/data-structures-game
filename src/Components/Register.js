@@ -1,7 +1,6 @@
 import React, {Component} from 'react'
 import Swal from "sweetalert2"
 import Cookies from "universal-cookie"
-import { BrowserRouter as Router, Link } from "react-router-dom";
 import Particles from "react-particles-js"
 
 
@@ -11,7 +10,7 @@ const reactLocal = "http://localhost:3000/"
 const remote = "https://data-structures-game.herokuapp.com/";
 
 //can also be const url = local; or const url = reactLocal;
-const url = local;
+const url = remote;
 
 /* This class provides the functionality for registering only,
    registering a new account and (eventually) adding friends
@@ -110,7 +109,7 @@ class Register extends Component {
     //make api call to log out
     handleInput = async (e) => {
         await this.setState({ [e.target.name]: e.target.value })
-        console.log(e.target.value)
+       
     }
 
 
