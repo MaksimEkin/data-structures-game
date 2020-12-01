@@ -250,7 +250,7 @@ class Login(TestCase):
         """Tests logging in with invalid password."""
 
         post_data = {'user_id': self.user_info,
-                     'password': 'many_pineapple'}
+                     'password': 'manymanypineapple'}
 
         response = self.client.post('/profile_page/api/login', post_data)
         self.assertEqual(response.status_code, 401,

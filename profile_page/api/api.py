@@ -252,7 +252,7 @@ def register(request):
         return Response({'error': str('Username can not start with "bot"!')}, status=status.HTTP_400_BAD_REQUEST)
 
     # Check if username has space
-    if str(data['user_name']).isspace() or str(data['password1']).isspace() or str(data['email']).isspace():
+    if len(str(data['user_name']).split(" ")) > 1 or len(str(data['password1']).split(" ")) > 1 or len(str(data['email']).split(" ")) > 1:
         return Response({'error': str('Username, password, and email can not have space!')}, status=status.HTTP_400_BAD_REQUEST)
 
     # check for valid e-mail
@@ -634,10 +634,9 @@ def check_special_characters(string):
     Check if string has the target special character.
     Return True if unwanted character is in the string.
     """
-
-    regex = re.compile('[@_!#$%^&*()<>?/\|}{~:]\'')
-
-    if regex.search(string) is None:
-        return False
-    else:
+    check = ["[", "@", "_", "!", "#", "$", "%", "^", "&", "*", "(", ")", "<", ">",
+             "?", "/", "\\", "|", "}", "{", "~", ":", "]", "'"]
+    if any(ext in string for ext in check):
         return True
+    else:
+        return False
