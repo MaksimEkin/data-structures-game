@@ -571,8 +571,3 @@ def scheduled_tasks(request):
 
     # TODO: RYAN, no code here but need to setup the CI on github to have URL to this API call
     return Response({'Done'})
-
-
-
-
-
