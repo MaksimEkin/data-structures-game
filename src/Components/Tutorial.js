@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import Particles from 'react-particles-js';
 
-
 class Tutorial extends Component{
 
     //constructor to set the intial state value's
