@@ -22,5 +22,6 @@ urlpatterns = [
     path('game_board/', include('game_board.urls')),
     path('profile_page/', include('profile_page.urls')),
     path('register/', include('register.urls')),
+    path('tutorial/', include('tutorial.urls')),
 
 ]

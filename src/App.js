@@ -6,7 +6,7 @@ import Header from './Components/Header';
 import {Route, Switch} from "react-router-dom";
 import { BrowserRouter as Router } from 'react-router-dom'
 import Register from "./Components/Register";
-
+import Tutorial from "./Components/Tutorial";
 
 //react router used to make this web app multiple pages instead of single page application
 export default function App() {
@@ -24,6 +24,7 @@ export default function App() {
             <Profile />
           </Route>
           <Route path="/register" exact component= {Register} />
+          <Route path="/tutorial" exact component= {Tutorial} />
           <Route path="/">
             <Home />
           </Route>
