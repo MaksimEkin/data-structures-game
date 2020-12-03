@@ -73,7 +73,7 @@ def start_game(request, difficulty, player_ids, data_structures):
             player_ids.append(pl_id)
 
     # Shuffle players
-    random.shuffle(player_ids)
+    #random.shuffle(player_ids)
 
     # Check if the number of players request is valid
     if len(player_ids) > config.MAX_NUM_PLAYERS:
