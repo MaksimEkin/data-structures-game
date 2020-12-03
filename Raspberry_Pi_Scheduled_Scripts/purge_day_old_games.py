@@ -1,8 +1,8 @@
 """
 Removes games older than a day from the mongo db from a Rasberry Pi
 """
-from pymongo import MongoClient
 import datetime as dt
+from pymongo import MongoClient
 
 client = MongoClient("mongodb+srv://pandaeatsbamboo:naw,man,theyEatRice@cluster0.daayj.mongodb.net/cluster0?retryWrites=true&w=majority")
 

@@ -1,7 +1,6 @@
 """
 Sets all user rankings from a Rasberry Pi
 """
-import pymongo
 from pymongo import MongoClient, DESCENDING, ReturnDocument
 
 client = MongoClient("mongodb+srv://pandaeatsbamboo:naw,man,theyEatRice@cluster0.daayj.mongodb.net/cluster0?retryWrites=true&w=majority")
