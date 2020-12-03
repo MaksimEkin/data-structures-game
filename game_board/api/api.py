@@ -4,6 +4,7 @@
 import json
 import random
 from time import sleep
+import uuid
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
@@ -27,8 +28,9 @@ def api_overview(request):
     api_urls = {
         'Start Game': '/start_game/<str:difficulty>/<str:player_ids>/<str:data_structures>',
         'Game Board': '/board/<str:id>',
-        'Re-balance Tree': '/rebalance/<str:game_id>',
-        'Action': '/action/<str:card>/<str:game_id>'
+        'Re-balance Tree': '/rebalance/<str:game_id>/<str:user_id>/<str:token>',
+        'Action': '/action/<str:card>/<str:game_id>/<str:user_id>/<str:token>',
+        'AI-Pick': '/action/<str:card>/<str:game_id>/<str:user_id>/<str:token>',
     }
     return Response(api_urls)
 
@@ -54,12 +56,21 @@ def start_game(request, difficulty, player_ids, data_structures):
                         status=status.HTTP_400_BAD_REQUEST)
 
     # Convert the string fields into list. Separate by comma if provided
-    player_ids = player_ids.split(',')
+    player_ids_temp = player_ids.split(',')
     data_structures = data_structures.split(',')
 
-    # If empty player_ids is passed
-    if len(str(player_ids[0])) == 0:
-        player_ids = ['Red Panda']
+    player_ids = list()
+    for pl_id in player_ids_temp:
+        pl_id = str(pl_id).strip()
+
+        # If empty player_ids is passed
+        if len(pl_id) == 0:
+            random_player = 'RedPanda_' + str(uuid.uuid1())[:5]
+            while random_player in player_ids:
+                random_player = 'RedPanda_' + str(uuid.uuid1())[:5]
+            player_ids.append(random_player)
+        else:
+            player_ids.append(pl_id)
 
     # Shuffle players
     random.shuffle(player_ids)
