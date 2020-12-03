@@ -1,5 +1,5 @@
 """
-Removes games older than a day from the mongo db from a Rasberry Pi
+Sets all user rankings from a Rasberry Pi
 """
 import pymongo
 from pymongo import MongoClient, DESCENDING, ReturnDocument
