@@ -1,5 +1,5 @@
 """
-Sets all user rankings from a Rasberry Pi
+Sets all user rankings from a Raspberry Pi
 """
 import os
 from pymongo import MongoClient, DESCENDING, ReturnDocument
