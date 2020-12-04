@@ -1,5 +1,6 @@
 """
-Removes games older than a day from the mongo db from a Rasberry Pi
+Removes games older than a day from the mongo db from a Raspberry Pi
+command to run: python purge_day_old_games.py
 """
 
 import os
