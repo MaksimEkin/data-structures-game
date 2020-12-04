@@ -51,7 +51,6 @@ def get_rankings():
 
 if __name__ == '__main__':
     rank_cursor = get_rankings()
-    print("Setting ranks...")
     rank_iterator = 1
 
     for user_rank in get_rankings():
@@ -62,4 +61,3 @@ if __name__ == '__main__':
             with open("rank_exception_log.txt", "a") as file:
                 file.write("Could not process " + str( user_rank ) + " in rankings\n")
             print("Exception logged - Ranking")
-    print("Ranks set")
