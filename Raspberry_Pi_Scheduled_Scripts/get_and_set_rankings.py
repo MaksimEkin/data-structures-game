@@ -1,5 +1,6 @@
 """
 Sets all user rankings from a Raspberry Pi
+command to run: python get_and_set_rankings.py
 """
 import os
 from pymongo import MongoClient, DESCENDING, ReturnDocument
