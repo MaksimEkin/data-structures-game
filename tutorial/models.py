@@ -1,5 +1,5 @@
 """
-    Views for Tutorial Page application.
+    This file is used for profile page db models.
 """
 #from django.db import models
 
