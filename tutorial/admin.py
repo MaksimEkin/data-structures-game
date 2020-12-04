@@ -1,6 +1,3 @@
-from django.contrib import admin
-
-
 """
     Views for Tutorial Page application.
 """
