@@ -43,7 +43,6 @@ def purge_old_games():
     yesterday = (dt.datetime.now() - dt.timedelta(days=1))
     mongo_cursor = client.InitialDB.Active_Games.find({},{'_id':0, 'game_id': 1, 'time_created':1})
 
-    print("Purging...")
     for game in mongo_cursor:
         try:
             game_date = game['time_created']
@@ -57,7 +56,6 @@ def purge_old_games():
                 file.write("Could not process " + str( game ) + " in purge\n")
             print("Exception logged - Purge")
 
-    print("Purge Complete")
     return 0
 
 if __name__ == '__main__':
