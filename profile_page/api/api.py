@@ -18,7 +18,7 @@ from profile_page.api import mock as mock_db
 def api_overview(request):
     '''
     Overview of the API calls exist.
-    :param request: 
+    :param request:
     :return: Response, list of API URLs for the user profile.
     '''
     api_urls = {
