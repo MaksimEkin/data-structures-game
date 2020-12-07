@@ -12,19 +12,21 @@ class Tutorial extends Component{
   
       return(
           <div>
-              { /* Display Game Tutorial videos */ }
+             { /* Display Game Tutorial videos */ }
+             <div class="text-center">
               <h1 className="text-center font-bold text-2xl"> Game Tutorials </h1>
-              <div className="items-center text-center inline-flex">
-                <iframe class="p-4 ml-8" width="400" height="250" src="https://www.youtube.com/embed/BvG2PfCWTE0" frameBorder="0"
+              <div className="items-center inline-flex">
+                <iframe class="p-4 ml-8" width="450" height="300" src="https://www.youtube.com/embed/BvG2PfCWTE0" frameBorder="0"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                       allowFullScreen></iframe>
-                <iframe class="p-4" width="400" height="250" src="https://www.youtube.com/embed/accUNOfEgtk" frameBorder="0"
+                <iframe class="p-4" width="450" height="300" src="https://www.youtube.com/embed/accUNOfEgtk" frameBorder="0"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                       allowFullScreen></iframe>
-                <iframe class="p-4" width="400" height="250" src="https://www.youtube.com/embed/kr5YIyw39zI" frameBorder="0"
+                <iframe class="p-4" width="450" height="300" src="https://www.youtube.com/embed/kr5YIyw39zI" frameBorder="0"
                           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                           allowFullScreen></iframe>
               </div>
+             </div>
 
               {/* space dividers */}
               <br />
@@ -69,13 +71,13 @@ class Tutorial extends Component{
           <div class="text-center">
               <h2 className="text-center text-gray-600 underline font-bold text-xl" > Videos </h2>
                 <div class="items-center inline-flex">
-                    <iframe class="p-4" width="400" height="250" src="https://www.youtube.com/embed/5C8bLQBjcDI" frameBorder="0"
+                    <iframe class="p-4" width="450" height="300" src="https://www.youtube.com/embed/5C8bLQBjcDI" frameBorder="0"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                       allowFullScreen></iframe>
-                    <iframe class="p-4" width="400" height="250" src="https://www.youtube.com/embed/vRwi_UcZGjU" frameBorder="0"
+                    <iframe class="p-4" width="450" height="300" src="https://www.youtube.com/embed/vRwi_UcZGjU" frameBorder="0"
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                         allowFullScreen></iframe>
-                    <iframe class="p-4" width="400" height="250" src="https://www.youtube.com/embed/ygZMI2YIcvk" frameBorder="0"
+                    <iframe class="p-4" width="450" height="300" src="https://www.youtube.com/embed/ygZMI2YIcvk" frameBorder="0"
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                             allowFullScreen></iframe>
                 </div>
