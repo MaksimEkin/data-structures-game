@@ -3,8 +3,6 @@ import Swal from "sweetalert2"
 import Cookies from "universal-cookie"
 import Particles from "react-particles-js"
 
-
-
 const local = "http://127.0.0.1:8000/";
 const reactLocal = "http://localhost:3000/"
 const remote = "https://data-structures-game.herokuapp.com/";
@@ -46,11 +44,14 @@ class Register extends Component {
         //use username as salt for SHA-256 hash, so combine username and plaintext pw into one string
         let toHash1 = this.state.username + this.state.password1
         let toHash2 = this.state.username + this.state.password2
+
         //hash it and convert to string format
         let hashed1 = CryptoJS.SHA256(toHash1)
         hashed1 = hashed1.toString()
+
         let hashed2 = CryptoJS.SHA256(toHash2)
         hashed2 = hashed2.toString()
+
         //store user input in FormData format
         let registerInfo = new FormData()
         registerInfo.append("user_name", this.state.username)
@@ -103,15 +104,12 @@ class Register extends Component {
                 text: returned['error']
             })
         }
-
     }
 
     //make api call to log out
     handleInput = async (e) => {
         await this.setState({ [e.target.name]: e.target.value })
-       
     }
-
 
     render() {
         return (
@@ -210,15 +208,13 @@ class Register extends Component {
 
                             </form>
 
-                        </div></span></div></div></div>
-
-
-
-
-
-
+                        </div>
+                    </span>
+                </div>
+            </div>
+            </div>
         )
     }
 }
 
-export default Register;
+export default Register
