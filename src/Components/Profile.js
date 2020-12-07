@@ -418,12 +418,12 @@ class Profile extends Component {
                         text: "Try again later."
                     })
                 } else {
+                    this.setState({ show_profile: false })
                     Swal.fire(
                         'Deleted!',
                         'Your file has been deleted.',
                         'success'
                     )
-                    this.setState({ show_profile: false })
                 }
             }
         })
