@@ -8,7 +8,6 @@ import datetime as dt
 from pymongo import MongoClient
 
 DATABASE_URL1 = os.environ.get('DATABASE_URL1')
-print(DATABASE_URL1)
 client = MongoClient(DATABASE_URL1)
 
 def remove_game(game_id: str):
