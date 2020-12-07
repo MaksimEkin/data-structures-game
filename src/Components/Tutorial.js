@@ -14,6 +14,11 @@ class Tutorial extends Component{
   
       return(
           <div>
+              <h1 className="text-center font-bold text-2xl"> Game Tutorials </h1>
+              <iframe class="p-4" width="400" height="250" src="https://www.youtube.com/embed/BvG2PfCWTE0" frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen></iframe>
+          <br />
 
       <div>
   
