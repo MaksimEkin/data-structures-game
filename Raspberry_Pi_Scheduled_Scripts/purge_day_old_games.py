@@ -49,13 +49,13 @@ def purge_old_games():
             game_date = game['time_created']
             game_datetime_obj = dt.datetime.strptime(game_date,"%d/%m/%Y %H:%M:%S")
             if game_datetime_obj < yesterday:
-                print(game, "Removed")
+                #print(game, "Removed")
                 remove_game(game['game_id'])
 
         except:
             with open("purge_exception_log.txt", "a") as file:
                 file.write("Could not process " + str( game ) + " in purge\n")
-            print("Exception logged - Purge")
+            #print("Exception logged - Purge")
 
     return 0
 
