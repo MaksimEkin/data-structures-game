@@ -44,9 +44,9 @@ class Profile(TestCase):
         self.user_info = str(uuid.uuid1()).split('-')[0]
 
         post_data = {'user_name':  self.user_info,
-                     'password1': 'smith1',
-                     'password2': 'smith1',
-                     'email':  self.user_info}
+                     'password1': 'smith1smith1',
+                     'password2': 'smith1smith1',
+                     'email':  self.user_info+"@gmail.com"}
         response = self.client.post('/profile_page/api/register', post_data)
         self.assertEqual(response.status_code, 200,
                           msg=f'{BColors.FAIL}\t[-]\tFailed creating an account!{BColors.ENDC}')
@@ -97,9 +97,9 @@ class Register(TestCase):
         self.user_info = str(uuid.uuid1()).split('-')[0]
 
         post_data = {'user_name':  self.user_info,
-                     'password1': 'smith1',
-                     'password2': 'smith1',
-                     'email':  self.user_info}
+                     'password1': 'smith1smith1',
+                     'password2': 'smith1smith1',
+                     'email':  self.user_info+"@gmail.com"}
         response = self.client.post('/profile_page/api/register', post_data)
         self.assertEqual(response.status_code, 200,
                           msg=f'{BColors.FAIL}\t[-]\tFailed creating an account!{BColors.ENDC}')
@@ -116,11 +116,11 @@ class Register(TestCase):
 
     def test_invalid_api_request(self):
         """Invalid API request fields"""
+        post_data = {'user_name':  self.user_info,
+                     'password1': 'smith1smith1',
+                     'password2': 'smith1smith1',
+                     'wrong_field':  self.user_info+"@gmail.com"}
 
-        post_data = {'user_name': 'john55',
-                     'password1': 'smith',
-                     'password2': 'smith',
-                     'wrong_field': 'test'}
         response = self.client.post('/profile_page/api/register', post_data).data
         self.assertEqual(response['error'], 'Missing required fields!',
                          msg=f'{BColors.FAIL}\t[-]\tAccepted invalid POST request!{BColors.ENDC}')
@@ -129,52 +129,54 @@ class Register(TestCase):
     def test_non_matching_password(self):
         """Attempts to register with non-matching password."""
 
-        post_data = {'user_name': 'john55',
-                     'password1': 'smith1',
-                     'password2': 'smith2',
-                     'email': 'test'}
+        post_data = {'user_name':  self.user_info,
+                     'password1': 'smith1smith1',
+                     'password2': 'smith1smith2',
+                     'email':  self.user_info+"@gmail.com"}
 
         response = self.client.post('/profile_page/api/register', post_data).data
-        self.assertEqual(response['error'], 'Passwords does not match!',
+        self.assertEqual(response['error'], 'Passwords do not match!',
                          msg=f'{BColors.FAIL}\t[-]\tAccepted non-matching password!{BColors.ENDC}')
         print(f"{BColors.OKGREEN}\t[+]\tPass not allowing non-matching password.{BColors.ENDC}")
 
     def test_user_name_bot(self):
         """Attempts to register username that starts with bot."""
 
-        post_data = {'user_name': 'botJohn',
-                     'password1': 'smith1',
-                     'password2': 'smith1',
-                     'email': 'test'}
+        post_data = {'user_name':  "bot"+self.user_info,
+                     'password1': 'smith1smith1',
+                     'password2': 'smith1smith1',
+                     'email':  self.user_info+"@gmail.com"}
 
         response = self.client.post('/profile_page/api/register', post_data).data
-        self.assertEqual(response['error'], 'Username can not start with bot!',
+        self.assertEqual(response['error'], 'Username can not start with "bot"!',
+
                          msg=f'{BColors.FAIL}\t[-]\tAccepted bot user name!{BColors.ENDC}')
         print(f"{BColors.OKGREEN}\t[+]\tUser name bot did not allowed.{BColors.ENDC}")
 
-    def test_user_three_characters(self):
-        """Attempts to register username that starts with bot."""
+    def test_user_short_characters(self):
+        """Attempts to register username that is too short."""
 
-        post_data = {'user_name': 'jo',
-                     'password1': 'smith1',
-                     'password2': 'smith1',
-                     'email': 'test'}
+        post_data = {'user_name':  'smi1',
+                     'password1': 'smith1smith1',
+                     'password2': 'smith1smith1',
+                     'email':  self.user_info+"@gmail.com"}
 
         response = self.client.post('/profile_page/api/register', post_data).data
-        self.assertEqual(response['error'], 'User name must be longer!',
+        self.assertEqual(response['error'], 'Username must be longer than 5 characters!',
+
                          msg=f'{BColors.FAIL}\t[-]\tAccepted short user name!{BColors.ENDC}')
         print(f"{BColors.OKGREEN}\t[+]\tShort user name was not allowed.{BColors.ENDC}")
 
     def test_short_password_characters(self):
         """Attempts to register with short password."""
 
-        post_data = {'user_name': 'joejoe',
+        post_data = {'user_name':  self.user_info,
                      'password1': 'smi1',
                      'password2': 'smi1',
-                     'email': 'test'}
+                     'email':  self.user_info+"@gmail.com"}
 
         response = self.client.post('/profile_page/api/register', post_data).data
-        self.assertEqual(response['error'], 'Password has to be longer than 5 characters!',
+        self.assertEqual(response['error'], 'Password has to be longer than 8 characters!',
                          msg=f'{BColors.FAIL}\t[-]\tAccepted short password!{BColors.ENDC}')
         print(f"{BColors.OKGREEN}\t[+]\tShort password was not allowed.{BColors.ENDC}")
 
@@ -182,9 +184,9 @@ class Register(TestCase):
         """Attempts to register an existing user."""
 
         post_data = {'user_name':  self.user_info,
-                     'password1': 'smith1',
-                     'password2': 'smith1',
-                     'email':  self.user_info + 'a'}
+                     'password1': 'smith1smith1',
+                     'password2': 'smith1smith1',
+                     'email':  self.user_info+"a@gmail.com"}
 
         response = self.client.post('/profile_page/api/register', post_data).data
         self.assertEqual(response['error'], 'Error when creating the account!',
@@ -194,10 +196,11 @@ class Register(TestCase):
     def test_duplicate_email(self):
         """Attempts to register an existing email."""
 
-        post_data = {'user_name':  self.user_info + 'a',
-                     'password1': 'smith1',
-                     'password2': 'smith1',
-                     'email':  self.user_info}
+
+        post_data = {'user_name':  self.user_info+'a',
+                     'password1': 'smith1smith1',
+                     'password2': 'smith1smith1',
+                     'email':  self.user_info+"@gmail.com"}
 
         response = self.client.post('/profile_page/api/register', post_data).data
         self.assertEqual(response['error'], 'Error when creating the account!',
@@ -215,10 +218,11 @@ class Login(TestCase):
         # temporary user name
         self.user_info = str(uuid.uuid1()).split('-')[0]
 
-        post_data = {'user_name': self.user_info,
+        post_data = {'user_name':  self.user_info,
                      'password1': 'pineapple',
                      'password2': 'pineapple',
-                     'email': self.user_info}
+                     'email':  self.user_info+"@gmail.com"}
+
         response = self.client.post('/profile_page/api/register', post_data)
         self.assertEqual(response.status_code, 200,
                           msg=f'{BColors.FAIL}\t[-]\tFailed creating an account!{BColors.ENDC}')
@@ -246,7 +250,7 @@ class Login(TestCase):
         """Tests logging in with invalid password."""
 
         post_data = {'user_id': self.user_info,
-                     'password': 'many_pineapple'}
+                     'password': 'manymanypineapple'}
 
         response = self.client.post('/profile_page/api/login', post_data)
         self.assertEqual(response.status_code, 401,
@@ -284,10 +288,11 @@ class Logout(TestCase):
         # temporary user name
         self.user_info = str(uuid.uuid1()).split('-')[0]
 
-        post_data = {'user_name': self.user_info,
+        post_data = {'user_name':  self.user_info,
                      'password1': 'pineapple',
                      'password2': 'pineapple',
-                     'email': self.user_info}
+                     'email':  self.user_info+"@gmail.com"}
+
         response = self.client.post('/profile_page/api/register', post_data)
         self.assertEqual(response.status_code, 200,
                           msg=f'{BColors.FAIL}\t[-]\tFailed creating an account!{BColors.ENDC}')
@@ -328,10 +333,11 @@ class Delete(TestCase):
         # temporary user name
         self.user_info = str(uuid.uuid1()).split('-')[0]
 
-        post_data = {'user_name': self.user_info,
+        post_data = {'user_name':  self.user_info,
                      'password1': 'pineapple',
                      'password2': 'pineapple',
-                     'email': self.user_info}
+                     'email':  self.user_info+"@gmail.com"}
+
         response = self.client.post('/profile_page/api/register', post_data)
         self.assertEqual(response.status_code, 200,
                           msg=f'{BColors.FAIL}\t[-]\tFailed creating an account!{BColors.ENDC}')
@@ -368,10 +374,11 @@ class SaveBoard(TestCase):
         # temporary user name
         self.user_info = str(uuid.uuid1()).split('-')[0]
 
-        post_data = {'user_name': self.user_info,
+        post_data = {'user_name':  self.user_info,
                      'password1': 'pineapple',
                      'password2': 'pineapple',
-                     'email': self.user_info}
+                     'email':  self.user_info+"@gmail.com"}
+
         response = self.client.post('/profile_page/api/register', post_data)
         self.assertEqual(response.status_code, 200,
                           msg=f'{BColors.FAIL}\t[-]\tFailed creating an account!{BColors.ENDC}')
@@ -446,24 +453,24 @@ class Share(TestCase):
         sleep(1)
 
         # temporary user names
-        self.user_1_info = str(uuid.uuid1()).split('-')[0]
-        self.user_2_info = str(uuid.uuid1()).split('-')[0]
+        self.user_1_info = str(uuid.uuid1())
+        self.user_2_info = str(uuid.uuid1())
 
         # Create the user 1
-        post_data_1 = {'user_name': self.user_1_info,
+        post_data_1 = {'user_name':  self.user_1_info,
                      'password1': 'pineapple',
                      'password2': 'pineapple',
-                     'email': self.user_1_info}
+                     'email':  self.user_1_info+"@gmail.com"}
         response_1 = self.client.post('/profile_page/api/register', post_data_1)
         self.assertEqual(response_1.status_code, 200,
                           msg=f'{BColors.FAIL}\t[-]\tFailed creating an account!{BColors.ENDC}')
         print(f"{BColors.OKGREEN}\t[+]\tPass creating a user.{BColors.ENDC}")
 
         # Create user 2
-        post_data_2 = {'user_name': self.user_2_info,
+        post_data_2 = {'user_name':  self.user_2_info,
                      'password1': 'pineapple',
                      'password2': 'pineapple',
-                     'email': self.user_2_info}
+                     'email':  self.user_2_info+"@gmail.com"}
         response_2 = self.client.post('/profile_page/api/register', post_data_2)
         self.assertEqual(response_2.status_code, 200,
                           msg=f'{BColors.FAIL}\t[-]\tFailed creating an account!{BColors.ENDC}')
@@ -566,10 +573,10 @@ class DeleteBoard(TestCase):
         self.user_info = str(uuid.uuid1()).split('-')[0]
 
         # Create the user
-        post_data = {'user_name': self.user_info,
+        post_data = {'user_name':  self.user_info,
                      'password1': 'pineapple',
                      'password2': 'pineapple',
-                     'email': self.user_info}
+                     'email':  self.user_info+"@gmail.com"}
         response_1 = self.client.post('/profile_page/api/register', post_data)
         self.assertEqual(response_1.status_code, 200,
                           msg=f'{BColors.FAIL}\t[-]\tFailed creating an account!{BColors.ENDC}')
@@ -631,10 +638,10 @@ class SavedBoards(TestCase):
         self.user_info = str(uuid.uuid1()).split('-')[0]
 
         # Create the user
-        post_data = {'user_name': self.user_info,
+        post_data = {'user_name':  self.user_info,
                      'password1': 'pineapple',
                      'password2': 'pineapple',
-                     'email': self.user_info}
+                     'email':  self.user_info+"@gmail.com"}
         response_1 = self.client.post('/profile_page/api/register', post_data)
         self.assertEqual(response_1.status_code, 200,
                           msg=f'{BColors.FAIL}\t[-]\tFailed creating an account!{BColors.ENDC}')
@@ -715,10 +722,10 @@ class LoadBoard(TestCase):
         self.user_info = str(uuid.uuid1()).split('-')[0]
 
         # Create the user
-        post_data = {'user_name': self.user_info,
+        post_data = {'user_name':  self.user_info,
                      'password1': 'pineapple',
                      'password2': 'pineapple',
-                     'email': self.user_info}
+                     'email':  self.user_info+"@gmail.com"}
         response_1 = self.client.post('/profile_page/api/register', post_data)
         self.assertEqual(response_1.status_code, 200,
                           msg=f'{BColors.FAIL}\t[-]\tFailed creating an account!{BColors.ENDC}')
@@ -799,20 +806,20 @@ class AddRemoveFriend(TestCase):
         self.user_2_info = str(uuid.uuid1()).split('-')[0]
 
         # Create the user 1
-        post_data_1 = {'user_name': self.user_1_info,
-                       'password1': 'pineapple',
-                       'password2': 'pineapple',
-                       'email': self.user_1_info}
+        post_data_1 = {'user_name':  self.user_1_info,
+                     'password1': 'pineapple',
+                     'password2': 'pineapple',
+                     'email':  self.user_1_info+"@gmail.com"}
         response_1 = self.client.post('/profile_page/api/register', post_data_1)
         self.assertEqual(response_1.status_code, 200,
                           msg=f'{BColors.FAIL}\t[-]\tFailed creating an account!{BColors.ENDC}')
         print(f"{BColors.OKGREEN}\t[+]\tPass creating a user.{BColors.ENDC}")
 
         # Create user 2
-        post_data_2 = {'user_name': self.user_2_info,
-                       'password1': 'pineapple',
-                       'password2': 'pineapple',
-                       'email': self.user_2_info}
+        post_data_2 = {'user_name':  self.user_2_info,
+                     'password1': 'pineapple',
+                     'password2': 'pineapple',
+                     'email':  self.user_2_info+"@gmail.com"}
         response_2 = self.client.post('/profile_page/api/register', post_data_2)
         self.assertEqual(response_2.status_code, 200,
                           msg=f'{BColors.FAIL}\t[-]\tFailed creating an account!{BColors.ENDC}')

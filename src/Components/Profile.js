@@ -104,19 +104,13 @@ class Profile extends Component {
             this.setState({ loggedIn: true, show_profile: false })
 
             //alert successful login
-            Swal.fire({
-                title: 'Successfully logged in as ' + this.state.username + '!',
-                icon: 'success',
-                confirmButtonText: 'Return to Home Page'
-
-                //return to home page if click on button
-            }).then((result) => {
-
-                //if player clicks "Return to Home Page" button, redirect there
-                if (result.isConfirmed) {
-                    window.location.href = "/"
-                }
-            })
+            //added this conditional so that don't see alert for cypress testing
+            if (!window.top.Cypress) {
+                Swal.fire({
+                    title: 'Successfully logged in as ' + this.state.username + '!',
+                    icon: 'success'
+                })
+            }
         }
 
         //if login did not succeed, show error message

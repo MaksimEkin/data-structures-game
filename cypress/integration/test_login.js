@@ -20,7 +20,7 @@ context('Login Page Testing', () => {
         cy.url().should('contain', '/profile_page')
     })
 
-    //test successful login with username "useruser" and password "pass1"
+    //test successful login with username "user1" and password "pass1"
     it("Test Successful Login", () => {
         cy.get("input[id=username]")
             .type('user1').should('have.value', 'user1')

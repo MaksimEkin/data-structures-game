@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBars } from '@fortawesome/free-solid-svg-icons'
-import panda from './panda.jpg'
-
+import nick from './nick.png'
+import "./styles.css";
 //this child component is called in Header compoment to be displayed on every page
 function NavMenu(){
     //react hook to click and expand/minimize menu
@@ -28,11 +28,13 @@ function NavMenu(){
                 <li>
                     <a className="space-y-20 text-lg py-3 border-t border-b block text-center font-semibold text-gray-800 mb-2" href='/profile_page'>Profile & Login</a>
                 </li>
+                <li>
+                    <a className="space-y-20 text-lg py-3 border-t border-b block text-center font-semibold text-gray-800 mb-2" href='/register'>Register</a>
+                </li>
         </ul>
         </div>
         <div class="col-lg-6 col-md-6" style={{'align-self':'flex-end'}}>
-            <img src={panda} alt={"panda"} />
-            <a href="https://www.vecteezy.com/free-vector/material">Material Vectors by Vecteezy</a>
+            <img src={nick} alt={"nick"} />
         </div>
         
         </div>

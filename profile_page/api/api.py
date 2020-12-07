@@ -6,6 +6,7 @@
     game board sharing and saving.
 """
 import uuid
+import re
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
@@ -17,8 +18,7 @@ from profile_page.api import mock as mock_db
 def api_overview(request):
     '''
     Overview of the API calls exist.
-
-    :param request:
+    :param request: 
     :return: Response, list of API URLs for the user profile.
     '''
     api_urls = {
@@ -47,7 +47,6 @@ def profile(request):
     POST request API call.
     Returns all of the user's profile information if the user is authenticated.
     Else, UNAUTHORIZED error is returned.
-
     :param request: POST request with fields 'user_id', 'token'.
     :return: success message, else error status.
     """
@@ -60,6 +59,11 @@ def profile(request):
 
     # POST Request content
     data = request.data
+
+    # check for bad characters
+    if check_special_characters(str(data['user_id'])) or check_special_characters(str(data['token'])):
+        return Response({'error': str('Unaccepted character passed!')},
+                        status=status.HTTP_400_BAD_REQUEST)
 
     # Here check if user_id matches the token with the database
     if not db.check_user(data['user_id'], data['token']):
@@ -98,11 +102,9 @@ def add_friend(request):
     POST request API call.
     Sends a friend request to the destination user if the source user is authenticated.
     Else, UNAUTHORIZED error is returned.
-
     source_user_id: user who is adding a friend.
     dest_user_id: friend who is being added.
     token: authentication token that allow access to the user's account.
-
     :param request: POST request with fields 'source_user_id', 'dest_user_id', 'token'
     :return: success message or error status.
     """
@@ -133,12 +135,10 @@ def accept_decline_friend(request):
     POST request API call.
     Accepts the friend request if the source user is authenticated.
     Else, UNAUTHORIZED error is returned.
-
     source_user_id: user who recieved the friend request.
     dest_user_id: user who initiated friend request.
     accept: indicate acceptence or decline of the request.
     token: authentication token that allow access to the user's account.
-
     :param request: POST request with fields 'source_user_id', 'dest_user_id', 'accept', 'token'
     :return: success message or error status.
     """
@@ -181,11 +181,9 @@ def remove_friend(request):
     POST request API call.
     Removes the friend from user's profile if the source user is authenticated.
     Else, UNAUTHORIZED error is returned.
-
     source_user_id: user who is deleting a friend.
     dest_user_id: friend that is being deleted.
     token: authentication token that allow access to the user's account.
-
     :param request: POST request with fields 'source_user_id', 'dest_user_id', 'token'
     :return: success message or error status.
     """
@@ -215,15 +213,12 @@ def register(request):
     """
     POST request API call.
     Registers a new user by creating a new account in the databse.
-
     Two passwords that are being passed must match.
     Username or e-mail should not exist already.
-
     user_name: User's unique name.
     password1: Password.
     password2: Password match.
     email: User's email.
-
     :param request: POST request with fields 'user_name', 'password1', 'password2', 'email'
     :return: user token for the authentcation if sucesfull, else error message.
     """
@@ -239,19 +234,33 @@ def register(request):
 
     # Check if passwords match
     if data['password1'] != data['password2']:
-        return Response({'error': str('Passwords does not match!')}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'error': str('Passwords do not match!')}, status=status.HTTP_400_BAD_REQUEST)
 
     # Check minimum password length
-    if len(str(data['password1'])) < 5:
-        return Response({'error': str('Password has to be longer than 5 characters!')}, status=status.HTTP_400_BAD_REQUEST)
+    if len(str(data['password1'])) <= 8:
+        return Response({'error': str('Password has to be longer than 8 characters!')}, status=status.HTTP_400_BAD_REQUEST)
 
     # check if user name is less than 3 characters
-    if len(str(data['user_name'])) < 3:
-        return Response({'error': str('User name must be longer!')}, status=status.HTTP_400_BAD_REQUEST)
+    if len(str(data['user_name'])) <= 5:
+        return Response({'error': str('Username must be longer than 5 characters!')}, status=status.HTTP_400_BAD_REQUEST)
 
     # Check if user name does not start with bot
     if str(data['user_name'])[0:3].lower() == 'bot':
-        return Response({'error': str('Username can not start with bot!')}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'error': str('Username can not start with "bot"!')}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Check if username has space
+    if len(str(data['user_name']).split(" ")) > 1 or len(str(data['password1']).split(" ")) > 1 or len(str(data['email']).split(" ")) > 1:
+        return Response({'error': str('Username, password, and email can not have space!')}, status=status.HTTP_400_BAD_REQUEST)
+
+    # check for valid e-mail
+    if not bool(re.search(r"^[\w\.\+\-]+\@[\w]+\.[a-z]{2,3}$", str(data['email']))):
+        return Response({'error': str('Invalid e-mail!')},
+                        status=status.HTTP_400_BAD_REQUEST)
+
+    # check for not allowed characters
+    if check_special_characters(str(data['user_name'])) or check_special_characters(str(data['password1'])):
+        return Response({'error': str('Unaccepted character passed!')},
+                        status=status.HTTP_400_BAD_REQUEST)
 
     # Here ask db to create a new user with its token
     token = str(uuid.uuid1())
@@ -260,7 +269,6 @@ def register(request):
 
     return Response({'status': 'success', 'token': token})
 
-
 @api_view(['POST'])
 def login(request):
     """
@@ -268,10 +276,8 @@ def login(request):
     Checks the database for matching username and password.
     If match is found, returns an authentication token.
     If match is not found, UNAUTHORIZED is returned.
-
     user_id: unique user identifier (same as username).
     password: user's password.
-
     :param request: POST request with fields 'user_id', 'password'.
     :return: user token for the authentcation if sucesfull, else error message.
     """
@@ -285,6 +291,11 @@ def login(request):
     # POST Request content
     data = request.data
 
+    # check for not allowed characters
+    if check_special_characters(str(data['user_id'])) or check_special_characters(str(data['password'])):
+        return Response({'error': str('Unaccepted character passed!')},
+                        status=status.HTTP_400_BAD_REQUEST)
+
     # Here ask db if username and password works out
     # if db says nope, return error. else proceed.
     if not db.login(data['user_id'], data['password']):
@@ -293,7 +304,7 @@ def login(request):
     # Here let db know of the new token that user owns
     token = str(uuid.uuid1())
     if not db.update_token(data['user_id'], token):
-        return Response({'error': str('Error when updating logging in!')}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response({'error': str('Error when updating log-in token!')}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     return Response({'status': 'success', 'token': token})
 
@@ -304,10 +315,8 @@ def logout(request):
     If the username has the given token, logout action is performed
     by removing user's token from the database.
     Else, UNAUTHORIZED error is returned.
-
     user_id: unique user identifier (same as username).
     token: authentication token that allow access to the user's account.
-
     :param request: POST request with fields 'user_id', 'token'.
     :return: success message, else error status.
     """
@@ -320,6 +329,11 @@ def logout(request):
 
     # POST Request content
     data = request.data
+
+    # check for not allowed characters
+    if check_special_characters(str(data['user_id'])) or check_special_characters(str(data['token'])):
+        return Response({'error': str('Unaccepted character passed!')},
+                        status=status.HTTP_400_BAD_REQUEST)
 
     # Here check if user_id matches the token with the database
     if not db.check_user(data['user_id'], data['token']):
@@ -337,10 +351,8 @@ def delete(request):
     """
     If the username has the given token, user's account is deleted.
     Else, UNAUTHORIZED error is returned.
-
     user_id: unique user identifier (same as username).
     token: authentication token that allow access to the user's account.
-
     :param request: POST request with fields 'user_id', 'token'.
     :return: success message, else error status.
     """
@@ -353,6 +365,11 @@ def delete(request):
 
     # POST Request content
     data = request.data
+
+    # check for not allowed characters
+    if check_special_characters(str(data['user_id'])) or check_special_characters(str(data['token'])):
+        return Response({'error': str('Unaccepted character passed!')},
+                        status=status.HTTP_400_BAD_REQUEST)
 
     # Here check if user_id matches the token with the database
     if not db.check_user(data['user_id'], data['token']):
@@ -372,13 +389,10 @@ def save_board(request):
     to the user's profile. Game is only saved if the user is
     authenticated, i.e. if the user has the matching token, else
     UNAUTHORIZED error is returned.
-
     Game that is being saved must exist in the list of active games.
-
     user_id: unique user identifier (same as username).
     token: authentication token that allow access to the user's account.
     game_id: ID of the saved game.
-
     :param request: POST request with fields 'user_id', 'game_id', 'token'.
     :return: success message, or error status.
     """
@@ -390,6 +404,12 @@ def save_board(request):
 
     # POST Request content
     data = request.data
+
+    # check for not allowed characters
+    if check_special_characters(str(data['user_id'])) or check_special_characters(str(data['game_id']))  \
+            or check_special_characters(str(data['token'])):
+        return Response({'error': str('Unaccepted character passed!')},
+                        status=status.HTTP_400_BAD_REQUEST)
 
     # Here check if user_id matches the token with the database
     if not db.check_user(data['user_id'], data['token']):
@@ -415,11 +435,9 @@ def delete_board(request):
     Removes the saved game board from user's profile.
     User must be authenticated, i.e. must have the matching token.
     Game board in the user's profile identified by game_id must exist.
-
     user_id: unique user identifier (same as username).
     token: authentication token that allow access to the user's account.
     game_id: ID of the saved game.
-
     :param request: POST request with fields 'user_id', 'game_id', 'token'.
     :return: success message, or error status.
     """
@@ -431,6 +449,12 @@ def delete_board(request):
 
     # POST Request content
     data = request.data
+
+    # check for not allowed characters
+    if check_special_characters(str(data['user_id'])) or check_special_characters(str(data['game_id']))  \
+            or check_special_characters(str(data['token'])):
+        return Response({'error': str('Unaccepted character passed!')},
+                        status=status.HTTP_400_BAD_REQUEST)
 
     # Here check if user_id matches the token with the database
     if not db.check_user(data['user_id'], data['token']):
@@ -451,15 +475,12 @@ def share(request):
     the user must have the matching token. The game board
     identified by game_id must exist in user's profile.
     Destination user must have the accept shared games setting turned on.
-
     Share action is performed by creating a copy of the game board in the
     user's profile identified by dest_user_id.
-
     source_user_id: unique user identifier of user initiating share (same as username).
     dest_user_id: unique user identifier of user recieving the game (same as username).
     token: authentication token that allow access to the user's account.
     game_id: ID of the saved game.
-
     :param request: POST request with fields 'source_user_id', 'dest_user_id', 'game_id', 'token'
     :return: success message or error status.
     """
@@ -471,6 +492,12 @@ def share(request):
 
     # POST Request content
     data = request.data
+
+    # check for not allowed characters
+    if check_special_characters(str(data['source_user_id'])) or check_special_characters(str(data['dest_user_id']))  \
+            or check_special_characters(str(data['game_id'])) or check_special_characters(str(data['token'])):
+        return Response({'error': str('Unaccepted character passed!')},
+                        status=status.HTTP_400_BAD_REQUEST)
 
     # Here check if user_id matches the token with the database
     if not db.check_user(data['source_user_id'], data['token']):
@@ -488,10 +515,8 @@ def share(request):
 def saved_boards(request, user_id, token):
     """
     GET request API call to aquire the saved games in the user's profile.
-
     user_id: unique user identifier (same as username).
     token: authentication token that allow access to the user's account.
-
     :param request: GET request
     :param user_id: username who is performing the action
     :param token: authentication token
@@ -528,13 +553,10 @@ def load_board(request):
     User must be authenticated, i.e. token must match with user's profile.
     Once the game loaded, i.e. moved to the active games, board can be
     interacted with using the Game Board API.
-
     User must have the claimed game board defined by the game_id.
-
     user_id: unique user identifier (same as username).
     token: authentication token that allow access to the user's account.
     game_id: ID of the saved game.
-
     :param request: POST request with fields 'user_id', 'game_id', 'token'
     :return: Game Board instance
     """
@@ -547,6 +569,11 @@ def load_board(request):
     # POST Request content
     data = request.data
 
+    if check_special_characters(str(data['user_id'])) or check_special_characters(str(data['game_id']))  \
+            or check_special_characters(str(data['token'])):
+        return Response({'error': str('Unaccepted character passed!')},
+                        status=status.HTTP_400_BAD_REQUEST)
+
     # Here check if user_id matches the token with the database
     if not db.check_user(data['user_id'], data['token']):
         return Response({'error': str('UNAUTHORIZED')}, status=status.HTTP_401_UNAUTHORIZED)
@@ -557,6 +584,9 @@ def load_board(request):
         return Response({'error': 'you got some messed up arguments (NICK)'},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     game_board['game_id'] = str(uuid.uuid1())
+
+    # indicate that this board is being loaded from the profile
+    game_board['profile_load'] = True
 
     # Here I am just going to move this board to active games using the api we already have.
     # Note that board is still saved on user's profile, but we are just creating a new active game.
@@ -578,3 +608,34 @@ def load_board(request):
     del response_status['game_board']['graph']['uid']
 
     return Response(response_status['game_board'])
+
+@api_view(['GET'])
+def scheduled_tasks(request):
+    """
+    GET request API call.
+    Starts the scheduled tasks
+    :param request: GET request
+    :return: success message, else error status.
+    """
+
+    # TODO: RYAN, here call schedule 1 (gameboard cleaner), don't forget to import it above
+    # ryan_code.destroy_games()
+    # IF ERROR EXAMPLE:
+    #         return Response({'error': 'Did not work because_!'},
+    #                         status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    # TODO: RYAN, here call schedule 2 (scores sorter to assign ranking to each user),  don't forget to import it above
+    # ryan_code2.set_rankings()
+
+    # TODO: RYAN, no code here but need to setup the CI on github to have URL to this API call
+    return Response({'Done'})
+
+def check_special_characters(string):
+    """
+    Check if string has the target special character.
+    Return True if unwanted character is in the string.
+    """
+    check = ["[", "@", "_", "!", "#", "$", "%", "^", "&", "*", "(", ")", "<", ">",
+             "?", "/", "\\", "|", "}", "{", "~", ":", "]", "'"]
+
+    return any(ext in string for ext in check)

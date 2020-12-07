@@ -31,4 +31,7 @@ urlpatterns = [
     path('api/share', api.share, name='profile-share'),
     path('api/saved_boards/<str:user_id>/<str:token>', api.saved_boards, name='profile-saved_boards'),
     path('api/load_board', api.load_board, name='profile-load_board'),
+
+    # Heroku scheduler
+    path('api/scheduled_tasks', api.scheduled_tasks, name='profile-scheduled_tasks'),
 ]
