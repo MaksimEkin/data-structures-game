@@ -6,11 +6,6 @@ class Tutorial extends Component{
     //constructor to set the intial state value's
     constructor(props) {
       super(props);
-      this.state = {
-        difficulty:null,
-        players:null,
-        data_structure:null
-      };
     }
   
     //display the background particle
@@ -18,7 +13,8 @@ class Tutorial extends Component{
     render(){
   
       return(
-  
+          <div>
+
       <div>
   
           <Particles
@@ -39,11 +35,36 @@ class Tutorial extends Component{
                 },
               }}
             />
-  
-              
-  
-  
+
       </div>
+              <h1 className="text-center font-bold text-2xl">Resources on AVL Trees</h1>
+              <br />
+              <h2 className="text-center text-gray-600 underline font-bold text-xl"> Articles </h2>
+          <div class="text-center font-semibold text-blue-400 underline">
+
+                <a href="https://www.geeksforgeeks.org/avl-tree-set-1-insertion"> Geeks For Geeks on AVL Trees</a>
+              <br />
+                  <a href = "https://www.tutorialspoint.com/data_structures_algorithms/avl_tree_algorithm.htm"> Tutorialspoint on AVL Trees</a>
+              <br />
+                <a href = "https://en.wikipedia.org/wiki/AVL_tree"> Wikipedia on AVL Trees </a>
+            <br /> <br />
+          </div>
+            <div class="text-center">
+              <h2 className="text-center text-gray-600 underline font-bold text-xl" > Videos </h2>
+                <div class="items-center inline-flex">
+              <iframe class="p-4" width="400" height="250" src="https://www.youtube.com/embed/5C8bLQBjcDI" frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen></iframe>
+              <iframe class="p-4" width="400" height="250" src="https://www.youtube.com/embed/vRwi_UcZGjU" frameBorder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen></iframe>
+              <iframe class="p-4" width="400" height="250" src="https://www.youtube.com/embed/ygZMI2YIcvk" frameBorder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen></iframe>
+                </div>
+                </div>
+
+          </div>
   
       )
   }
