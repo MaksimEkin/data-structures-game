@@ -12,7 +12,7 @@ from rest_framework import status
 from game_board.api import utils as game_utils
 from profile_page.database import profile_page_db as db
 from profile_page.api import mock as mock_db
-
+import uuid
 
 @api_view(['GET'])
 def api_overview(request):
@@ -554,11 +554,14 @@ def load_board(request):
 
     # Load the game from user's saved profile
     game_board = db.load_board(data['user_id'], data['game_id'])
+    if not game_board:
+        return Response({'error': 'you got some messed up arguments (NICK)'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    game_board['game_id'] = str(uuid.uuid1())
 
     # Here I am just going to move this board to active games using the api we already have.
     # Note that board is still saved on user's profile, but we are just creating a new active game.
     response_status = game_utils.create_board_db(game_board)
-    print(response_status)
     if response_status['error']:
         return Response({'error': response_status['reason']},
                         status=status.HTTP_500_INTERNAL_SERVER_ERROR)

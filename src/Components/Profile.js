@@ -11,16 +11,12 @@ const remote = "https://data-structures-game.herokuapp.com/";
 const tableHeaders = ["Game", "Type", "Difficulty", "Actions"]
 
 //can also be const url = local; or const url = reactLocal;
-const url = local;
+const url = remote;
 
 /* This class provides the functionality for logging in and out,
    registering a new account and (eventually) adding friends
    and viewing user's profile info
  */
-
-const sleep = (milliseconds) => {
-    return new Promise(resolve => setTimeout(resolve, milliseconds))
-}
 
 class Profile extends Component {
     constructor(props) {
@@ -28,6 +24,13 @@ class Profile extends Component {
 
         //see if logged in when profile page called
         const cookies = new Cookies();
+        
+        //remove current gameboard (if applicable)
+        if ((cookies.get('loaded_game')) && (cookies.get('loaded_game') != '')) {
+            cookies.remove('loaded_game', { path: '/' })
+            cookies.set('loaded_game', '', { path: '/' })
+        }
+
         let prevLogin //for checking if logged in already, true if already logged in
         if ((cookies.get('token')) && (cookies.get('token') != '')) {
             prevLogin = true
@@ -158,6 +161,9 @@ class Profile extends Component {
             cookies.remove('token', { path: '/' })
             cookies.set('username', '', { path: '/' })
             cookies.set('token', '', { path: '/' })
+            cookies.remove('loaded_game', { path: '/' })
+            cookies.set('loaded_game', '', { path: '/' })
+
 
             this.setState({ loggedIn: false })
 
@@ -282,12 +288,14 @@ class Profile extends Component {
         })
     }
 
-    viewCallback = (id) => {
+    viewCallbackHelper = async (id) => {
+        const cookies = new Cookies()
+
         //store user input in FormData format
-        let apiData = new FormData()
-        apiData.append("user_id", this.state.user_name)
+        let apiData = new FormData()        
+        apiData.append("user_id", cookies.get('username'))
         apiData.append("game_id", id)
-        apiData.append("token", this.state.token)
+        apiData.append("token", cookies.get('token'))
 
         //api call parameters
         let requestOptions = {
@@ -296,20 +304,43 @@ class Profile extends Component {
             redirect: 'follow'
         };
 
-        // //make api call
-        // let fetch_url = url + "profile_page/api/load_board"
-        // let response = await fetch(fetch_url, requestOptions)
+        //make api call
+        let fetch_url = url + "profile_page/api/load_board"
+        let response = await fetch(fetch_url, requestOptions)
+          
+        //make sure api call was successful
+        if (response.status == 401) {
+            this.setState({
+                auth_error: true},
+                () => { this.updateProfile();
+            })
+        } else {
+            let returned = await response.json()
+                       
+            //store game id in a cookie
+            const cookies = new Cookies()
+            cookies.set('loaded_game', returned["game_id"], { path: '/' })
+            window.location.href = "/game_board"
+        }
+    }
+
+    viewCallback = (id) => {
 
         Swal.fire({
-            title: 'Failed to load game!',
-            icon: 'error',
-            text: "This feature is under development."
-            })
-        }
-
+            title: 'Do you want to load this gameboard?',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            confirmButtonText: `Yes`,
+          }).then((result) => {
+            /* Read more about isConfirmed, isDenied below */
+            if (result.isConfirmed) {
+                console.log("Confirmed");
+                this.viewCallbackHelper(id)
+            }
+          })
+    }
 
     shareCallbackHelper = async (id, dest_user) => {
-    
         const cookies = new Cookies()
 
         //store user input in FormData format
@@ -375,7 +406,6 @@ class Profile extends Component {
 
 
     deleteCallbackHelper = async (id) => {
-        
         const cookies = new Cookies()
 
         //store user input in FormData format
@@ -404,7 +434,6 @@ class Profile extends Component {
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
             confirmButtonText: 'Yes, delete it!'
         }).then((result) => {
             if (result.isConfirmed) {
@@ -517,7 +546,7 @@ class Profile extends Component {
                                 <span>Total Points</span>
                             </div>
                             <div class="text-center">
-                                <h2 className="space-y-5 text-md text-center font-semibold text-gray-800 mb-2">{this.state.show_profile && this.state.user_rank}</h2>
+                                <h2 className="space-y-5 text-md text-center font-semibold text-gray-800 mb-2">#{this.state.show_profile && this.state.user_rank}</h2>
                                 <span>Ranking</span>
                             </div>
                         </div>
@@ -562,6 +591,8 @@ class Profile extends Component {
             })
         } else {
             let returned = await response.json()
+            let game_id = returned["game_id"]
+            
             this.setState({
                 auth_error: false,
                 user_games: returned["user_profile"]["saved_games"],
