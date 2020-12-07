@@ -12,7 +12,6 @@ from rest_framework import status
 from game_board.api import utils as game_utils
 from profile_page.database import profile_page_db as db
 from profile_page.api import mock as mock_db
-import uuid
 
 @api_view(['GET'])
 def api_overview(request):
