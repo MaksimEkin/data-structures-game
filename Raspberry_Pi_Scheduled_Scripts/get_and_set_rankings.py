@@ -61,4 +61,4 @@ if __name__ == '__main__':
         except:
             with open("rank_exception_log.txt", "a") as file:
                 file.write("Could not process " + str( user_rank ) + " in rankings\n")
-            print("Exception logged - Ranking")
+            #print("Exception logged - Ranking")
