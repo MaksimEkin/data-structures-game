@@ -22,6 +22,9 @@ class Tutorial extends Component{
                 <iframe class="p-4" width="400" height="250" src="https://www.youtube.com/embed/accUNOfEgtk" frameBorder="0"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                       allowFullScreen></iframe>
+                  <iframe class="p4" width="400" height="250" src="https://www.youtube.com/embed/kr5YIyw39zI" frameBorder="0"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen></iframe>
               </div>
           <br />
 
