@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import ReactDOM from "react-dom";
 import { Button, Grid, Typography, Card, CardHeader, CardActions, CardActionArea, CardContent, Chip } from '@material-ui/core';
-import {create_adjacency, create_graph} from './CreateGraphAdj.js';
+import { create_adjacency, create_graph } from './CreateGraphAdj.js';
 import Cookies from 'universal-cookie';
 import WinModal from './Modal/WinModal.js';
 import ReactTooltip from "react-tooltip";
@@ -25,7 +25,7 @@ import {
   SPECIAL_EDGE_TYPE,
   SPECIAL_TYPE,
   SKINNY_TYPE,
-    GOLD_NODE
+  GOLD_NODE
 } from "./config";
 
 import "./styles.css";
@@ -42,7 +42,7 @@ const url = remote;
 //define sample node
 const sample = {
   edges: [{}],
-  nodes: [{ id: "start1", title: "Start (0)", type: GOLD_NODE,  node_id:"", points:0 },]
+  nodes: [{ id: "start1", title: "Start (0)", type: GOLD_NODE, node_id: "", points: 0 },]
 };
 
 //Gameboard Component
@@ -58,7 +58,7 @@ class GameBoard extends Component {
       selected: {},
       layoutEngineType: 'VerticalTree',
 
-      read_only:true,
+      read_only: true,
 
       //waiting on API call?
       loading: true,
@@ -73,11 +73,11 @@ class GameBoard extends Component {
       playerPointVal: null,
       playerCardChoice: null,
       playerBalanceAttempt: null,
-      difficulty:null,
-      players:null,
-      playersArray:[],
-      data_structure:null,
-      initial_load:true,
+      difficulty: null,
+      players: null,
+      playersArray: [],
+      data_structure: null,
+      initial_load: true,
 
       //used in conjunction with the API's end_game returned in the JSON
       game_over: false,
@@ -96,36 +96,61 @@ class GameBoard extends Component {
 
     const cookies = new Cookies();
 
-    //set state variables to these variables to be used in the url
-    let difficulty = cookies.get('level');
-    let players = cookies.get('playerList');
+    let game_id = "";
+    let response = "";
+    let players = "";
+    let loaded_flag = false;
 
     if (cookies.get('username') != null && cookies.get('token') != null) {
       if (cookies.get('username') != "" && cookies.get('token') != "") {
         this.setState({ username: cookies.get('username'), token: cookies.get('token') })
-        players = players + "," + cookies.get('username');
+        players = cookies.get('username') + ","
       }
     }
 
-    this.setState({ playersArray: players.split(',') })
-    let ds = cookies.get('gameDS');
+    if ((cookies.get('loaded_game')) && (cookies.get('loaded_game') != '')) {
+      game_id = cookies.get('loaded_game')
+      cookies.remove('loaded_game', { path: '/' })
+      cookies.set('loaded_game', '', { path: '/' })
+      loaded_flag = true
+
+    } else {
+      //set state variables to these variables to be used in the url
+      let difficulty = cookies.get('level');
+      players = players + cookies.get('playerList');
+      let player_split = players.split(',')
+      for (let index = 0; index < player_split.length; index++) { 
+        player_split[index] = player_split[index].trim();
+      }  
+
+      this.setState({ playersArray: player_split })
+      let ds = cookies.get('gameDS');
+
+      let createGameURL = url + "game_board/api/start_game/" + difficulty + "/" + players + "/" + ds
+
+      //API call to start game
+      response = await fetch(createGameURL);
+      game_id = await response.json();
+    }
 
     //get cookie variables from state and insert into url
-    let createGameURL = url + "game_board/api/start_game/" + difficulty + "/" + players + "/" + ds
     let getGameURL = url + "game_board/api/board/";
 
-
-    //API call to start game
-    let response = await fetch(createGameURL);
-    let game_id = await response.json();
-
     //save the get request response to state
-    this.setState({ gameID: game_id['game_id'] });
-    cookies.set('game_id', game_id['game_id'], { path: '/' });
+    if (!loaded_flag) {
+      game_id = game_id['game_id']
+    }
+    this.setState({ gameID: game_id});
+    cookies.set('game_id', game_id, { path: '/' });
 
     //get request to api and include the dynamic game_id
-    response = await fetch(getGameURL + game_id['game_id']);
+    response = await fetch(getGameURL + game_id);
     let board_ = await response.json();
+
+    // if the players have not been set yet
+    if (loaded_flag) {
+      this.setState({ playersArray: board_['player_ids'] });
+    }
 
     //set the state values with respect to the dynamic json response
     this.setState({ board: board_, turn: board_['turn'] });
@@ -161,9 +186,8 @@ class GameBoard extends Component {
           </foreignObject>
         )}
         <use
-          className={`node ${hovered ? "hovered" : ""} ${
-            selected ? "selected" : ""
-          }`}
+          className={`node ${hovered ? "hovered" : ""} ${selected ? "selected" : ""
+            }`}
           x="-77"
           y="-77"
           width="154"
@@ -314,8 +338,8 @@ class GameBoard extends Component {
     const viewNode = {
       id: Date.now(),
       title: "",
-      node_id:"",
-      points:0,
+      node_id: "",
+      points: 0,
       type,
       x,
       y
@@ -486,12 +510,11 @@ class GameBoard extends Component {
     let newBoard = await response.json();
     
     //player might lose points when re-balance occurs
-    this.setState({playerPointVal: newBoard['player_points'][this.state.turn]})
-    this.setState({ board: newBoard, turn: newBoard['turn']});
+    this.setState({ playerPointVal: newBoard['player_points'][this.state.turn] })
+    this.setState({ board: newBoard, turn: newBoard['turn'] });
 
     let made_graph = create_graph(this.state.board['graph'])
     this.setState({ graph: made_graph});
-
     this.setState({loading: false})
    
   }
@@ -517,46 +540,45 @@ class GameBoard extends Component {
 
     //form the URL that will be used
     let selectedCard = cookies.get('selectedCard');
-    let fetch_url = url+"game_board/api/action/" + selectedCard + '/' + this.state.board['game_id'] + '/' + this.state.username + '/' + this.state.token
+    let fetch_url = url + "game_board/api/action/" + selectedCard + '/' + this.state.board['game_id'] + '/' + this.state.username + '/' + this.state.token
 
-    this.setState({ loading: true});
+    this.setState({ loading: true });
 
     //make the API call
     let response = await fetch(fetch_url);
     let newBoard = await response.json();
 
     //store the results
-    this.setState({ board: newBoard, turn: newBoard['turn']});
-    this.setState({playerPointVal: newBoard['player_points'][this.state.turn]})
-    this.setState({deckSize: newBoard['deck'].length});
+    this.setState({ board: newBoard, turn: newBoard['turn'] });
+    this.setState({ playerPointVal: newBoard['player_points'][this.state.turn] })
+    this.setState({ deckSize: newBoard['deck'].length });
 
     
     let made_graph = create_graph(this.state.board['graph'])
-    this.setState({ graph: made_graph});
-    this.setState({loading: false})
- 
-
+    this.setState({ graph: made_graph });
+    this.setState({ loading: false })
   }
 
   //AI api call
   aiCall = async () => {
-    let ai_url = url+"game_board/api/ai_pick/" + this.state.board['game_id'] + '/' + this.state.username + '/' + this.state.token
+    let ai_url = url + "game_board/api/ai_pick/" + this.state.board['game_id'] + '/' + this.state.username + '/' + this.state.token
 
-    this.setState({ loading: true});
+    this.setState({ loading: true });
 
     //make the API call
     let ai_response = await fetch(ai_url);
     let ai_board = await ai_response.json();
 
     //store the results
-    this.setState({ board: ai_board, turn: ai_board['turn']});
-    this.setState({playerPointVal: ai_board['player_points'][this.state.turn]})
-    this.setState({deckSize: ai_board['deck'].length});
+    this.setState({ board: ai_board, turn: ai_board['turn'] });
+    this.setState({ playerPointVal: ai_board['player_points'][this.state.turn] })
+    this.setState({ deckSize: ai_board['deck'].length });
 
     // update the tree visual
     let made_graph = create_graph(this.state.board['graph'])
     this.setState({ graph: made_graph});
-    this.setState({loading: false})
+    this.setState({ loading: false })
+
     //rebalance alert after bot's turn
     if(this.state.board != null && !this.state.board.graph.balanced && !this.state.game_over){
       this.rebalanceAlert()
@@ -568,8 +590,8 @@ class GameBoard extends Component {
   checkGameStatus = async () => {
 
     //if the JSON has end_game = true, store that in the state
-    if (this.state.board['end_game']){
-      this.setState({game_over: true})
+    if (this.state.board['end_game']) {
+      this.setState({ game_over: true })
     }
 
     //introduced a timeout because of a bug that arose without it:
@@ -583,13 +605,13 @@ class GameBoard extends Component {
   checkBoard = async () => {
 
     //API call to view state of the board
-    let temp_url = url+"game_board/api/board/" + this.state.board['game_id']
+    let temp_url = url + "game_board/api/board/" + this.state.board['game_id']
     let resp = await fetch(temp_url);
     let temp_board = await resp.json();
 
     //if the game is no longer found, it is over
     if (temp_board["error"] == "Game Not Found!") {
-      this.setState({game_over: true})
+      this.setState({ game_over: true })
     }
 
   }
@@ -602,7 +624,7 @@ class GameBoard extends Component {
 
     // design class names
     let points_class_name = "text-4xl font-bold text-gray-900 dark:text-gray-200";
-    let node_id_class_name =  "text-l font-semibold text-gray-800 dark:text-gray-200";
+    let node_id_class_name = "text-l font-semibold text-gray-800 dark:text-gray-200";
 
     // if points is single digit re-adjust its x coordinate position
     if (data.points < 10) {
@@ -620,8 +642,7 @@ class GameBoard extends Component {
     );
   };
 
-  repositionNodes = () =>{
-    
+  repositionNodes = () => {
     this.setState({
       layoutEngineType: 'SnapToGrid',
       read_only: false,
@@ -668,10 +689,10 @@ class GameBoard extends Component {
     let winning_player = "";
     let winning_player_points = 0;
     this.state.board["player_ids"].map((curr_player, ii, arr) => {
-        if (this.state.board["player_points"][curr_player] > winning_player_points) {
-          winning_player_points = this.state.board["player_points"][curr_player];
-          winning_player = curr_player;
-        }
+      if (this.state.board["player_points"][curr_player] > winning_player_points) {
+        winning_player_points = this.state.board["player_points"][curr_player];
+        winning_player = curr_player;
+      }
     });
 
     // Put a glowing alert on the winning player's display
@@ -684,32 +705,32 @@ class GameBoard extends Component {
     // Get all of the cards as string to be displayed
     let cardsDisplay = "";
     this.state.board["cards"][player].map((card, ii, arr) => {
-        if (arr.length - 1 === ii) {
-            // last one
-           cardsDisplay += card
-        } else {
-           cardsDisplay += card + " - "
-        }
+      if (arr.length - 1 === ii) {
+        // last one
+        cardsDisplay += card
+      } else {
+        cardsDisplay += card + " - "
+      }
     });
 
     // Return HTML component cards with the information
     return (
-          <div className={class_name_box}>
-            <div className={class_name_points} name="player_points_display">
-                {this.state.board["player_points"][player]}
-            </div>
-            <div>
-              <p  className="text-l text-center font-bold text-gray-800 mb-2" name="player_name_display">
-                {player_name}
-              </p>
-              <p className="text-m font-semibold text-gray-800 dark:text-gray-200" name="player_cards_display">
-                {cardsDisplay}
-              </p>
-            </div>
-          </div>
+      <div className={class_name_box}>
+        <div className={class_name_points} name="player_points_display">
+          {this.state.board["player_points"][player]}
+        </div>
+        <div>
+          <p className="text-l text-center font-bold text-gray-800 mb-2" name="player_name_display">
+            {player_name}
+          </p>
+          <p className="text-m font-semibold text-gray-800 dark:text-gray-200" name="player_cards_display">
+            {cardsDisplay}
+          </p>
+        </div>
+      </div>
     )
   }
-  
+
   saveGame = async () => {
     if (!this.state.initial_load && this.state.username != "-1" && this.state.token != "-1") {
 
@@ -742,7 +763,7 @@ class GameBoard extends Component {
           'Saved!',
           'Game has been saved to your profile.',
           'success'
-      )
+        )
       }
     }
   }
@@ -750,8 +771,8 @@ class GameBoard extends Component {
   rebalanceAlert = () =>{
       Swal.fire({
       //display winner score
-      title: "UNBALANCED BOARD, PLAYER: " + this.state.turn,
-      text: "TIME TO REBALANCE"
+      title: "Unbalanced Board, Player: " + this.state.turn,
+      text: "Time to Rebalance!"
     })
     this.setState({ showModal: !this.state.showModal})
     
@@ -761,18 +782,17 @@ class GameBoard extends Component {
 
     if (!this.state.initial_load && this.state.username != "-1" && this.state.token != "-1") {
       return (
-
-          <button data-delay-show='500' data-place="bottom" data-tip="Save the current game to profile"
-                  data-offset="{'top': -20}" data-text-color="yellow"
-                  className="transition duration-500 ease-in-out bg-green-500 hover:bg-green-600  transform hover:-translate-y-1 hover:scale-105   border-green-500  border-opacity-50 rounded-lg shadow-2xl flex-1 m-1 py-1 flex justify-center font-bold text-xl text-gray-800"
-                  onClick={() => this.saveGame()}>Save Game</button>
+        <button data-delay-show='500' data-place="bottom" data-tip="Save the current game to profile"
+          data-offset="{'top': -20}" data-text-color="yellow"
+          className="transition duration-500 ease-in-out bg-green-500 hover:bg-green-600  transform hover:-translate-y-1 hover:scale-105   border-green-500  border-opacity-50 rounded-lg shadow-2xl flex-1 m-1 py-1 flex justify-center font-bold text-xl text-gray-800"
+          onClick={() => this.saveGame()}>Save Game</button>
 
 
       )
     }
   }
 
-  afterRenderEdge = (id, element, viewEdge, edgeContainer,isEdgeSelected) => {
+  afterRenderEdge = (id, element, viewEdge, edgeContainer, isEdgeSelected) => {
     // TO CHANGE THE COLOR AND SIZE OF THE EDGES
     //afterRenderEdge?: (id: string, element: any, edge: IEdge, edgeContainer: any, isEdgeSelected: boolean) => void;
     //console.log("Start afterRenderEdge");
@@ -872,11 +892,11 @@ class GameBoard extends Component {
         }
 
         <div className="flex mb-4 flex justify-center space-x-4">
-            { !this.state.initial_load && this.state.playersArray.map((player) => this.playersDisplay(player)) }
+          {!this.state.initial_load && this.state.playersArray.map((player) => this.playersDisplay(player))}
         </div>
 
 
-        <div style={{height: "10rem"}}>
+        <div style={{ height: "10rem" }}>
 
           {this.state.game_over ? <WinModal winner={this.state.turn} win_board={this.state.board} /> : <div> </div>}
           <div className="flex items-center bg-opacity-0 h-11">
@@ -892,13 +912,13 @@ class GameBoard extends Component {
             onClick={() => this.playCard(card_3)}>{card_3}</button>
 
             <div
-                className="flex justify-center">
+              className="flex justify-center">
               <div className="flex items-center p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800">
                 <div
-                    className="p-3 mr-4 text-orange-500 bg-orange-100 rounded-full dark:text-orange-100 dark:bg-orange-500">
+                  className="p-3 mr-4 text-orange-500 bg-orange-100 rounded-full dark:text-orange-100 dark:bg-orange-500">
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                     <path
-                        d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"></path>
+                      d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"></path>
                   </svg>
                 </div>
                 <div>
@@ -923,7 +943,7 @@ class GameBoard extends Component {
                   Check Nodes
               </button>
 
-              {this.buildSaveButton()}
+            {this.buildSaveButton()}
 
         </div>
         

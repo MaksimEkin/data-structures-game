@@ -18,16 +18,19 @@ const url = local;
    and viewing user's profile info
  */
 
-const sleep = (milliseconds) => {
-    return new Promise(resolve => setTimeout(resolve, milliseconds))
-}
-
 class Profile extends Component {
     constructor(props) {
         super(props);
 
         //see if logged in when profile page called
         const cookies = new Cookies();
+        
+        //remove current gameboard (if applicable)
+        if ((cookies.get('loaded_game')) && (cookies.get('loaded_game') != '')) {
+            cookies.remove('loaded_game', { path: '/' })
+            cookies.set('loaded_game', '', { path: '/' })
+        }
+
         let prevLogin //for checking if logged in already, true if already logged in
         if ((cookies.get('token')) && (cookies.get('token') != '')) {
             prevLogin = true
@@ -45,7 +48,8 @@ class Profile extends Component {
             user_points: null,
             user_rank: null,
             user_games: null,
-            is_loaded: false,
+            show_profile: false,
+            auth_error: false,
         }
     }
 
@@ -97,7 +101,7 @@ class Profile extends Component {
             cookies.set('username', this.state.username, { path: '/' })
 
             //update state to reflect successful login
-            this.setState({ loggedIn: true })
+            this.setState({ loggedIn: true, show_profile: false })
 
             //alert successful login
             //added this conditional so that don't see alert for cypress testing
@@ -124,7 +128,6 @@ class Profile extends Component {
     //make api call to log out
     logoutFxn = async () => {
 
-        this.setState({is_loaded: false})
         const cookies = new Cookies()
 
         //format user_id and token as FormData
@@ -152,6 +155,9 @@ class Profile extends Component {
             cookies.remove('token', { path: '/' })
             cookies.set('username', '', { path: '/' })
             cookies.set('token', '', { path: '/' })
+            cookies.remove('loaded_game', { path: '/' })
+            cookies.set('loaded_game', '', { path: '/' })
+
 
             this.setState({ loggedIn: false })
 
@@ -276,12 +282,14 @@ class Profile extends Component {
         })
     }
 
-    viewCallback = (id) => {
+    viewCallbackHelper = async (id) => {
+        const cookies = new Cookies()
+
         //store user input in FormData format
-        let apiData = new FormData()
-        apiData.append("user_id", this.state.user_name)
+        let apiData = new FormData()        
+        apiData.append("user_id", cookies.get('username'))
         apiData.append("game_id", id)
-        apiData.append("token", this.state.token)
+        apiData.append("token", cookies.get('token'))
 
         //api call parameters
         let requestOptions = {
@@ -290,20 +298,43 @@ class Profile extends Component {
             redirect: 'follow'
         };
 
-        // //make api call
-        // let fetch_url = url + "profile_page/api/load_board"
-        // let response = await fetch(fetch_url, requestOptions)
+        //make api call
+        let fetch_url = url + "profile_page/api/load_board"
+        let response = await fetch(fetch_url, requestOptions)
+          
+        //make sure api call was successful
+        if (response.status == 401) {
+            this.setState({
+                auth_error: true},
+                () => { this.updateProfile();
+            })
+        } else {
+            let returned = await response.json()
+                       
+            //store game id in a cookie
+            const cookies = new Cookies()
+            cookies.set('loaded_game', returned["game_id"], { path: '/' })
+            window.location.href = "/game_board"
+        }
+    }
+
+    viewCallback = (id) => {
 
         Swal.fire({
-            title: 'Failed to load game!',
-            icon: 'error',
-            text: "This feature is under development."
-            })
-        }
-
+            title: 'Do you want to load this gameboard?',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            confirmButtonText: `Yes`,
+          }).then((result) => {
+            /* Read more about isConfirmed, isDenied below */
+            if (result.isConfirmed) {
+                console.log("Confirmed");
+                this.viewCallbackHelper(id)
+            }
+          })
+    }
 
     shareCallbackHelper = async (id, dest_user) => {
-    
         const cookies = new Cookies()
 
         //store user input in FormData format
@@ -369,7 +400,6 @@ class Profile extends Component {
 
 
     deleteCallbackHelper = async (id) => {
-        
         const cookies = new Cookies()
 
         //store user input in FormData format
@@ -398,7 +428,6 @@ class Profile extends Component {
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
             confirmButtonText: 'Yes, delete it!'
         }).then((result) => {
             if (result.isConfirmed) {
@@ -412,7 +441,7 @@ class Profile extends Component {
                         text: "Try again later."
                     })
                 } else {
-                    this.setState({is_loaded: false});
+                    this.setState({ show_profile: false })
                     Swal.fire(
                         'Deleted!',
                         'Your file has been deleted.',
@@ -451,7 +480,10 @@ class Profile extends Component {
 
     buildGames = (games) => {
         if (games == null || games.length == 0) {
-            return <div></div>;
+            return(                            
+            <div class="text-center mr-3 border-r pr-3">
+                <h2 className="space-y-10 text-md text-center text-gray-500 mb-2"> No game history... Go play some games! </h2>
+            </div>)
         } else {
 
             let header = []
@@ -500,30 +532,33 @@ class Profile extends Component {
                             <img src="/static/bohemian_panda.png" class="rounded-full border-solid border-white border-2 -mt-3 h-32 w-32" />
                         </div>
                         <div class="text-center px-3 pb-6 pt-2">
-                            <h3 class="text-black text-md bold font-bold">{this.state.is_loaded && this.state.user_name}</h3>
+                            <h3 class="text-black text-md bold font-bold">{this.state.show_profile && this.state.user_name}</h3>
                         </div>
                         <div class="flex justify-center pb-3 text-grey-dark">
                             <div class="text-center mr-3 border-r pr-3">
-                                <h2 className="space-y-5 text-md text-center font-semibold text-gray-800 mb-2">{this.state.is_loaded && this.state.user_points}</h2>
+                                <h2 className="space-y-5 text-md text-center font-semibold text-gray-800 mb-2">{this.state.show_profile && this.state.user_points}</h2>
                                 <span>Total Points</span>
                             </div>
                             <div class="text-center">
-                                <h2 className="space-y-5 text-md text-center font-semibold text-gray-800 mb-2">{this.state.is_loaded && this.state.user_rank}</h2>
+                                <h2 className="space-y-5 text-md text-center font-semibold text-gray-800 mb-2">#{this.state.show_profile && this.state.user_rank}</h2>
                                 <span>Ranking</span>
                             </div>
                         </div>
                     </div>
-                    {this.state.is_loaded && this.buildGames(this.state.user_games)}
+                    {this.state.show_profile && this.buildGames(this.state.user_games)}
                 </div>
             </div>
         </div>)
 
     }
 
+    // confirm profile is ready to show
+    updateProfile = () => {
+        this.setState({ show_profile: true})
+    }
 
-    //api call to get user's rank and points
+    // set state based off of API success
     profileAPICall = async () => {
-
         const cookies = new Cookies()
 
         //store user input in FormData format
@@ -543,20 +578,24 @@ class Profile extends Component {
         let response = await fetch(fetch_url, requestOptions)
 
         //make sure api call was successful
-        if (!response.ok) {
-            return false;
+        if (response.status == 401) {
+            this.setState({
+                auth_error: true},
+                () => { this.updateProfile();
+            })
+        } else {
+            let returned = await response.json()
+            let game_id = returned["game_id"]
+            
+            this.setState({
+                auth_error: false,
+                user_games: returned["user_profile"]["saved_games"],
+                user_name: returned["user_profile"]["user_name"],
+                user_points: returned["user_profile"]["points"],
+                user_rank: returned["user_profile"]["rank"]},
+                () => { this.updateProfile();
+            })
         }
-
-        //otherwise, jsonify the api return
-        let returned = await response.json()
-        this.setState({
-            user_games: returned["user_profile"]["saved_games"],
-            user_name: returned["user_profile"]["user_name"],
-            user_points: returned["user_profile"]["points"],
-            user_rank: returned["user_profile"]["rank"],
-        })
-        //await sleep(100) // wait 100 ms
-        return true;
     }
 
 
@@ -570,26 +609,30 @@ class Profile extends Component {
 
         //display user profile page with option to log out
         else {
-            let auth = true;
-            if (!this.state.is_loaded) {
-                auth = this.profileAPICall()
-                this.setState({is_loaded: true})
-                return (
-                    <div className="w-full h-full fixed block top-0 left-0 bg-white opacity-75 z-50">
-                        <span className="text-green-500 opacity-75 top-1/2 my-0 mx-auto block relative w-0 h-0">
-                            <i className="fas fa-circle-notch fa-spin fa-5x"></i>
-                        </span>
-                    </div>
-                )
-            } else {
-                auth = (auth && !(cookies.get('token') === ''))
-                if (!auth) {
-                    return(<div>
-                            {this.authError()}
-                          </div>)
+            if(this.state.show_profile) {
+                if (this.auth_error) { // whoops auth error! don't show anything!
+                    return(
+                      <div>
+                        {this.authError()}
+                      </div>)
                 } else {
-                    return (this.state.is_loaded && this.displayUserProfile())
+                    return (this.displayUserProfile())
                 }
+
+            // display loading screen while user waits
+            } else {
+                this.profileAPICall()
+                return ( 
+                    <div>
+                      <link rel="stylesheet" href="https://pagecdn.io/lib/font-awesome/5.10.0-11/css/all.min.css"></link>
+                      <div className="w-full h-full fixed block top-0 left-0 bg-white opacity-75 z-50">
+                        <span
+                          style={{top: '50%'}} 
+                          className="text-blue-400 opacity-75 top-1/2 my-0 mx-auto block relative w-0 h-0">
+                          <i className="fas fa-circle-notch fa-spin fa-5x"></i>
+                        </span>
+                      </div>
+                    </div>)                
             }
         }
     }

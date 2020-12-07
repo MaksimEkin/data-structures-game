@@ -14,9 +14,6 @@ from game_board.api import utils as game_utils
 from profile_page.database import profile_page_db as db
 from profile_page.api import mock as mock_db
 
-
-# TODO: RYAN, Import your code
-
 @api_view(['GET'])
 def api_overview(request):
     '''
@@ -583,6 +580,10 @@ def load_board(request):
 
     # Load the game from user's saved profile
     game_board = db.load_board(data['user_id'], data['game_id'])
+    if not game_board:
+        return Response({'error': 'you got some messed up arguments (NICK)'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    game_board['game_id'] = str(uuid.uuid1())
 
     # indicate that this board is being loaded from the profile
     game_board['profile_load'] = True
