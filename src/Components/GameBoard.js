@@ -99,12 +99,20 @@ class GameBoard extends Component {
     if (cookies.get('username') != null && cookies.get('token') != null) {
       if (cookies.get('username') != "" && cookies.get('token') != "") {
         this.setState({ username: cookies.get('username'), token: cookies.get('token') })
-        players = players + "," + cookies.get('username');
+        if (players == '') {
+          players = cookies.get('username');
+        } else {
+          players = players + "," + cookies.get('username');
+        }
       }
     }
 
+    // if empty player is passed
+    if (players == '' || players == null) {
+      players = 'RedPanda'
+    }
+
     // compose player list
-    this.setState({ playersArray: players.split(',') })
     let ds = cookies.get('gameDS');
 
     //get cookie variables from state and insert into url
@@ -127,6 +135,7 @@ class GameBoard extends Component {
     this.setState({ board: board_, turn: board_['turn'] });
     this.setState({ playerPointVal: board_['player_points'][this.state.turn] });
     this.setState({ deckSize: board_['deck'].length });
+    this.setState({ playersArray: board_['player_ids'] })
 
     //pass the new board state into create_graph function and set the made_graph state
     let made_graph = create_graph(this.state.board['graph'])

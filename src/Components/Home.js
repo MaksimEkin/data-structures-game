@@ -72,22 +72,27 @@ class Home extends Component{
               },
             }}
           />
-
-            <div className="flex items-center justify-center h-screen">
-                <GameInfo className="flex items-center justify-center h-screen"
-                    level = {this.state.difficulty}
-                    playerList={this.state.players}
-                    gameDS={this.state.data_structure}
-                />
-            </div>
-
-            <div className="space-y-30 flex justify-center">
-                <div className='Rankings'>
-                  <RankingTable
-                    data = {this.state.data} 
-                  />
+            <div className="grid grid-cols-4 items-center justify-center h-screen">
+                <div></div>
+                <div className="flex justify-center">
+                    <GameInfo
+                        level = {this.state.difficulty}
+                        playerList={this.state.players}
+                        gameDS={this.state.data_structure}
+                    />
                 </div>
+
+                <div className="flex justify-center">
+                    <div className='Rankings'>
+                        <p className="text-xl text-center font-semibold text-gray-800 mb-2">Top Ranking Players</p>
+                      <RankingTable
+                        data = {this.state.data}
+                      />
+                    </div>
+                </div>
+                <div></div>
             </div>
+
 
     </div>
 
