@@ -585,7 +585,15 @@ class Profile extends Component {
                 auth_error: true},
                 () => { this.updateProfile();
             })
-        } else {
+        } 
+        if (response['error']) {
+            Swal.fire({
+                title: 'There was a problem with the requested profile!',
+                icon: 'error',
+                confirmButtonText: response['error']
+            })
+        }
+        else {
             let returned = await response.json()
             let game_id = returned["game_id"]
             
