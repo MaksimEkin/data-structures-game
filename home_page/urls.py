@@ -10,5 +10,5 @@ urlpatterns = [
 
     # Homepage API call to get the ranking
     path('api', api.api_overview, name='homepage-api_overview'),
-    path('api/rankings/<int:top_n>', api.rankings, name='game-board-ranking-top-n'),
+    path('api/rankings/<str:top_n>', api.rankings, name='game-board-ranking-top-n'),
 ]

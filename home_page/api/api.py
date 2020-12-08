@@ -19,7 +19,7 @@ def api_overview(request):
     :return: Response, list of API URLs.
     """
     api_urls = {
-        'Top Ranking Users': '/rankings/<str:difficulty>/<int:top_n>',
+        'Top Ranking Users': '/rankings/<int:top_n>',
     }
     return Response(api_urls)
 
