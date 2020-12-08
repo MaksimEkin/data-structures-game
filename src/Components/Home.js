@@ -5,6 +5,14 @@ import Particles from 'react-particles-js';
 import GameInfo from './Modal/GameInfo.js'
 import { RankingTable } from './RankingTable'
 
+//this allows us to test separately locally and on Heroku by changing just one line
+const local = "http://127.0.0.1:8000/";
+const reactLocal = "http://localhost:3000/"
+const remote = "https://data-structures-game.herokuapp.com/";
+
+//can also be const url = local; or const url = reactLocal;
+const url = local;
+
 //this function is called from App.js to start the interface of the game
 //calls the GameInfo modal to get the new game's information
 class Home extends Component{
@@ -15,7 +23,8 @@ class Home extends Component{
     this.state = {
       difficulty:null,
       players:null,
-      data_structure:null
+      data_structure:null,
+      data:[{"id":0,"user_name":"test","total_score":0}]
     };
   }
 
@@ -26,7 +35,16 @@ class Home extends Component{
       if ((cookies.get('loaded_game')) && (cookies.get('loaded_game') != '')) {
         cookies.remove('loaded_game', { path: '/' })
         cookies.set('loaded_game', '', { path: '/' })
-    }
+      }
+
+      //assemble api call 
+      let rankingsURL = url + "api/rankings/" + 20;
+      let response = await fetch(rankingsURL);
+      let rank_head = await response.json();
+      console.log(rank_head);
+      this.setState({ data: rank_head['top_ranking_players'] })
+
+
   }
 
   //display the background particle
@@ -66,7 +84,9 @@ class Home extends Component{
 
             <div className="space-y-30 flex justify-center">
                 <div className='Rankings'>
-                  <RankingTable />
+                  <RankingTable
+                    data = {this.state.data} 
+                  />
                 </div>
             </div>
 
