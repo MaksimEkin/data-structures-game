@@ -236,11 +236,11 @@ def register(request):
     if data['password1'] != data['password2']:
         return Response({'error': str('Passwords do not match!')}, status=status.HTTP_400_BAD_REQUEST)
 
-    # Check minimum password length
+    # Check minimum password length of 8
     if len(str(data['password1'])) <= 8:
         return Response({'error': str('Password has to be longer than 8 characters!')}, status=status.HTTP_400_BAD_REQUEST)
 
-    # check if user name is less than 3 characters
+    # check if user name is less than 5 characters
     if len(str(data['user_name'])) <= 5:
         return Response({'error': str('Username must be longer than 5 characters!')}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -248,7 +248,7 @@ def register(request):
     if str(data['user_name'])[0:3].lower() == 'bot':
         return Response({'error': str('Username can not start with "bot"!')}, status=status.HTTP_400_BAD_REQUEST)
 
-    # Check if username has space
+    # Check if username, password, or e-mail has space
     if len(str(data['user_name']).split(" ")) > 1 or len(str(data['password1']).split(" ")) > 1 or len(str(data['email']).split(" ")) > 1:
         return Response({'error': str('Username, password, and email can not have space!')}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -257,7 +257,7 @@ def register(request):
         return Response({'error': str('Invalid e-mail!')},
                         status=status.HTTP_400_BAD_REQUEST)
 
-    # check for not allowed characters
+    # check for not allowed characters in user name or password
     if check_special_characters(str(data['user_name'])) or check_special_characters(str(data['password1'])):
         return Response({'error': str('Unaccepted character passed!')},
                         status=status.HTTP_400_BAD_REQUEST)
