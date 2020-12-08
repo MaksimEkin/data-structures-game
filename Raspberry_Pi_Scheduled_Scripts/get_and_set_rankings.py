@@ -3,6 +3,7 @@ Sets all user rankings from a Raspberry Pi
 command to run: python get_and_set_rankings.py
 """
 import os
+import datetime
 from pymongo import MongoClient, DESCENDING, ReturnDocument
 
 DATABASE_URL1 = os.environ.get('DATABASE_URL1')
@@ -53,12 +54,17 @@ def get_rankings():
 if __name__ == '__main__':
     rank_cursor = get_rankings()
     rank_iterator = 1
+    Success = True
 
     for user_rank in get_rankings():
         try:
             set_ranking(user_rank["user_id"], rank_iterator)
             rank_iterator +=1
         except:
-            with open("rank_exception_log.txt", "a") as file:
+            Success = False
+            with open("rank_log.txt", "a") as file:
                 file.write("Could not process " + str( user_rank ) + " in rankings\n")
-            #print("Exception logged - Ranking")
+
+    if Success:
+        with open("rank_log.txt", "a") as file:
+            file.write("Ranking success at "+ str(datetime.datetime.now())+"\n")

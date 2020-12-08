@@ -43,18 +43,23 @@ def purge_old_games():
     yesterday = (dt.datetime.now() - dt.timedelta(days=1))
     mongo_cursor = client.InitialDB.Active_Games.find({},{'_id':0, 'game_id': 1, 'time_created':1})
 
+    Success = True
+
     for game in mongo_cursor:
         try:
             game_date = game['time_created']
             game_datetime_obj = dt.datetime.strptime(game_date,"%d/%m/%Y %H:%M:%S")
             if game_datetime_obj < yesterday:
-                #print(game, "Removed")
                 remove_game(game['game_id'])
 
         except:
-            with open("purge_exception_log.txt", "a") as file:
+            Success = False
+            with open("purge_log.txt", "a") as file:
                 file.write("Could not process " + str( game ) + " in purge\n")
-            #print("Exception logged - Purge")
+
+    if Success:
+        with open("purge_log.txt", "a") as file:
+            file.write("Ranking success at "+ str(dt.datetime.now())+"\n")
 
     return 0
 
