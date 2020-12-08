@@ -73,32 +73,39 @@ def update_board_db(board, user_id='-1', token='-1'):
             # if user is authenticated
             if user_id not in ['-1', -1, ''] and token not in ['-1', -1, '']:
 
-                # Here check if user_id matches the token with the database
-                if not profile_db.check_user(user_id, token):
-                    result['error'] = True
-                    result['reason'] = "User is not authenticated"
-                    return result
+                # check if the game is being loaded from profile page
+                if 'profile_load' in list(board.keys()) and board['profile_load'] is False:
 
-                if str(user_id) in board['player_ids']:
+                    # Here check if user_id matches the token with the database
+                    if profile_db.check_user(user_id, token):
+                        # Currently error return if user is not authenticated is disabled
+                        # It just not updates the score
+                        #result['error'] = True
+                        #result['reason'] = "User is not authenticated"
+                        #return result
 
-                    # if not negative points board['turn']
-                    if board['player_points'][str(user_id)] > 0:
+                        # if the user is in part of the players (paranoid check)
+                        if str(user_id) in board['player_ids']:
 
-                        # get user's current points
-                        curr_points = profile_db.get_points(str(user_id))
+                            # if not negative points
+                            if board['player_points'][str(user_id)] > 0:
 
-                        # get the target points
-                        if user_id == board['turn']:
-                            target_points = curr_points + (math.log(board['player_points'][str(user_id)]) * 2)
-                        else:
-                            target_points = curr_points + math.log(board['player_points'][str(user_id)])
+                                # get user's current points
+                                curr_points = profile_db.get_points(str(user_id))
 
-                        # set the new points
-                        profile_db.set_points(str(user_id), target_points)
+                                # get the target points
+                                if user_id == board['turn']:
+                                    # if the user is the winner, double the points
+                                    target_points = curr_points + (math.log(board['player_points'][str(user_id)]) * 2)
+                                else:
+                                    # don't double the points if the user is not the winner
+                                    target_points = curr_points + math.log(board['player_points'][str(user_id)])
+
+                                # set the new points
+                                profile_db.set_points(str(user_id), target_points)
 
             # remove the game from the database
             db.remove_game(board['game_id'])
-
 
         # Game continues
         else:
@@ -193,7 +200,8 @@ def new_board(difficulty, player_ids, data_structures):
         # 'selected_data_structures': data_structures,
         # 'timed_game': False,
         # 'seconds_until_next_ds': 60,
-        'online': False
+        'online': False,
+        'profile_load': False
     }
     return board
 

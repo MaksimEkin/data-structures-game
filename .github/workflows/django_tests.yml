@@ -27,9 +27,10 @@ jobs:
         pip install -r requirements.txt
     - name: Run Tests
       run: |
-        # Game Board API
+        # API Calls
         python manage.py test game_board.api.tests_api
         python manage.py test profile_page.api.tests_api
+        python manage.py test home_page.api.tests_api
 
         # Database
         python manage.py test game_board.database.test_db

@@ -1,12 +1,11 @@
 import React, { Component } from "react";
-import ReactDOM from "react-dom";
-import { Button, Grid, Typography, Card, CardHeader, CardActions, CardActionArea, CardContent, Chip } from '@material-ui/core';
 import {create_adjacency, create_graph} from './CreateGraphAdj.js';
 import Cookies from 'universal-cookie';
 import WinModal from './Modal/WinModal.js';
 import ReactTooltip from "react-tooltip";
 import Particles from 'react-particles-js';
 import Swal from "sweetalert2"
+import "./styles.css";
 
 //Uber's digraph react folder
 import {
@@ -27,7 +26,6 @@ import {
     GOLD_NODE
 } from "./config";
 
-import "./styles.css";
 //Fix XSS security issues when developing locally
 //this allows us to test separately locally and on Heroku by changing just one line
 const local = "http://127.0.0.1:8000/";
@@ -47,6 +45,7 @@ const sample = {
 class GameBoard extends Component {
   constructor(props) {
     super(props);
+
     //this is used for accessing variables between components
     this.customNodeRef = React.createRef();
 
@@ -78,9 +77,10 @@ class GameBoard extends Component {
       initial_load:true,
 
       //used in conjunction with the API's end_game returned in the JSON
-      game_over: false
+      game_over: false,
+      rebalance_modal:false,
+      showModal:true
     };
-
 
   }
 
@@ -103,13 +103,13 @@ class GameBoard extends Component {
       }
     }
 
+    // compose player list
     this.setState({ playersArray: players.split(',') })
     let ds = cookies.get('gameDS');
 
     //get cookie variables from state and insert into url
     let createGameURL = url + "game_board/api/start_game/" + difficulty + "/" + players + "/" + ds
     let getGameURL = url + "game_board/api/board/";
-
 
     //API call to start game
     let response = await fetch(createGameURL);
@@ -133,6 +133,7 @@ class GameBoard extends Component {
     this.setState({ graph: made_graph });
     this.setState({ loading: false, initial_load: false });
 
+    //ai player
     if (!this.state.game_over) {
       if (this.state.turn.replace(/\s+/g, "").toLowerCase().startsWith('bot')) {
         if (!this.state.loading) {
@@ -453,9 +454,7 @@ class GameBoard extends Component {
       this.GraphView.panToNode(event.target.value, true);
     }
   };
-
-  /* Define custom graph editing methods here */
-
+ 
   //checks if the current board is balanced and returns true or false
   checkRebalance = () => {
     let isBalanced = this.state.board.graph.balanced
@@ -465,28 +464,30 @@ class GameBoard extends Component {
   //called if checkRebalance returns false
   //post request to get correct/balanced game board and sets gameboard to
   //return balanced board
-  rebalance = async () => {
+  rebalance = async (attempt) => {
     this.setState({loading:true})
 
+    let rebalance_attempt={'adjacency_list':attempt}
     let fetch_url = url+"game_board/api/rebalance/" + this.state.gameID + '/' + this.state.username + '/' + this.state.token
-    let balance_attempt={'adjacency_list':{'node2':['node0'],'node0':['node5','node3'],'node5':[],'node3':[]}}
+
     let requestOptions = {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(balance_attempt)
+      headers: {Accept: 'application/json', 'Content-Type': 'application/json'},
+      body: JSON.stringify(rebalance_attempt)
     };
 
     let response = await fetch(fetch_url, requestOptions);
     let newBoard = await response.json();
-
+    
     //player might lose points when re-balance occurs
     this.setState({playerPointVal: newBoard['player_points'][this.state.turn]})
     this.setState({ board: newBoard, turn: newBoard['turn']});
 
     let made_graph = create_graph(this.state.board['graph'])
     this.setState({ graph: made_graph});
-    this.setState({loading: false})
 
+    this.setState({loading: false})
+   
   }
 
   // arg: card chosen
@@ -498,9 +499,10 @@ class GameBoard extends Component {
 
     //make the API call to actually play the card the user chose
     this.apiCall()
-
-    //check if playing selected card ended the game
-    //this.checkGameStatus()
+    
+    if(this.state.board != null && !this.state.board.graph.balanced){
+      this.rebalanceAlert()
+    }
   }
 
   //modularize the api call for playing a card
@@ -521,8 +523,6 @@ class GameBoard extends Component {
     this.setState({ board: newBoard, turn: newBoard['turn']});
     this.setState({playerPointVal: newBoard['player_points'][this.state.turn]})
     this.setState({deckSize: newBoard['deck'].length});
-
-    //check if board is balanced then rebalance tree if fxn returned false
 
     let made_graph = create_graph(this.state.board['graph'])
     this.setState({ graph: made_graph});
@@ -548,6 +548,11 @@ class GameBoard extends Component {
     let made_graph = create_graph(this.state.board['graph'])
     this.setState({ graph: made_graph});
     this.setState({loading: false})
+    //rebalance alert after bot's turn
+    if(this.state.board != null && !this.state.board.graph.balanced && !this.state.game_over){
+      this.rebalanceAlert()
+    }
+          
   }
 
   //check if game is over (ie: is golden node at the root of the tree/does API end_game == true?)
@@ -557,11 +562,6 @@ class GameBoard extends Component {
     if (this.state.board['end_game']){
       this.setState({game_over: true})
     }
-
-    //introduced a timeout because of a bug that arose without it:
-    //the state was updating before the API call returned,
-    //and the game was ending 1 turn after it should have
-    //setTimeout(this.checkBoard, 200)
   }
 
   //if the API can no longer find the game board in the db,
@@ -577,7 +577,6 @@ class GameBoard extends Component {
     if (temp_board["error"] == "Game Not Found!") {
       this.setState({game_over: true})
     }
-
   }
 
   // Create custom text content for the nodes: Node point and Node ID
@@ -607,9 +606,10 @@ class GameBoard extends Component {
   };
 
   repositionNodes = () =>{
+    
     this.setState({
       layoutEngineType: 'SnapToGrid',
-      read_only: false
+      read_only: false,
     })
   }
 
@@ -619,6 +619,13 @@ class GameBoard extends Component {
       read_only: true
     })
 
+    let user_graph = create_adjacency(this.state.graph)
+
+    //passes users balance attempt in adjaceny form to rebalance
+    this.rebalance(user_graph)
+    
+    this.setState({ showModal: !this.state.showModal})
+    
   }
 
   // Function to display all of the players in the gameboard
@@ -726,16 +733,25 @@ class GameBoard extends Component {
     }
   }
 
+  rebalanceAlert = () =>{
+      Swal.fire({
+      //display winner score
+      title: "UNBALANCED BOARD, PLAYER: " + this.state.turn,
+      text: "TIME TO REBALANCE"
+    })
+    this.setState({ showModal: !this.state.showModal})
+  }
+
   buildSaveButton = () => {
 
+    //conditionally display save game button
     if (!this.state.initial_load && this.state.username != "-1" && this.state.token != "-1") {
       return (
+
           <button data-delay-show='500' data-place="bottom" data-tip="Save the current game to profile"
                   data-offset="{'top': -20}" data-text-color="yellow"
                   className="transition duration-500 ease-in-out bg-green-500 hover:bg-green-600  transform hover:-translate-y-1 hover:scale-105   border-green-500  border-opacity-50 rounded-lg shadow-2xl flex-1 m-1 py-1 flex justify-center font-bold text-xl text-gray-800"
                   onClick={() => this.saveGame()}>Save Game</button>
-
-
       )
     }
   }
@@ -743,15 +759,7 @@ class GameBoard extends Component {
   afterRenderEdge = (id, element, viewEdge, edgeContainer,isEdgeSelected) => {
     // TO CHANGE THE COLOR AND SIZE OF THE EDGES
     //afterRenderEdge?: (id: string, element: any, edge: IEdge, edgeContainer: any, isEdgeSelected: boolean) => void;
-    //console.log("Start afterRenderEdge");
-    //console.log("id= ",id);
-    //console.log("element= ",element);
-    //console.log("viewEdge= ",viewEdge);
-    //console.log("edgeContainer= ",edgeContainer);
-    //console.log("isEdgeSelected= ",isEdgeSelected);
-    //console.log("end afterRenderEdge");
   }
-
 
   renderBackground = (gridSize) => {
     return (
@@ -763,6 +771,7 @@ class GameBoard extends Component {
         fill={"#eae7dc"}
       />
     );
+
   };
   //in react life cycle, code that is rendered occurs after constructor initialization
   //and component mounting and then reflects the change in state/prop values
@@ -802,40 +811,42 @@ class GameBoard extends Component {
                 this.aiCall()
             }
         }
-        if(!this.checkRebalance() && !this.state.turn.replace(/\s+/g, "").toLowerCase().startsWith('bot')){
-            this.rebalance()
-        }
+      
     }
 
     //html returned to display page. When each card is played, the appropriate function is called, which in turn makes an API call
     return (
 
       <div>
-        <Particles
+
+        {
+          // Dynamically render particles effect
+          <Particles
               id="particles2"
               params={{
                 particles: {
-                  color:"#000000",
+                  color: !(this.state.deckSize <= 13) ? "#000000" : !(this.state.deckSize <= 7) ? "#0080ff"  : !(this.state.deckSize <= 5) ? "#8000ff" : !(this.state.deckSize <= 3) ? "#358f17" : "#ff0080",
                   line_linked: {
-                    color:"#000000",
-                    distance:50,
+                    color: !(this.state.deckSize <= 13) ? "#000000" : !(this.state.deckSize <= 7) ? "#0080ff"  : !(this.state.deckSize <= 5) ? "#8000ff" : !(this.state.deckSize <= 3) ? "#358f17" : "#ff0080",
+                    distance: 50,
                   },
                   number: {
-                    value: 38,
+                    value: 185,
                     density: {
                       enable: true,
                       value_area: 500,
                     }
                   },
-                  move:{
-                    direction:"bottom",
+                  move: {
+                    direction: !(this.state.deckSize <= 7) ? "bottom" : "none",
                     random:true,
-                    speed:1,
-                    out_mode:"out",
+                    speed: !(this.state.deckSize <= 13) ? 1 : !(this.state.deckSize <= 7) ? 1.5  : !(this.state.deckSize <= 5) ? 2 : !(this.state.deckSize <= 3) ? 2.5 : 3,
+                    out_mode:!(this.state.deckSize <= 5) ? "out" : "bounce",
                   }
-                },
+               },
               }}
-        />
+          />
+        }
 
         <div className="flex mb-4 flex justify-center space-x-4">
             { !this.state.initial_load && this.state.playersArray.map((player) => this.playersDisplay(player)) }
@@ -844,13 +855,18 @@ class GameBoard extends Component {
 
         <div style={{height: "10rem"}}>
 
-          {this.state.game_over ? <WinModal winner={this.state.turn} win_board={this.state.board}/> : <div> </div>}
-
+          {this.state.game_over ? <WinModal winner={this.state.turn} win_board={this.state.board} /> : <div> </div>}
           <div className="flex items-center bg-opacity-0 h-11">
 
-            <button className="transition duration-500 ease-in-out bg-blue-500 hover:bg-red-500 transform hover:-translate-y-1 hover:scale-105 bg-blue-300 border-blue-350 border-opacity-50 rounded-lg shadow-2xl flex-1 m-1 py-1 flex justify-center font-bold text-xl text-gray-800" onClick={() => this.playCard(card_1)}>{card_1}</button>
-            <button className="transition duration-500 ease-in-out bg-blue-500 hover:bg-red-500 transform hover:-translate-y-1 hover:scale-105 bg-blue-300 border-blue-350 border-opacity-50 rounded-lg shadow-2xl flex-1 m-1 py-1 flex justify-center font-bold text-xl text-gray-800" onClick={() => this.playCard(card_2)}>{card_2}</button>
-            <button className="transition duration-500 ease-in-out bg-blue-500 hover:bg-red-500 transform hover:-translate-y-1 hover:scale-105 bg-blue-300 border-blue-350 border-opacity-50 rounded-lg shadow-2xl flex-1 m-1 py-1 flex justify-center font-bold text-xl text-gray-800" onClick={() => this.playCard(card_3)}>{card_3}</button>
+            <button className="transition duration-500 ease-in-out bg-blue-500 hover:bg-red-500 transform hover:-translate-y-1 hover:scale-105 bg-blue-300 border-blue-350 border-opacity-50 rounded-lg shadow-2xl flex-1 m-1 py-1 flex justify-center font-bold text-xl text-gray-800" 
+            disabled={(this.state.board != null && !this.state.board.graph.balanced)? true : false}
+            onClick={() => this.playCard(card_1)}>{card_1}</button>
+            <button className="transition duration-500 ease-in-out bg-blue-500 hover:bg-red-500 transform hover:-translate-y-1 hover:scale-105 bg-blue-300 border-blue-350 border-opacity-50 rounded-lg shadow-2xl flex-1 m-1 py-1 flex justify-center font-bold text-xl text-gray-800" 
+            disabled={(this.state.board != null && !this.state.board.graph.balanced)? true : false}
+            onClick={() => this.playCard(card_2)}>{card_2}</button>
+            <button className="transition duration-500 ease-in-out bg-blue-500 hover:bg-red-500 transform hover:-translate-y-1 hover:scale-105 bg-blue-300 border-blue-350 border-opacity-50 rounded-lg shadow-2xl flex-1 m-1 py-1 flex justify-center font-bold text-xl text-gray-800" 
+            disabled={(this.state.board != null && !this.state.board.graph.balanced)? true : false}
+            onClick={() => this.playCard(card_3)}>{card_3}</button>
 
             <div
                 className="flex justify-center">
@@ -871,15 +887,23 @@ class GameBoard extends Component {
             </div>
 
               <button data-delay-show='500' data-place="bottom" data-tip="Shift click to make edges, delete a selected node with the keyboard's delete key" data-offset="{'top': -20}" data-text-color="yellow"
-                  className="transition duration-500 ease-in-out bg-orange-500 hover:bg-orange-600  transform hover:-translate-y-1 hover:scale-105 border-orange-500 border-opacity-50 rounded-lg shadow-2xl flex-1 m-1 py-1 flex justify-center font-bold text-xl text-gray-800" onClick={() =>this.repositionNodes()}>Reposition Nodes</button>
+                  disabled={(this.state.board != null && this.state.board.graph.balanced)? true : false}
+                  className="transition duration-500 ease-in-out bg-orange-500 hover:bg-orange-600  transform hover:-translate-y-1 hover:scale-105 border-orange-500 border-opacity-50 rounded-lg shadow-2xl flex-1 m-1 py-1 flex justify-center font-bold text-xl text-gray-800" 
+                  onClick={() =>this.repositionNodes()}>
+                  Reposition Nodes
+                </button>
 
               <button data-delay-show='500' data-place="bottom" data-tip="End's turn and determines rebalance correctness" data-offset="{'top': -20}" data-text-color="yellow"
-                  className="transition duration-500 ease-in-out bg-orange-500 hover:bg-orange-600  transform hover:-translate-y-1 hover:scale-105   border-orange-500  border-opacity-50 rounded-lg shadow-2xl flex-1 m-1 py-1 flex justify-center font-bold text-xl text-gray-800" onClick={() =>this.checkNodes()}>Check Nodes</button>
+                  disabled={(this.state.board != null && this.state.board.graph.balanced)? true : false}
+                  className="transition duration-500 ease-in-out bg-orange-500 hover:bg-orange-600  transform hover:-translate-y-1 hover:scale-105   border-orange-500  border-opacity-50 rounded-lg shadow-2xl flex-1 m-1 py-1 flex justify-center font-bold text-xl text-gray-800" 
+                  onClick={() =>this.checkNodes()}>
+                  Check Nodes
+              </button>
 
               {this.buildSaveButton()}
 
         </div>
-
+        
         <ReactTooltip />
         {/*from react digraph library to format graph */}
         <div id = "graph" style={{ height: "60rem"}}>
@@ -919,6 +943,7 @@ class GameBoard extends Component {
           renderBackground={this.renderBackground}
         />
         </div>
+        
 
         </div>
       </div>
@@ -926,5 +951,3 @@ class GameBoard extends Component {
   }
 }
 export default GameBoard;
-//const rootElement = document.getElementById("root");
-//ReactDOM.render(<GameBoard />, rootElement);
