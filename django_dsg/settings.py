@@ -47,7 +47,8 @@ INSTALLED_APPS = [
     'home_page',
     'game_board',
     'profile_page',
-    'register'
+    'register',
+    'tutorial'
 ]
 
 MIDDLEWARE = [
