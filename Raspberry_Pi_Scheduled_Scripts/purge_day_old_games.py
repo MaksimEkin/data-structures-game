@@ -59,7 +59,7 @@ def purge_old_games():
 
     if Success:
         with open("purge_log.txt", "a") as file:
-            file.write("Ranking success at "+ str(datetime.datetime.now())+"\n")
+            file.write("Ranking success at "+ str(dt.datetime.now())+"\n")
 
     return 0
 
