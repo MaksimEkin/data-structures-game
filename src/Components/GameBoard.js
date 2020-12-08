@@ -37,7 +37,7 @@ const reactLocal = "http://localhost:3000/"
 const remote = "https://data-structures-game.herokuapp.com/";
 
 //can also be const url = local; or const url = reactLocal;
-const url = remote;
+const url = local;
 
 //define sample node
 const sample = {
@@ -109,6 +109,7 @@ class GameBoard extends Component {
 
     this.setState({ playersArray: players.split(',') })
     let ds = cookies.get('gameDS');
+    console.log('difficulty: ',difficulty, 'players: ',players, 'ds: ',ds);
 
     //get cookie variables from state and insert into url
     let createGameURL = url + "game_board/api/start_game/" + difficulty + "/" + players + "/" + ds
@@ -119,6 +120,9 @@ class GameBoard extends Component {
     let response = await fetch(createGameURL);
     let game_id = await response.json();
 
+    console.log('response', response)
+    console.log('game_id',game_id);
+    
     //save the get request response to state
     this.setState({ gameID: game_id['game_id'] });
     cookies.set('game_id', game_id['game_id'], { path: '/' });
@@ -126,7 +130,9 @@ class GameBoard extends Component {
     //get request to api and include the dynamic game_id
     response = await fetch(getGameURL + game_id['game_id']);
     let board_ = await response.json();
-
+    console.log('board_.graph ',board_.graph)
+    
+    if (board_.graph) {
     //set the state values with respect to the dynamic json response
     this.setState({ board: board_, turn: board_['turn'] });
     this.setState({ playerPointVal: board_['player_points'][this.state.turn] });
@@ -136,7 +142,7 @@ class GameBoard extends Component {
     let made_graph = create_graph(this.state.board['graph'])
     this.setState({ graph: made_graph });
     this.setState({ loading: false, initial_load: false });
-
+   
     if (!this.state.game_over) {
       if (this.state.turn.replace(/\s+/g, "").toLowerCase().startsWith('bot')) {
         if (!this.state.loading) {
@@ -145,6 +151,12 @@ class GameBoard extends Component {
         }
       }
     }
+  }
+  else{
+    //console.log("response['error']",response['error']);
+    console.log('response=undefined, routing to home')
+    window.location.href = "/"
+  }
   }
 
   //from imported digraph folder - function to display node
@@ -156,7 +168,7 @@ class GameBoard extends Component {
             style={{ pointerEvents: "all" }}
             width="100"
             height="50"
-            xmlnsXlink="http://www.w3.org/1999/xlink"
+            xmlnsXlink="http://www.w3.org/1999/xlink"s
           >
           </foreignObject>
         )}
@@ -484,7 +496,14 @@ class GameBoard extends Component {
 
     let response = await fetch(fetch_url, requestOptions);
     let newBoard = await response.json();
-    
+    if (response["status"] != "success") {
+      Swal.fire({
+        title: 'Rebalancing Failed',
+        icon: 'error',
+        text: response['error']
+    })
+
+    }
     //player might lose points when re-balance occurs
     this.setState({playerPointVal: newBoard['player_points'][this.state.turn]})
     this.setState({ board: newBoard, turn: newBoard['turn']});

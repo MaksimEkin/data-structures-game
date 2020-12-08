@@ -11,7 +11,7 @@ const remote = "https://data-structures-game.herokuapp.com/";
 const tableHeaders = ["Game", "Type", "Difficulty", "Actions"]
 
 //can also be const url = local; or const url = reactLocal;
-const url = remote;
+const url = local;
 
 /* This class provides the functionality for logging in and out,
    registering a new account and (eventually) adding friends
@@ -388,6 +388,8 @@ class Profile extends Component {
         //make api call
         let fetch_url = url + "profile_page/api/delete_board"
         let response = await fetch(fetch_url, requestOptions)
+        console.log("response.ok == true: ",response.ok)
+
         return (response.ok === true)
     }
 
@@ -543,8 +545,14 @@ class Profile extends Component {
         let response = await fetch(fetch_url, requestOptions)
 
         //make sure api call was successful
-        if (!response.ok) {
-            return false;
+        if (response['error']) {
+            Swal.fire({
+                title: 'There was a problem with the requested profile!',
+                icon: 'error',
+                confirmButtonText: response['error']
+
+                //return to profile page if click on button
+            })
         }
 
         //otherwise, jsonify the api return
@@ -594,4 +602,4 @@ class Profile extends Component {
         }
     }
 }
-export default Profile
+export default Profile 
