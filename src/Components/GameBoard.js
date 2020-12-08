@@ -106,18 +106,15 @@ class GameBoard extends Component {
     // compose player list
     this.setState({ playersArray: players.split(',') })
     let ds = cookies.get('gameDS');
-    console.log('difficulty: ',difficulty, 'players: ',players, 'ds: ',ds);
+
 
     //get cookie variables from state and insert into url
-    let createGameURL = url + "game_board/api/start_game/" + difficulty + "/" + cookies.get('username') + "/" + ds
+    let createGameURL = url + "game_board/api/start_game/" + difficulty + "/" + players + "/" + ds
     let getGameURL = url + "game_board/api/board/";
 
     //API call to start game
     let response = await fetch(createGameURL);
     let game_id = await response.json();
-
-    console.log('response', response)
-    console.log('game_id',game_id);
     
     //save the get request response to state
     this.setState({ gameID: game_id['game_id'] });
@@ -126,9 +123,8 @@ class GameBoard extends Component {
     //get request to api and include the dynamic game_id
     response = await fetch(getGameURL + game_id['game_id']);
     let board_ = await response.json();
-    console.log('board_.graph ',board_.graph)
     
-    if (board_.graph) {
+  
     //set the state values with respect to the dynamic json response
     this.setState({ board: board_, turn: board_['turn'] });
     this.setState({ playerPointVal: board_['player_points'][this.state.turn] });
@@ -147,12 +143,8 @@ class GameBoard extends Component {
         }
       }
     }
-  }
-  else{
-    //console.log("response['error']",response['error']);
-    console.log('response=undefined, routing to home')
-    window.location.href = "/"
-  }
+  
+ 
   }
 
   //from imported digraph folder - function to display node
