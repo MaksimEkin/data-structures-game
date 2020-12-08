@@ -1,13 +1,11 @@
 import React, { Component } from "react";
-import ReactDOM from "react-dom";
-import { Button, Grid, Typography, Card, CardHeader, CardActions, CardActionArea, CardContent, Chip } from '@material-ui/core';
 import {create_adjacency, create_graph} from './CreateGraphAdj.js';
 import Cookies from 'universal-cookie';
 import WinModal from './Modal/WinModal.js';
 import ReactTooltip from "react-tooltip";
 import Particles from 'react-particles-js';
-
 import Swal from "sweetalert2"
+import "./styles.css";
 
 //Uber's digraph react folder
 import {
@@ -28,8 +26,6 @@ import {
     GOLD_NODE
 } from "./config";
 
-import "./styles.css";
-
 //Fix XSS security issues when developing locally
 //this allows us to test separately locally and on Heroku by changing just one line
 const local = "http://127.0.0.1:8000/";
@@ -37,7 +33,7 @@ const reactLocal = "http://localhost:3000/"
 const remote = "https://data-structures-game.herokuapp.com/";
 
 //can also be const url = local; or const url = reactLocal;
-const url = local;
+const url = remote;
 
 //define sample node
 const sample = {
@@ -49,6 +45,7 @@ const sample = {
 class GameBoard extends Component {
   constructor(props) {
     super(props);
+
     //this is used for accessing variables between components
     this.customNodeRef = React.createRef();
 
@@ -85,7 +82,6 @@ class GameBoard extends Component {
       showModal:true
     };
 
-
   }
 
   // Initialize component objects by setting state and props of the gameboard
@@ -107,14 +103,14 @@ class GameBoard extends Component {
       }
     }
 
+    // compose player list
     this.setState({ playersArray: players.split(',') })
     let ds = cookies.get('gameDS');
     console.log('difficulty: ',difficulty, 'players: ',players, 'ds: ',ds);
 
     //get cookie variables from state and insert into url
-    let createGameURL = url + "game_board/api/start_game/" + difficulty + "/" + players + "/" + ds
+    let createGameURL = url + "game_board/api/start_game/" + difficulty + "/" + cookies.get('username') + "/" + ds
     let getGameURL = url + "game_board/api/board/";
-
 
     //API call to start game
     let response = await fetch(createGameURL);
@@ -469,8 +465,6 @@ class GameBoard extends Component {
       this.GraphView.panToNode(event.target.value, true);
     }
   };
-
-  /* Define custom graph editing methods here */
  
   //checks if the current board is balanced and returns true or false
   checkRebalance = () => {
@@ -481,8 +475,7 @@ class GameBoard extends Component {
   //called if checkRebalance returns false
   //post request to get correct/balanced game board and sets gameboard to
   //return balanced board
-  
-    rebalance = async (attempt) => {
+  rebalance = async (attempt) => {
     this.setState({loading:true})
 
     let rebalance_attempt={'adjacency_list':attempt}
@@ -549,12 +542,9 @@ class GameBoard extends Component {
     this.setState({playerPointVal: newBoard['player_points'][this.state.turn]})
     this.setState({deckSize: newBoard['deck'].length});
 
-    
     let made_graph = create_graph(this.state.board['graph'])
     this.setState({ graph: made_graph});
     this.setState({loading: false})
- 
-
   }
 
   //AI api call
@@ -590,11 +580,6 @@ class GameBoard extends Component {
     if (this.state.board['end_game']){
       this.setState({game_over: true})
     }
-
-    //introduced a timeout because of a bug that arose without it:
-    //the state was updating before the API call returned,
-    //and the game was ending 1 turn after it should have
-    //setTimeout(this.checkBoard, 200)
   }
 
   //if the API can no longer find the game board in the db,
@@ -610,7 +595,6 @@ class GameBoard extends Component {
     if (temp_board["error"] == "Game Not Found!") {
       this.setState({game_over: true})
     }
-
   }
 
   // Create custom text content for the nodes: Node point and Node ID
@@ -645,7 +629,6 @@ class GameBoard extends Component {
       layoutEngineType: 'SnapToGrid',
       read_only: false,
     })
-
   }
 
   checkNodes = () => {
@@ -653,7 +636,9 @@ class GameBoard extends Component {
       layoutEngineType: 'VerticalTree',
       read_only: true
     })
+
     let user_graph = create_adjacency(this.state.graph)
+
     //passes users balance attempt in adjaceny form to rebalance
     this.rebalance(user_graph)
     
@@ -773,11 +758,11 @@ class GameBoard extends Component {
       text: "TIME TO REBALANCE"
     })
     this.setState({ showModal: !this.state.showModal})
-    
   }
 
   buildSaveButton = () => {
 
+    //conditionally display save game button
     if (!this.state.initial_load && this.state.username != "-1" && this.state.token != "-1") {
       return (
 
@@ -785,8 +770,6 @@ class GameBoard extends Component {
                   data-offset="{'top': -20}" data-text-color="yellow"
                   className="transition duration-500 ease-in-out bg-green-500 hover:bg-green-600  transform hover:-translate-y-1 hover:scale-105   border-green-500  border-opacity-50 rounded-lg shadow-2xl flex-1 m-1 py-1 flex justify-center font-bold text-xl text-gray-800"
                   onClick={() => this.saveGame()}>Save Game</button>
-
-
       )
     }
   }
@@ -794,13 +777,6 @@ class GameBoard extends Component {
   afterRenderEdge = (id, element, viewEdge, edgeContainer,isEdgeSelected) => {
     // TO CHANGE THE COLOR AND SIZE OF THE EDGES
     //afterRenderEdge?: (id: string, element: any, edge: IEdge, edgeContainer: any, isEdgeSelected: boolean) => void;
-    //console.log("Start afterRenderEdge");
-    //console.log("id= ",id);
-    //console.log("element= ",element);
-    //console.log("viewEdge= ",viewEdge);
-    //console.log("edgeContainer= ",edgeContainer);
-    //console.log("isEdgeSelected= ",isEdgeSelected);
-    //console.log("end afterRenderEdge");
   }
 
   renderBackground = (gridSize) => {
@@ -993,5 +969,3 @@ class GameBoard extends Component {
   }
 }
 export default GameBoard;
-//const rootElement = document.getElementById("root");
-//ReactDOM.render(<GameBoard />, rootElement);

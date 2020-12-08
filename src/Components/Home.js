@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import "./styles.css";
+import Cookies from 'universal-cookie';
 import Particles from 'react-particles-js';
 import GameInfo from './Modal/GameInfo.js'
 import { RankingTable } from './RankingTable'
@@ -16,6 +17,16 @@ class Home extends Component{
       players:null,
       data_structure:null
     };
+  }
+
+  async componentDidMount() {
+      //remove current gameboard (if applicable)
+      const cookies = new Cookies();
+      
+      if ((cookies.get('loaded_game')) && (cookies.get('loaded_game') != '')) {
+        cookies.remove('loaded_game', { path: '/' })
+        cookies.set('loaded_game', '', { path: '/' })
+    }
   }
 
   //display the background particle

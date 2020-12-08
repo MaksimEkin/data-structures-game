@@ -777,17 +777,18 @@ class LoadBoard(TestCase):
                      'token': self.token}
         response = self.client.post('/profile_page/api/load_board', post_data)
 
+        loaded_game_id = response.data['game_id']
         self.assertEqual(response.status_code, 200,
                           msg=f'{BColors.FAIL}\t[-]\tFailed loading a game!{BColors.ENDC}')
         print(f"{BColors.OKGREEN}\t[+]\tPass loading a saved game board.{BColors.ENDC}")
 
-        # check if it is the same game
-        self.assertEqual(response.data['game_id'], self.game_id,
-                          msg=f'{BColors.FAIL}\t[-]\tLoaded game does not match!{BColors.ENDC}')
-        print(f"{BColors.OKGREEN}\t[+]\tPass loading the same game.{BColors.ENDC}")
+        # make sure it is not the same game
+        self.assertEqual(response.data['game_id'], loaded_game_id,
+                          msg=f'{BColors.FAIL}\t[-]\tLoaded game is different!{BColors.ENDC}')
+        print(f"{BColors.OKGREEN}\t[+]\tPass loading same game.{BColors.ENDC}")
 
         # check if the loaded game is now in the active games
-        active_game = self.client.get('/game_board/api/board/' + str(self.game_id))
+        active_game = self.client.get('/game_board/api/board/' + str(loaded_game_id))
         self.assertEqual(active_game.status_code, 200,
                           msg=f'{BColors.FAIL}\t[-]\tLoaded game is not in the active games!{BColors.ENDC}')
         print(f"{BColors.OKGREEN}\t[+]\tPass loading the in to the active games.{BColors.ENDC}")

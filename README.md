@@ -49,6 +49,9 @@ Cross-origins calls are blocked due to a header that is in place to protect agai
 - **Profile Page API**
     - Located at [profile_page/api/tests_api.py](https://github.com/MaksimEkin/data-structures-game/tree/master/profile_page/api/tests_api.py)
     - Run from the root directory of the project with ```python manage.py test profile_page.api.tests_api```
+- **Homepage**
+    - Located at [home_page/api/tests_api.py](https://github.com/MaksimEkin/data-structures-game/tree/master/home_page/api/tests_api.py)
+    - Run from the root directory of the project with ```python manage.py test home_page.api.tests_api```
 - **Game Board Database**
     - Located at [game_board/database/test_db.py](https://github.com/MaksimEkin/data-structures-game/tree/master/game_board/database/test_db.py)
     - Run from the root directory of the project with ```python manage.py test game_board.database.test_db```
