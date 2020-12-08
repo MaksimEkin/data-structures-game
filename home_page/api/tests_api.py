@@ -2,12 +2,7 @@
 Run: python manage.py test home_page.api.tests_api
 Reference: https://www.django-rest-framework.org/api-guide/testing/
 """
-from time import sleep
-import random
-import string
-import json
 from django.test import TestCase
-from home_page.database import home_page_db as db
 
 class BColors:
     """Colors for printing"""
