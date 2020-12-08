@@ -41,7 +41,6 @@ class Home extends Component{
       let rankingsURL = url + "api/rankings/" + 20;
       let response = await fetch(rankingsURL);
       let rank_head = await response.json();
-      console.log(rank_head);
       this.setState({ data: rank_head['top_ranking_players'] })
 
 
