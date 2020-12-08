@@ -46,7 +46,9 @@ def rankings(request, top_n):
         if ii > int(top_n):
             break
 
+        temp = {'user_id': cursor['user_id'], 'points': round(cursor['points'], 2)}
+
         # get the user info from db
-        players_info.append(cursor)
+        players_info.append(temp)
 
     return Response({'top_ranking_players': players_info, 'n': int(top_n)})
