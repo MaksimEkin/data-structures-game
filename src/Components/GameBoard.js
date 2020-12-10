@@ -33,7 +33,7 @@ const reactLocal = "http://localhost:3000/"
 const remote = "https://data-structures-game.herokuapp.com/";
 
 //can also be const url = local; or const url = reactLocal;
-const url = local;
+const url = remote;
 
 //define sample node
 const sample = {
@@ -115,20 +115,34 @@ class GameBoard extends Component {
     // compose player list
     let ds = cookies.get('gameDS');
 
-    //get cookie variables from state and insert into url
-    let createGameURL = url + "game_board/api/start_game/" + difficulty + "/" + players + "/" + ds
+    let game_id = "";
+    let response = "";
     let getGameURL = url + "game_board/api/board/";
 
-    //API call to start game
-    let response = await fetch(createGameURL);
-    let game_id = await response.json();
+    // game is being loaded from database
+    if ((cookies.get('loaded_game')) && (cookies.get('loaded_game') != '')) {
+      game_id = cookies.get('loaded_game')
+
+      // remove loaded game from cookies so it can't be reloaded with user wanting so
+      cookies.remove('loaded_game', { path: '/' })
+      cookies.set('loaded_game', '', { path: '/' })
+    
+    // creating a new game
+    } else {
+      let createGameURL = url + "game_board/api/start_game/" + difficulty + "/" + players + "/" + ds
+
+      //API call to start game
+      response = await fetch(createGameURL);
+      game_id = await response.json();
+      game_id = game_id['game_id']  // get actual game id from JSON object
+    }
 
     //save the get request response to state
-    this.setState({ gameID: game_id['game_id'] });
-    cookies.set('game_id', game_id['game_id'], { path: '/' });
+    this.setState({ gameID: game_id });
+    cookies.set('game_id', game_id, { path: '/' });
 
     //get request to api and include the dynamic game_id
-    response = await fetch(getGameURL + game_id['game_id']);
+    response = await fetch(getGameURL + game_id);
     let board_ = await response.json();
 
     //set the state values with respect to the dynamic json response

@@ -11,7 +11,7 @@ const reactLocal = "http://localhost:3000/"
 const remote = "https://data-structures-game.herokuapp.com/";
 
 //can also be const url = local; or const url = reactLocal;
-const url = local;
+const url = remote;
 
 //this function is called from App.js to start the interface of the game
 //calls the GameInfo modal to get the new game's information
