@@ -25,7 +25,7 @@ The Data Structures Game is a competitive online game. The goal of this game is 
 - [Windows](https://docs.oracle.com/en/database/oracle/r-enterprise/1.5.1/oread/creating-and-modifying-environment-variables-on-windows.html#GUID-DD6F9982-60D5-48F6-8270-A27EC53807D0)
    
 5. Clone the repository:
-- ```git clone https://github.com/MaksimEkin/data-structures-game.git```
+- ```git clone https://github.com/Plongesam/data-structures-game.git```
 6. Install the libraries needed by the project using the ```requirements.txt``` located at the root directory of the project file you cloned (make sure you are on ```dsg```):
 - ```pip install -r requirements.txt```
 7. Install the NodeJS libraries used by React:
