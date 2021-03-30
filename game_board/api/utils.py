@@ -229,7 +229,7 @@ def new_board(difficulty, player_ids, data_structures):
             'total_ants': 1,
             'total_surface_ants': 1,
             'curr_day': 1,
-            'player_ids': player_ids,
+            'player_ids': player_ids[0],
             'difficulty': difficulty,
             'num_players': len(player_ids),
             'curr_data_structure': data_structures[0],
