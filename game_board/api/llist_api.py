@@ -67,13 +67,11 @@ def start_game(request, difficulty, player_ids, data_structures):
         else:
             player_ids.append(pl_id)
 
-    # Shuffle players
-    #random.shuffle(player_ids)
 
     # Check if the number of players request is valid
-    if len(player_ids) > config.MAX_NUM_PLAYERS:
+    if len(player_ids) > config.LLIST_MAX_NUM_PLAYERS:
         return Response({'error': 'Too many players requested!',
-                         'options': config.MAX_NUM_PLAYERS},
+                         'options': config.LLIST_MAX_NUM_PLAYERS},
                         status=status.HTTP_400_BAD_REQUEST)
 
     # Create new game board JSON (dict), and store it in the database
