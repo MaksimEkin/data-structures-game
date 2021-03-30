@@ -174,35 +174,72 @@ def new_board(difficulty, player_ids, data_structures):
     # if it is an AVL
     if data_structures[0] == 'AVL':
         graph = avl.avlNew(config.HEIGHT[str(difficulty)], config.POINTS[str(difficulty)]['max'])
-    # Currently only gives AVL
+        deck = create_card_deck(list(graph['node_points'].keys()), data_structures[0], difficulty, graph['gold_node'])
+        cards, deck = distribute_cards(player_ids, deck)
+        # real_players = [player for player in player_ids if not player.lower().startswith(config.BOT_NAME_PREFIX)]
+        board = {
+            'game_id': str(uuid.uuid1()),
+            'graph': graph,
+            'player_ids': player_ids,
+            'player_names': [''],
+            'player_points': {str(id): 0 for id in player_ids},
+            'turn': random.choice(player_ids),
+            'deck': deck,
+            'cards': cards,
+            'difficulty': difficulty,
+            'num_players': len(player_ids),
+            'curr_data_structure': data_structures[0],
+            'end_game': False,
+            'time_created': datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
+            # Below features are left out for future sprints
+            # 'selected_data_structures': data_structures,
+            # 'timed_game': False,
+            # 'seconds_until_next_ds': 60,
+            'online': False,
+            'profile_load': False
+        }
+    # Currently only gives AVL however, this will be for linked list game mode
     else:
-        graph = avl.avlNew(config.HEIGHT[str(difficulty)], config.POINTS[str(difficulty)])
+        #graph = avl.avlNew(config.HEIGHT[str(difficulty)], config.POINTS[str(difficulty)])
+        # this will be replaced when I have the llist_handler class
+        graph = {
+            'node_list': [],
+            'num_tunnels': {},
+            'num_food': {},
+            'num_ants': {}, #dict of nodes with the amount of ants. Ex. node1: 0, node2: 1
+            'under_attack': {} #dict of nodes under attack. Ex. node1: False, node2: True
+        }
+        board = {
+            'game_id': str(uuid.uuid1()),
+            'graph': graph,
+            'ant_locations': [],
+            'queen_at_head': True,
+            'total_chambers': 0,
+            'total_food': config.INIT_NUM_FOOD,
+            'total_food_types': {
+                'crumb': 1,
+                'berry': 1,
+                'donut': 1
+            },
+            'time_tracks': {
+                'move/forage': 6,
+                'dig_tunnel': 6,
+                'dig/fill_chamber': 6
+            },
+            'total_ants': 1,
+            'total_surface_ants': 1,
+            'curr_day': 1,
+            'player_ids': player_ids,
+            'difficulty': difficulty,
+            'num_players': len(player_ids),
+            'curr_data_structure': data_structures[0],
+            'end_game': False,
+            'time_created': datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
+            'online': False,
+            'profile_load': False
+        }
+    
 
-    deck = create_card_deck(list(graph['node_points'].keys()), data_structures[0], difficulty, graph['gold_node'])
-    cards, deck = distribute_cards(player_ids, deck)
-    # real_players = [player for player in player_ids if not player.lower().startswith(config.BOT_NAME_PREFIX)]
-
-    board = {
-        'game_id': str(uuid.uuid1()),
-        'graph': graph,
-        'player_ids': player_ids,
-        'player_names': [''],
-        'player_points': {str(id): 0 for id in player_ids},
-        'turn': random.choice(player_ids),
-        'deck': deck,
-        'cards': cards,
-        'difficulty': difficulty,
-        'num_players': len(player_ids),
-        'curr_data_structure': data_structures[0],
-        'end_game': False,
-        'time_created': datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
-        # Below features are left out for future sprints
-        # 'selected_data_structures': data_structures,
-        # 'timed_game': False,
-        # 'seconds_until_next_ds': 60,
-        'online': False,
-        'profile_load': False
-    }
     return board
 
 
