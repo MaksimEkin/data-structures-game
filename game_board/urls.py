@@ -20,7 +20,7 @@ urlpatterns = [
     path('api/action/<str:card>/<str:game_id>/<str:user_id>/<str:token>', api.action, name='game-board-action'),
 
     #Game Play API Calls For Linked List
-    path('api', llist_api.api_overview, name='llist-game-board-api_overview'),
-    path('api/start_game/<str:difficulty>/<str:player_ids>/<str:data_structures>', llist_api.start_game, name='llist-game-board-start_game'),
-    path('api/board/<str:game_id>', llist_api.board, name='llist-game-board-game_status'),
+    path('llist_api', llist_api.api_overview, name='llist-game-board-api_overview'),
+    path('llist_api/start_game/<str:difficulty>/<str:player_ids>/<str:data_structures>', llist_api.start_game, name='llist-game-board-start_game'),
+    path('llist_api/board/<str:game_id>', llist_api.board, name='llist-game-board-game_status'),
 ]
