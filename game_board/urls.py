@@ -3,7 +3,7 @@
 """
 from django.urls import path
 from game_board.api import api
-from game_board.llist_api import llist_api
+from game_board.api import llist_api
 from . import views
 
 urlpatterns = [
