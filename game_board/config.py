@@ -41,7 +41,7 @@ CARDS_IN_DECK = {
 #           <node#> node specific action
 # ========================================================================
 CARDS = {
-    'AVL'  : ['Insert #', 'Delete node#'],
+    'AVL': ['Insert #', 'Delete node#'],
     'STACK': ['Pop', 'Push #']
 }
 
