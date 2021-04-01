@@ -11,19 +11,37 @@ const url = local;
 
 
 //export default function App() {
-class App extends Component {
-
+class LListGameboard extends Component {
   // constructor with default values
   constructor(props) {
     super(props);
     this.state = {
+      // game settings
+      difficulty:null,
+      gameMode:null,
+      players:null,
+
       // in-game stats
-      food: 0,
+      food: 1,
       time: 0,
-      numChambers: 0,
+      numChambers: 3,
       numAnts: 2,
 
+      loading: true,
+
     };
+  }
+
+  //component rendered at least once
+  // fetch the data here
+  async componentDidMount() {
+    //previous team added cookies... look into that
+
+    //API call
+    let response = fetch(url + "game_board/llist_api")
+
+
+
   }
 
   render() {
@@ -34,7 +52,7 @@ class App extends Component {
         </div>
 
         <div className="stats-container">
-          <Stats />
+          <Stats time={this.state.time} food={this.state.food} ants={this.state.numAnts} chambers={this.state.numChambers}/>
         </div>
 
 
@@ -43,4 +61,4 @@ class App extends Component {
   }
 }
 
-export default
+export default LListGameboard

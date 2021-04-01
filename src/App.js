@@ -18,12 +18,13 @@ export default function App() {
         {/* A <Switch> looks through its children <Route>s and
             renders the first one that matches the current URL. */}
         <Switch>
+          <Route path="/game_board/llist_api">
+            <LListGameboard />
+          </Route>
           <Route path="/game_board">
             <GameBoard />
           </Route>
-          <Route path="/llist_gameboard">
-            <LListGameboard />
-          </Route>
+
           <Route path="/profile_page">
             <Profile />
           </Route>

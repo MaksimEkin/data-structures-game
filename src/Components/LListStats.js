@@ -1,9 +1,8 @@
 import React, { Component } from "react";
-import './Stats.css';
+import './LListGameboard.css';
 
 // shows the in  game stats in the upper right corner of game page
-// hardcoded values for now
-class Stats extends Component {
+class LListStats extends Component {
 
   render() {
     return (
@@ -14,15 +13,15 @@ class Stats extends Component {
           <p>ANTS</p>
           <p>CHAMBERS</p>
         </div>
-        <div className="stats-values">
-          <p>0</p>
-          <p>0</p>
-          <p>0</p>
-          <p>0</p>
+        <div className="stats">
+          <p>{this.props.time}</p>
+          <p>{this.props.food}</p>
+          <p>{this.props.ants}</p>
+          <p>{this.props.chambers}</p>
         </div>
       </div>
 
     )
   }
 }
-export default Stats
+export default LListStats
