@@ -1,0 +1,45 @@
+.gamepage {
+  background: linear-gradient(#34e6fe 45%, #36cf57 45%, #89724d 50%);
+  background-color: #00FF00;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.title {
+  position: fixed;
+  top: 0;
+  font-size: calc(30px + 2vmin);
+  text-align: center;
+  color: red;
+}
+
+.stats{
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  position: fixed;
+  top: 20px;
+  right: 18vh;
+  font-size: calc(10px + 2vmin);
+}
+
+.stats-values{
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  position: fixed;
+  top: 20px;
+  right: 10vh;
+  font-size: calc(10px + 2vmin);
+}
+
+.stats-row{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+}
