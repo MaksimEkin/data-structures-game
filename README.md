@@ -45,7 +45,9 @@ Cross-origins calls are blocked due to a header that is in place to protect agai
 
 - **Game Board API**
     - Located at [game_board/api/tests_api.py](https://github.com/MaksimEkin/data-structures-game/tree/master/game_board/api/tests_api.py)
-    - Run from the root directory of the project with ```python manage.py test game_board.api.tests_api```
+    - Run from the root directory of the project with 
+        1. ```python manage.py test game_board.api.tests_api``` 
+        2. ```python manage.py test game_board.api.tests_llist_api```
 - **Profile Page API**
     - Located at [profile_page/api/tests_api.py](https://github.com/MaksimEkin/data-structures-game/tree/master/profile_page/api/tests_api.py)
     - Run from the root directory of the project with ```python manage.py test profile_page.api.tests_api```
@@ -73,5 +75,6 @@ Cross-origins calls are blocked due to a header that is in place to protect agai
     - Note: Developed to be run on Safari. In Safari under the Develop menu Allow Remote Automation. Then change the remote url variable to local in GameBoard.js. Build the project with ```npm run build```, and run Django ```python manage.py runserver```. Tests can be run from ```src/Tests```.
     - Test 1: ```python -m unittest test_player_display_text.py```
     - Test 2: ```python -m unittest test_node_text.py```
+    - Test 3: ```python test_homepage```
     
 [See Wiki for details.](https://github.com/MaksimEkin/data-structures-game/wiki)
