@@ -31,30 +31,45 @@ class TestStringMethods(unittest.TestCase):
         """Setup the test"""
         # Web Browser Instance
         self.driver = webdriver.Safari()
-        self.driver.get("http://127.0.0.1:8000/")
+        
+
+
+    def test_homepage_elements(self):
+
+        driver= self.driver
+        driver.get("http://127.0.0.1:8000/")
 
         # Setup game players
-        player_list = self.driver.find_element_by_name('playerList')
+        player_list = driver.find_element_by_name('playerList')
         player_list.click()
         player_list.send_keys(Keys.COMMAND + "a")
         player_list.send_keys(Keys.DELETE)
         player_list.send_keys("ID1,ID2")
 
+        self.assertEqual(player_list.get_attribute('value'), "ID1,ID2")
+
         # Choose difficulty
-        difficulty_levels = Select(self.driver.find_element_by_name('level'))
+        difficulty_levels = Select(driver.find_element_by_name('level'))
         difficulty_levels.select_by_visible_text('Easy')
+        selected_level = difficulty_levels.first_selected_option
+
+        self.assertEqual(selected_level.text, 'Easy')
+
+        # Choose ds game
+        dsGame = Select(driver.find_element_by_name('gameDS'))
+        dsGame.select_by_visible_text('Linked List Standard')
+        selected_dsGame = dsGame.first_selected_option
+
+        self.assertEqual(selected_dsGame.text, 'Linked List Standard')
 
 
+
+
+
+    def tearDown(self):
         self.driver.close()
 
-    def test_node_contents(self):
+    
 
-        """Tests the node contents."""
-        
-        # check if all nodes exist
-        for node in self.ids:
-            self.assertIn(node, list(self.check.keys()))
-
-        # check if point in the node match to what is expected
-        for ii, node in enumerate(self.ids):
-            self.assertEqual(self.check[node], self.points[ii])
+if __name__ == '__main__':
+    unittest.main()
