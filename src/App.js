@@ -7,6 +7,7 @@ import {Route, Switch} from "react-router-dom";
 import { BrowserRouter as Router } from 'react-router-dom'
 import Register from "./Components/Register";
 import Tutorial from "./Components/Tutorial";
+import LListGameboard from "./Components/LListGameboard";
 
 //react router used to make this web app multiple pages instead of single page application
 export default function App() {
@@ -17,9 +18,13 @@ export default function App() {
         {/* A <Switch> looks through its children <Route>s and
             renders the first one that matches the current URL. */}
         <Switch>
+          <Route path="/game_board/llist_api">
+            <LListGameboard />
+          </Route>
           <Route path="/game_board">
             <GameBoard />
           </Route>
+
           <Route path="/profile_page">
             <Profile />
           </Route>
