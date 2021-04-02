@@ -63,6 +63,9 @@ render(){
                     <select  className="space-x-60 border border-gray-300 rounded-lg text-gray-600 h-10 pl-5 pr-10 bg-white hover:border-gray-400 focus:outline-none appearance-none" type='text' id="game" value={this.state.gameDS} onInput={this.handleInput} name='gameDS'
                             label='DSgame' style={{marginBottom: '1em'}}>
                         <option value="AVL">AVL</option>
+                        <option value="LLIST-standard">Linked List Standard</option>
+                        <option value="LLIST-survival">Linked List Survival</option>
+
 
                      </select>
             </div>
