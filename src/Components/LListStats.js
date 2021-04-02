@@ -24,3 +24,4 @@ class LListStats extends Component {
     )
   }
 }
+export default LListStats
