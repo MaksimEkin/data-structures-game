@@ -15,7 +15,8 @@
 # ========================================================================
 DIFFICULTY_LEVELS = ['Hard', 'Medium', 'Easy']
 CARDS_PER_PLAYER = 3
-MAX_NUM_PLAYERS = 5
+MAX_NUM_PLAYERS = 5     # For avl game
+LLIST_MAX_NUM_PLAYERS = 1   # For linnked list game
 BOT_NAME_PREFIX = "bot"
 BOT_SLEEP_TIME = 2
 
@@ -41,7 +42,7 @@ CARDS_IN_DECK = {
 #           <node#> node specific action
 # ========================================================================
 CARDS = {
-    'AVL'  : ['Insert #', 'Delete node#'],
+    'AVL': ['Insert #', 'Delete node#'],
     'STACK': ['Pop', 'Push #']
 }
 
@@ -114,3 +115,57 @@ REBAL_CHANCE = {
     DIFFICULTY_LEVELS[1] : 65,
     DIFFICULTY_LEVELS[2] : 50
 }
+
+
+
+# ========================================================================
+# LINKED LIST GAME MODE CONFIGURATIONS FROM HERE ON
+# LINKED LIST GAME MODE CONFIGURATIONS FROM HERE ON  
+# LINKED LIST GAME MODE CONFIGURATIONS FROM HERE ON                 
+# ========================================================================
+# ========================================================================
+# General: Configuration constants particular to the llist game mode
+#   INIT_NUM_FOOD:  Starting number of food for players
+#   FOOD_TYPES: The type of food that can be grabbed from a forrage
+#
+# ========================================================================
+INIT_NUM_FOOD = 6
+FORAGE_TYPES = ['crumb', 'berry', 'donut', 'attack']
+
+# ========================================================================
+# Chances of coming under attack when foraging for each difficulty
+#   FORAGE_CHANCE:  Chance of shit happening under a forage
+#                   
+# ========================================================================
+FORAGE_CHANCE = {
+    DIFFICULTY_LEVELS[0] : {
+        FORAGE_TYPES[0]: .35,
+        FORAGE_TYPES[1]: .30,
+        FORAGE_TYPES[2]: .15,
+        FORAGE_TYPES[3]: .20
+    },
+    DIFFICULTY_LEVELS[1] : {
+        FORAGE_TYPES[0]: .325,
+        FORAGE_TYPES[1]: .325,
+        FORAGE_TYPES[2]: .20,
+        FORAGE_TYPES[3]: .15
+    },
+    DIFFICULTY_LEVELS[2] : {
+        FORAGE_TYPES[0]: .30,
+        FORAGE_TYPES[1]: .35,
+        FORAGE_TYPES[2]: .25,
+        FORAGE_TYPES[3]: .10
+    }
+}
+
+
+FOOD_VALUE = {
+    FORAGE_TYPES[0]: 1,
+    FORAGE_TYPES[1]: 2,
+    FORAGE_TYPES[2]: 3,
+    FORAGE_TYPES[3]: -1
+}
+
+
+
+
