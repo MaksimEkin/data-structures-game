@@ -2,6 +2,8 @@ import React, { Component } from "react";
 import './LListGameboard.css';
 import Stats from './LListStats';
 import Cookies from 'universal-cookie';
+import Queen from './antqueen.png';
+import Ant from './ant.png';
 
 //this allows us to test separately locally and on Heroku by changing just one line
 const local = "http://127.0.0.1:8000/";
@@ -27,12 +29,13 @@ class LListGameboard extends Component {
       ds: null,
 
       // in-game stats
-      food: 1,
+      food: 3,
       time: 0,
-      numChambers: 3,
-      numAnts: 2,
+      numChambers: 0,
+      numAnts: 1,
 
       loading: true,
+      spawningAnt: false,
 
     };
   }
@@ -79,6 +82,20 @@ class LListGameboard extends Component {
 
   }
 
+  // api call to spawn an ant
+  spawnAnt = () =>{
+    
+    
+  };
+
+  // startHover and endHover are used when mouse is hovering over queen ant 
+  startHover = () =>{
+    this.setState({hovering: true})
+  }
+  endHover = () => {
+    this.setState({hovering: false})
+  }
+
   render() {
     return (
       <div className="gamepage">
@@ -90,6 +107,18 @@ class LListGameboard extends Component {
           <Stats time={this.state.time} food={this.state.food} ants={this.state.numAnts} chambers={this.state.numChambers}/>
         </div>
 
+        {this.state.hovering? 
+        <rect style={{width:"160px", height:"130px", background:"white", opacity:".5", position:"absolute", top:"44%", left:"27%", border:"10px solid rgba(255, 255, 255, .5)", borderRadius:"5px"}}/>
+        : null}
+        {this.state.hovering? 
+        <p style={{fontSize:"12px", position:"absolute", top:"44%", left:"27.5%"}}>Click to spawn worker ant</p>
+        : null}
+        <span>
+          <button><img src={Queen} width ="130" style={{position:'absolute', top: '45.5%', left:'28%', padding:"5px 5px"}} 
+          onMouseOver ={this.startHover} onMouseOut = {this.endHover}
+          onClick={this.spawnAnts}/></button>
+        </span>
+        
 
       </div>
     );
