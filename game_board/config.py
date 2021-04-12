@@ -19,7 +19,7 @@ MAX_NUM_PLAYERS = 5     # For avl game
 LLIST_MAX_NUM_PLAYERS = 1   # For linnked list game
 BOT_NAME_PREFIX = "bot"
 BOT_SLEEP_TIME = 2
-
+ANT_SPAWN_VAL = 3
 # ========================================================================
 # Size of the deck of cards for each difficulty level
 #   CARDS_IN_DECK : Each key is a difficulty from DIFFICULTY_LEVELS, and
