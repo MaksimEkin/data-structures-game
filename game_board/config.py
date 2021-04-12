@@ -139,22 +139,22 @@ FORAGE_TYPES = ['crumb', 'berry', 'donut', 'attack']
 # ========================================================================
 FORAGE_CHANCE = {
     DIFFICULTY_LEVELS[0] : {
-        FORAGE_TYPES[0]: .35,
-        FORAGE_TYPES[1]: .30,
-        FORAGE_TYPES[2]: .15,
-        FORAGE_TYPES[3]: .20
+        FORAGE_TYPES[0]: 35,
+        FORAGE_TYPES[1]: 65,
+        FORAGE_TYPES[2]: 80,
+        FORAGE_TYPES[3]: 100
     },
     DIFFICULTY_LEVELS[1] : {
-        FORAGE_TYPES[0]: .325,
-        FORAGE_TYPES[1]: .325,
-        FORAGE_TYPES[2]: .20,
-        FORAGE_TYPES[3]: .15
+        FORAGE_TYPES[0]: 33,
+        FORAGE_TYPES[1]: 65,
+        FORAGE_TYPES[2]: 85,
+        FORAGE_TYPES[3]: 100
     },
     DIFFICULTY_LEVELS[2] : {
-        FORAGE_TYPES[0]: .30,
-        FORAGE_TYPES[1]: .35,
-        FORAGE_TYPES[2]: .25,
-        FORAGE_TYPES[3]: .10
+        FORAGE_TYPES[0]: 30,
+        FORAGE_TYPES[1]: 65,
+        FORAGE_TYPES[2]: 90,
+        FORAGE_TYPES[3]: 100
     }
 }
 

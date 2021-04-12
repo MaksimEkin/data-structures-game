@@ -110,6 +110,44 @@ def board(request, game_id):
 
 
 
+@api_view(['GET'])
+def forage(request, game_id, ant_loc, dest):
+    """
+    Spawns an ant given the game ID
+
+    :param game_id: unique identifier of the board
+    :param ant_loc: the chamber in which the ant is located
+    :param dest: the chamber where the food should be placed
+    :return game board JSON:
+    """
+
+    # Load the game board from database
+    response_status = utils.load_board_db(game_id)
+    if response_status['error']:
+        return Response({'error': response_status['reason']},
+                        status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    board = response_status['game_board']
+
+    # If there is no queen then game over actually
+    if !board['queen_at_head']:
+        return Response({'invalid_action': 'lost queen'},
+                        status=status.HTTP_400_BAD_REQUEST)
+
+    # If there are no ants in the requested chamber return error
+    if board['graph']['num_ants'][ant_loc] == 0:
+        return Response({'invalid_action': 'no ants'},
+                        status=status.HTTP_400_BAD_REQUEST)
+
+    # If the requested chamber is under attack return error
+    if board['graph']['under_attack'][ant_loc]:
+        return Response({'invalid_action': 'under attack'},
+                        status=status.HTTP_400_BAD_REQUEST)
+
+    # If the player can't make a forage move, return error
+    if board['time_tracks']['move/forage'] == 0:
+        return Response({'invalid_action': 'cant forage'},
+                        status=status.HTTP_400_BAD_REQUEST)
+
 
 # @api_view(['GET'])
 # def spawn_ant(request, game_id):
@@ -172,4 +210,3 @@ def board(request, game_id):
 #     board_response = response_status['game_board']
 #     return Response(board_response)
 
-    
