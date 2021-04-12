@@ -5,6 +5,7 @@ import json
 from django.test import TestCase
 from game_board import config
 from game_board.database import game_board_db as db
+from .. import config
 
 
 class BColors:
@@ -32,50 +33,25 @@ class APIOverview(TestCase):
 
 
 class GameActions(TestCase):
-    """Tests the API calls that is related to starting games."""
+    """Tests the API calls that is related to game actions."""
 
-    def test_spwan_ant(self):
+    def test_forage(self):
         # create a new game
         created_game = self.client.get('/game_board/llist_api/start_game/Easy/ID1lltest/LLIST')
         # load the game
         response = self.client.get('/game_board/llist_api/board/' + str(created_game.data['game_id']))
         # call spawn ant function THIS WILL FAIL UNTIL I MEET WITH DAVID
-        response = self.client.get('/game_board/llist_api/spawn_ant/' + str(response.data['game_id']))
+        response = self.client.get('/game_board/temp-josh/forage/' + str(response.data['game_id']) + '/Easy/node1/node1')
 
-        board = response.data
+        food_choice = response.data
         # make sure there was no error
         self.assertNotEqual(response.status_code, 400, msg=f'{BColors.FAIL}\t[-]\tResponse was 400!{BColors.ENDC}')
         print(f"{BColors.OKGREEN}\t[+]\tPass returning the correct response code.{BColors.ENDC}")
 
-        # Check to make sure first spawn worked
-        self.assertEqual(board['total_food'], 3, msg=f'{BColors.FAIL}\t[-]\tFood was '+board['total_food']+' not 3!{BColors.ENDC}')
-        self.assertEqual(board['total_food_types']['crumb'], 1, msg=f'{BColors.FAIL}\t[-]\tcrumb was not 1!{BColors.ENDC}')
-        self.assertEqual(board['total_food_types']['berry'], 1, msg=f'{BColors.FAIL}\t[-]\tberry was not 1!{BColors.ENDC}')
-        self.assertEqual(board['total_food_types']['donut'], 0, msg=f'{BColors.FAIL}\t[-]\tdonut was not 0!{BColors.ENDC}')
-        print(f"{BColors.OKGREEN}\t[+]\tPass spawning first ant.{BColors.ENDC}")
+        self.assertIn(food_choice, config.FOOD_TYPES, msg=f'{BColors.FAIL}\t[-]\tFood chosen was not in list of food{BColors.ENDC}')
+        print(f"{BColors.OKGREEN}\t[+]\tPass choosing a random food type based off difficulty.{BColors.ENDC}")
 
-
-        response = self.client.get('/game_board/llist_api/spawn_ant/' + str(response.data['game_id']))
-
-        board = response.data
-        # make sure there was no error
-        self.assertNotEqual(response.status_code, 400, msg=f'{BColors.FAIL}\t[-]\tResponse was 400!{BColors.ENDC}')
-        print(f"{BColors.OKGREEN}\t[+]\tPass returning the correct response code.{BColors.ENDC}")
-
-        # Check to make sure first spawn worked
-        self.assertEqual(board['total_food'], 0, msg=f'{BColors.FAIL}\t[-]\tFood was '+board['total_food']+' not 0!{BColors.ENDC}')
-        self.assertEqual(board['total_food_types']['crumb'], 0, msg=f'{BColors.FAIL}\t[-]\tcrumb was not 0!{BColors.ENDC}')
-        self.assertEqual(board['total_food_types']['berry'], 0, msg=f'{BColors.FAIL}\t[-]\tberry was not 0!{BColors.ENDC}')
-        self.assertEqual(board['total_food_types']['donut'], 0, msg=f'{BColors.FAIL}\t[-]\tdonut was not 0!{BColors.ENDC}')
-        print(f"{BColors.OKGREEN}\t[+]\tPass spawning second ant.{BColors.ENDC}")
-
-
-        response = self.client.get('/game_board/llist_api/spawn_ant/' + str(response.data['game_id']))
-
-        board = response.data
-        # make sure there was no error
-        self.assertEqual(response.status_code, 400, msg=f'{BColors.FAIL}\t[-]\tResponse was not 400!{BColors.ENDC}')
-        print(f"{BColors.OKGREEN}\t[+]\tPass not making an ant when out of food.{BColors.ENDC}")
+        # check if
 
         # remove the created game
         sleep(0.2)

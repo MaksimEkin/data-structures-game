@@ -111,11 +111,12 @@ def board(request, game_id):
 
 
 @api_view(['GET'])
-def forage(request, game_id, ant_loc, dest):
+def forage(request, game_id, difficulty, ant_loc, dest):
     """
     Spawns an ant given the game ID
 
     :param game_id: unique identifier of the board
+    :param difficulty: game difficulty
     :param ant_loc: the chamber in which the ant is located
     :param dest: the chamber where the food should be placed
     :return game board JSON:
@@ -147,6 +148,40 @@ def forage(request, game_id, ant_loc, dest):
     if board['time_tracks']['move/forage'] == 0:
         return Response({'invalid_action': 'cant forage'},
                         status=status.HTTP_400_BAD_REQUEST)
+
+    # choose a random number then choose the forage type that will be returned
+    rand_food = random.randint(0, 100)
+    crumb_chance = config.FORAGE_CHANCE[difficulty][config.FOOD_TYPES[0]]
+    berry_chance = config.FORAGE_CHANCE[difficulty][config.FOOD_TYPES[1]]
+    donut_chance = config.FORAGE_CHANCE[difficulty][config.FOOD_TYPES[2]]
+    attack_chance = config.FORAGE_CHANCE[difficulty][config.FOOD_TYPES[3]]
+
+    # Check if crumb was chosen
+    if rand_food >= 0 and rand_food < crumb_chance:
+        forage_result = config.FOOD_TYPES[0]
+
+    # Check if berry was chosen
+    if rand_food >= crumb_chance and rand_food < berry_chance:
+        forage_result = config.FOOD_TYPES[1]
+
+    # Check if donut was chosen
+    if rand_food >= berry_chance and rand_food < donut_chance:
+        forage_result = config.FOOD_TYPES[2]
+
+    # Check if attack was chosen
+    if rand_food >= donut_chance and rand_food < attack_chance:
+        forage_result = config.FOOD_TYPES[3]
+
+
+    return Response(forage_result)
+    # Update the board on database
+    # response_status = utils.update_board_db(board, user_id, token)
+    # if response_status['error']:
+    #     return Response({'error': response_status['reason']},
+    #                     status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    # board_response = response_status['game_board']
+    # return Response(board_response)
 
 
 # @api_view(['GET'])
