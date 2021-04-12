@@ -111,65 +111,65 @@ def board(request, game_id):
 
 
 
-@api_view(['GET'])
-def spawn_ant(request, game_id):
-    """
-    Spawns an ant given the game ID
+# @api_view(['GET'])
+# def spawn_ant(request, game_id):
+#     """
+#     Spawns an ant given the game ID
 
-    :param user_id: username
-    :param token: authentication token
-    :param card: what action to be performed
-    :param game_id: unique identifier of the board
-    :return game board JSON:
-    """
+#     :param user_id: username
+#     :param token: authentication token
+#     :param card: what action to be performed
+#     :param game_id: unique identifier of the board
+#     :return game board JSON:
+#     """
 
-    # Load the game board from database
-    response_status = utils.load_board_db(game_id)
-    if response_status['error']:
-        return Response({'error': response_status['reason']},
-                        status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    board = response_status['game_board']
-
-
-    if !board['queen_at_head']:
-        return Response({'invalid_action': 'lost queen'},
-                        status=status.HTTP_400_BAD_REQUEST)
-
-    # Make sure there is enough food to spawn a new ant
-    if board['total_food'] < config.ANT_SPAWN_VAL:
-        return Response({'invalid_action': 'not enough food'},
-                        status=status.HTTP_400_BAD_REQUEST)
+#     # Load the game board from database
+#     response_status = utils.load_board_db(game_id)
+#     if response_status['error']:
+#         return Response({'error': response_status['reason']},
+#                         status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+#     board = response_status['game_board']
 
 
-    # Take away food, if they have food that can be 
-    curr_food_types = board['total_food_types']
+#     if !board['queen_at_head']:
+#         return Response({'invalid_action': 'lost queen'},
+#                         status=status.HTTP_400_BAD_REQUEST)
 
-    # If player has a donut take it
-    if curr_food_types[config.FOOD_TYPES[2]] > 0:
-        board['total_food_types'][config.FOOD_TYPES[2]] -= 1
-        board['total_food'] -= config.ANT_SPAWN_VAL
-    # If player has at least one berry and one crumb, take one of each
-    elif curr_food_types[config.FOOD_TYPES[1]] > 0 and curr_food_types[config.FOOD_TYPES[0]] > 0:
-        board['total_food_types'][config.FOOD_TYPES[1]] -= 1
-        board['total_food_types'][config.FOOD_TYPES[0]] -= 1
-        board['total_food'] -= config.ANT_SPAWN_VAL
-    # If player only has crumbs take it
-    elif curr_food_types[config.FOOD_TYPES[0]] >= config.ANT_SPAWN_VAL:
-        board['total_food_types'][config.FOOD_TYPES[0]] -= config.ANT_SPAWN_VAL
-    # Player has enough food, but is not evenly divisable by three.
-    else:
-        return Response({'invalid_action': 'cant divide'},
-                        status=status.HTTP_400_BAD_REQUEST)
+#     # Make sure there is enough food to spawn a new ant
+#     if board['total_food'] < config.ANT_SPAWN_VAL:
+#         return Response({'invalid_action': 'not enough food'},
+#                         status=status.HTTP_400_BAD_REQUEST)
 
 
+#     # Take away food, if they have food that can be 
+#     curr_food_types = board['total_food_types']
 
-    # Update the board on database
-    response_status = utils.update_board_db(board, user_id, token)
-    if response_status['error']:
-        return Response({'error': response_status['reason']},
-                        status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+#     # If player has a donut take it
+#     if curr_food_types[config.FOOD_TYPES[2]] > 0:
+#         board['total_food_types'][config.FOOD_TYPES[2]] -= 1
+#         board['total_food'] -= config.ANT_SPAWN_VAL
+#     # If player has at least one berry and one crumb, take one of each
+#     elif curr_food_types[config.FOOD_TYPES[1]] > 0 and curr_food_types[config.FOOD_TYPES[0]] > 0:
+#         board['total_food_types'][config.FOOD_TYPES[1]] -= 1
+#         board['total_food_types'][config.FOOD_TYPES[0]] -= 1
+#         board['total_food'] -= config.ANT_SPAWN_VAL
+#     # If player only has crumbs take it
+#     elif curr_food_types[config.FOOD_TYPES[0]] >= config.ANT_SPAWN_VAL:
+#         board['total_food_types'][config.FOOD_TYPES[0]] -= config.ANT_SPAWN_VAL
+#     # Player has enough food, but is not evenly divisable by three.
+#     else:
+#         return Response({'invalid_action': 'cant divide'},
+#                         status=status.HTTP_400_BAD_REQUEST)
 
-    board_response = response_status['game_board']
-    return Response(board_response)
+
+
+#     # Update the board on database
+#     response_status = utils.update_board_db(board, user_id, token)
+#     if response_status['error']:
+#         return Response({'error': response_status['reason']},
+#                         status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+#     board_response = response_status['game_board']
+#     return Response(board_response)
 
     
