@@ -129,6 +129,11 @@ def forage(request, game_id, difficulty, ant_loc, dest):
                         status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     board = response_status['game_board']
 
+    # If there are no chambers player can't forage
+    if board['total_chambers'] == 0:
+        return Response({'invalid_action': 'no chambers'},
+                        status=status.HTTP_400_BAD_REQUEST)
+
     # If there is no queen then game over actually
     if !board['queen_at_head']:
         return Response({'invalid_action': 'lost queen'},
