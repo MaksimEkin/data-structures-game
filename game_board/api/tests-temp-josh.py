@@ -34,6 +34,7 @@ class APIOverview(TestCase):
 
 class GameActions(TestCase):
     """Tests the API calls that is related to game actions."""
+    """Tests will be expanded upon once create chamber function is implemented"""
 
     def test_forage(self):
         # create a new game
@@ -43,15 +44,12 @@ class GameActions(TestCase):
         # call spawn ant function THIS WILL FAIL UNTIL I MEET WITH DAVID
         response = self.client.get('/game_board/temp-josh/forage/' + str(response.data['game_id']) + '/Easy/node1/node1')
 
-        food_choice = response.data
-        # make sure there was no error
-        self.assertNotEqual(response.status_code, 400, msg=f'{BColors.FAIL}\t[-]\tResponse was 400!{BColors.ENDC}')
+        board = response.data
+
+        # make sure there was an error since no chambers are there.
+        self.assertEqual(response.status_code, 400, msg=f'{BColors.FAIL}\t[-]\tResponse was not 400!{BColors.ENDC}')
         print(f"{BColors.OKGREEN}\t[+]\tPass returning the correct response code.{BColors.ENDC}")
 
-        self.assertIn(food_choice, config.FOOD_TYPES, msg=f'{BColors.FAIL}\t[-]\tFood chosen was not in list of food{BColors.ENDC}')
-        print(f"{BColors.OKGREEN}\t[+]\tPass choosing a random food type based off difficulty.{BColors.ENDC}")
-
-        # check if
 
         # remove the created game
         sleep(0.2)

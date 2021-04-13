@@ -129,6 +129,11 @@ def forage(request, game_id, difficulty, ant_loc, dest):
                         status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     board = response_status['game_board']
 
+    # If there are no chambers player can't forage
+    if board['total_chambers'] == 0:
+        return Response({'invalid_action': 'no chambers'},
+                        status=status.HTTP_400_BAD_REQUEST)
+
     # If there is no queen then game over actually
     if !board['queen_at_head']:
         return Response({'invalid_action': 'lost queen'},
@@ -151,37 +156,58 @@ def forage(request, game_id, difficulty, ant_loc, dest):
 
     # choose a random number then choose the forage type that will be returned
     rand_food = random.randint(0, 100)
-    crumb_chance = config.FORAGE_CHANCE[difficulty][config.FOOD_TYPES[0]]
-    berry_chance = config.FORAGE_CHANCE[difficulty][config.FOOD_TYPES[1]]
-    donut_chance = config.FORAGE_CHANCE[difficulty][config.FOOD_TYPES[2]]
-    attack_chance = config.FORAGE_CHANCE[difficulty][config.FOOD_TYPES[3]]
+    crumb_chance = config.FORAGE_CHANCE[difficulty][config.FORAGE_TYPES[0]]
+    berry_chance = config.FORAGE_CHANCE[difficulty][config.FORAGE_TYPES[1]]
+    donut_chance = config.FORAGE_CHANCE[difficulty][config.FORAGE_TYPES[2]]
+    attack_chance = config.FORAGE_CHANCE[difficulty][config.FORAGE_TYPES[3]]
 
     # Check if crumb was chosen
     if rand_food >= 0 and rand_food < crumb_chance:
-        forage_result = config.FOOD_TYPES[0]
+        forage_result = config.FORAGE_TYPES[0]
 
     # Check if berry was chosen
     if rand_food >= crumb_chance and rand_food < berry_chance:
-        forage_result = config.FOOD_TYPES[1]
+        forage_result = config.FORAGE_TYPES[1]
 
     # Check if donut was chosen
     if rand_food >= berry_chance and rand_food < donut_chance:
-        forage_result = config.FOOD_TYPES[2]
+        forage_result = config.FORAGE_TYPES[2]
 
     # Check if attack was chosen
     if rand_food >= donut_chance and rand_food < attack_chance:
-        forage_result = config.FOOD_TYPES[3]
+        forage_result = config.FORAGE_TYPES[3]
+
+    # If the forage resulted in the chamber coming under attack,
+    # Then reflect the change in the board
+    if forage_result == config.FORAGE_TYPES[3]:
+        board['graph']['under_attack'][dest] = True
+        board['total_under_attack'] += 1
+        board['graph']['num_ants'][ant_loc] -= 1
+        board['graph']['num_ants'][dest] += 1
+
+    # Otherwise, put the food in the requested chamber, move the ant, and update the board
+    else:
+        # Change food in requested chamber
+        board['graph']['num_food'][dest][forage_result] += 1
+        board['graph']['num_food'][dest]['total'] += config.FOOD_VALUE[forage_result]
+
+        # Change food stats on for the game board
+        board['total_food_types'][forage_result] += 1
+        board['total_food'] += config.FOOD_VALUE[forage_result]
+
+        # Move the ant from og spot to new spot
+        board['graph']['num_ants'][ant_loc] -= 1
+        board['graph']['num_ants'][dest] += 1
 
 
-    return Response(forage_result)
     # Update the board on database
-    # response_status = utils.update_board_db(board, user_id, token)
-    # if response_status['error']:
-    #     return Response({'error': response_status['reason']},
-    #                     status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    response_status = utils.update_board_db(board, user_id, token)
+    if response_status['error']:
+        return Response({'error': response_status['reason']},
+                        status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    # board_response = response_status['game_board']
-    # return Response(board_response)
+    board_response = response_status['game_board']
+    return Response(board_response)
 
 
 # @api_view(['GET'])
