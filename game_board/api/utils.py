@@ -205,9 +205,9 @@ def new_board(difficulty, player_ids, data_structures):
         graph = {
             'node_list': [],
             'num_tunnels': {},
-            'num_food': {},
+            'num_food': {}, #dict of nodes. Each node has a dict. Ex. node1: {crumb:1, berry:1, donut:0, total:3,}
             'num_ants': {}, #dict of nodes with the amount of ants. Ex. node1: 0, node2: 1
-            'under_attack': {} #dict of nodes under attack. Ex. node1: False, node2: True
+            'under_attack': {}, #dict of nodes under attack. Ex. node1: False, node2: True
         }
         board = {
             'game_id': str(uuid.uuid1()),
@@ -219,15 +219,16 @@ def new_board(difficulty, player_ids, data_structures):
             'total_food_types': {
                 'crumb': 1,
                 'berry': 1,
-                'donut': 1
+                'donut': 1,
             },
             'time_tracks': {
                 'move/forage': 6,
                 'dig_tunnel': 6,
-                'dig/fill_chamber': 6
+                'dig/fill_chamber': 6,
             },
             'total_ants': 1,
             'total_surface_ants': 1,
+            'total_under_attack': 0,
             'curr_day': 1,
             'player_ids': player_ids,
             'difficulty': difficulty,
@@ -236,7 +237,7 @@ def new_board(difficulty, player_ids, data_structures):
             'end_game': False,
             'time_created': datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
             'online': False,
-            'profile_load': False
+            'profile_load': False,
         }
     
 
