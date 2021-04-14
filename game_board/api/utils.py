@@ -61,59 +61,69 @@ def update_board_db(board, user_id='-1', token='-1'):
 
     try:
 
-        # Game ended
-        if (board['graph']['root_node'] == board['graph']['gold_node'] or
-                len(board['deck']) == 0):
+        if board['curr_data_structure'] == 'AVL':
+            # Game ended
+            if (board['graph']['root_node'] == board['graph']['gold_node'] or
+                    len(board['deck']) == 0):
 
-            # update the board
-            board['end_game'] = True
-            board['turn'] = max(board['player_points'], key=board['player_points'].get)  # get player w/ max points
-            result['game_board'] = board
+                # update the board
+                board['end_game'] = True
+                board['turn'] = max(board['player_points'], key=board['player_points'].get)  # get player w/ max points
+                result['game_board'] = board
 
-            # if user is authenticated
-            if user_id not in ['-1', -1, ''] and token not in ['-1', -1, '']:
+                # if user is authenticated
+                if user_id not in ['-1', -1, ''] and token not in ['-1', -1, '']:
 
-                # check if the game is being loaded from profile page
-                if 'profile_load' in list(board.keys()) and board['profile_load'] is False:
+                    # check if the game is being loaded from profile page
+                    if 'profile_load' in list(board.keys()) and board['profile_load'] is False:
 
-                    # Here check if user_id matches the token with the database
-                    if profile_db.check_user(user_id, token):
-                        # Currently error return if user is not authenticated is disabled
-                        # It just not updates the score
-                        #result['error'] = True
-                        #result['reason'] = "User is not authenticated"
-                        #return result
+                        # Here check if user_id matches the token with the database
+                        if profile_db.check_user(user_id, token):
+                            # Currently error return if user is not authenticated is disabled
+                            # It just not updates the score
+                            #result['error'] = True
+                            #result['reason'] = "User is not authenticated"
+                            #return result
 
-                        # if the user is in part of the players (paranoid check)
-                        if str(user_id) in board['player_ids']:
+                            # if the user is in part of the players (paranoid check)
+                            if str(user_id) in board['player_ids']:
 
-                            # if not negative points
-                            if board['player_points'][str(user_id)] > 0:
+                                # if not negative points
+                                if board['player_points'][str(user_id)] > 0:
 
-                                # get user's current points
-                                curr_points = profile_db.get_points(str(user_id))
+                                    # get user's current points
+                                    curr_points = profile_db.get_points(str(user_id))
 
-                                # get the target points
-                                if user_id == board['turn']:
-                                    # if the user is the winner, double the points
-                                    target_points = curr_points + (math.log(board['player_points'][str(user_id)]) * 2)
-                                else:
-                                    # don't double the points if the user is not the winner
-                                    target_points = curr_points + math.log(board['player_points'][str(user_id)])
+                                    # get the target points
+                                    if user_id == board['turn']:
+                                        # if the user is the winner, double the points
+                                        target_points = curr_points + (math.log(board['player_points'][str(user_id)]) * 2)
+                                    else:
+                                        # don't double the points if the user is not the winner
+                                        target_points = curr_points + math.log(board['player_points'][str(user_id)])
 
-                                # set the new points
-                                profile_db.set_points(str(user_id), target_points)
+                                    # set the new points
+                                    profile_db.set_points(str(user_id), target_points)
 
-            # remove the game from the database
-            db.remove_game(board['game_id'])
+                # remove the game from the database
+                db.remove_game(board['game_id'])
 
-        # Game continues
+            # Game continues
+            else:
+
+                # Next player's turn
+                next_player_index = (board['player_ids'].index(board['turn']) + 1) % len(board['player_ids'])
+                board['turn'] = board['player_ids'][next_player_index]
+
+                _ = db.update_game(board['game_id'], board)
+
+                # hide the UID used by data structure backend from user
+                del board['graph']['uid']
+
+                # Update
+                result['game_board'] = board
+
         else:
-
-            # Next player's turn
-            next_player_index = (board['player_ids'].index(board['turn']) + 1) % len(board['player_ids'])
-            board['turn'] = board['player_ids'][next_player_index]
-
             _ = db.update_game(board['game_id'], board)
 
             # hide the UID used by data structure backend from user
