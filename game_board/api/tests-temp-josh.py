@@ -5,6 +5,7 @@ import json
 from django.test import TestCase
 from game_board import config
 from game_board.database import game_board_db as db
+from game_board.api import utils
 from .. import config
 
 
