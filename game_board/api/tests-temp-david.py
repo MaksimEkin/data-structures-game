@@ -36,17 +36,17 @@ class GameActions(TestCase):
     """Tests the API calls that is related to game actions."""
     """Tests will be expanded upon once create chamber function is implemented"""
 
-    def test_forage(self):
+    def test_spawn(self):
         # create a new game
         created_game = self.client.get('/game_board/llist_api/start_game/Easy/ID1lltest/LLIST')
         # load the game
         response = self.client.get('/game_board/llist_api/board/' + str(created_game.data['game_id']))
-        # call spawn ant function THIS WILL FAIL UNTIL I MEET WITH DAVID
-        response = self.client.get('/game_board/temp-josh/forage/' + str(response.data['game_id']) + '/Easy/node1/node1')
+        # call spawn ant function
+        response = self.client.get('/game_board/temp-david/spawn/' + str(response.data['game_id']))
 
         board = response.data
 
-        # make sure there was an error since no chambers are there.
+        # make sure there was an error since there isn't enough food
         self.assertEqual(response.status_code, 400, msg=f'{BColors.FAIL}\t[-]\tResponse was not 400!{BColors.ENDC}')
         print(f"{BColors.OKGREEN}\t[+]\tPass returning the correct response code.{BColors.ENDC}")
 

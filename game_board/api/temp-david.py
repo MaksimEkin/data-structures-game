@@ -109,108 +109,6 @@ def board(request, game_id):
 
     return Response(response_status['game_board'])
 
-
-
-@api_view(['GET'])
-def forage(request, game_id, difficulty, ant_loc, dest):
-    """
-    Spawns an ant given the game ID
-
-    :param game_id: unique identifier of the board
-    :param difficulty: game difficulty
-    :param ant_loc: the chamber in which the ant is located
-    :param dest: the chamber where the food should be placed
-    :return game board JSON:
-    """
-
-    # Load the game board from database
-    response_status = utils.load_board_db(game_id)
-    if response_status['error']:
-        return Response({'error': response_status['reason']},
-                        status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    board = response_status['game_board']
-
-    # If there are no chambers player can't forage
-    if board['total_chambers'] == 0:
-        return Response({'invalid_action': 'no chambers'},
-                        status=status.HTTP_400_BAD_REQUEST)
-
-    # If there is no queen then game over actually
-    if !board['queen_at_head']:
-        return Response({'invalid_action': 'lost queen'},
-                        status=status.HTTP_400_BAD_REQUEST)
-
-    # If there are no ants in the requested chamber return error
-    if board['graph']['num_ants'][ant_loc] == 0:
-        return Response({'invalid_action': 'no ants'},
-                        status=status.HTTP_400_BAD_REQUEST)
-
-    # If the requested chamber is under attack return error
-    if board['graph']['under_attack'][ant_loc]:
-        return Response({'invalid_action': 'under attack'},
-                        status=status.HTTP_400_BAD_REQUEST)
-
-    # If the player can't make a forage move, return error
-    if board['time_tracks']['move/forage'] == 0:
-        return Response({'invalid_action': 'cant forage'},
-                        status=status.HTTP_400_BAD_REQUEST)
-
-    # choose a random number then choose the forage type that will be returned
-    rand_food = random.randint(0, 100)
-    crumb_chance = config.FORAGE_CHANCE[difficulty][config.FORAGE_TYPES[0]]
-    berry_chance = config.FORAGE_CHANCE[difficulty][config.FORAGE_TYPES[1]]
-    donut_chance = config.FORAGE_CHANCE[difficulty][config.FORAGE_TYPES[2]]
-    attack_chance = config.FORAGE_CHANCE[difficulty][config.FORAGE_TYPES[3]]
-
-    # Check if crumb was chosen
-    if rand_food >= 0 and rand_food < crumb_chance:
-        forage_result = config.FORAGE_TYPES[0]
-
-    # Check if berry was chosen
-    if rand_food >= crumb_chance and rand_food < berry_chance:
-        forage_result = config.FORAGE_TYPES[1]
-
-    # Check if donut was chosen
-    if rand_food >= berry_chance and rand_food < donut_chance:
-        forage_result = config.FORAGE_TYPES[2]
-
-    # Check if attack was chosen
-    if rand_food >= donut_chance and rand_food < attack_chance:
-        forage_result = config.FORAGE_TYPES[3]
-
-    # If the forage resulted in the chamber coming under attack,
-    # Then reflect the change in the board
-    if forage_result == config.FORAGE_TYPES[3]:
-        board['graph']['under_attack'][dest] = True
-        board['total_under_attack'] += 1
-        board['graph']['num_ants'][ant_loc] -= 1
-        board['graph']['num_ants'][dest] += 1
-
-    # Otherwise, put the food in the requested chamber, move the ant, and update the board
-    else:
-        # Change food in requested chamber
-        board['graph']['num_food'][dest][forage_result] += 1
-        board['graph']['num_food'][dest]['total'] += config.FOOD_VALUE[forage_result]
-
-        # Change food stats on for the game board
-        board['total_food_types'][forage_result] += 1
-        board['total_food'] += config.FOOD_VALUE[forage_result]
-
-        # Move the ant from og spot to new spot
-        board['graph']['num_ants'][ant_loc] -= 1
-        board['graph']['num_ants'][dest] += 1
-
-
-    # Update the board on database
-    response_status = utils.update_board_db(board, user_id, token)
-    if response_status['error']:
-        return Response({'error': response_status['reason']},
-                        status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-    board_response = response_status['game_board']
-    return Response(board_response)
-
-
 @api_view(['GET'])
 def spawn_ant(request, game_id):
     """
@@ -245,22 +143,29 @@ def spawn_ant(request, game_id):
     curr_food_types = board['total_food_types']
 
     # If player has a donut take it
-    if curr_food_types[config.FOOD_TYPES[2]] > 0:
-        board['total_food_types'][config.FOOD_TYPES[2]] -= 1
+    if curr_food_types[config.FORAGE_TYPES[2]] > 0:
+        board['total_food_types'][config.FORAGE_TYPES[2]] -= 1
         board['total_food'] -= config.ANT_SPAWN_VAL
     # If player has at least one berry and one crumb, take one of each
-    elif curr_food_types[config.FOOD_TYPES[1]] > 0 and curr_food_types[config.FOOD_TYPES[0]] > 0:
-        board['total_food_types'][config.FOOD_TYPES[1]] -= 1
-        board['total_food_types'][config.FOOD_TYPES[0]] -= 1
+    elif curr_food_types[config.FORAGE_TYPES[1]] > 0 and curr_food_types[config.FORAGE_TYPES[0]] > 0:
+        board['total_food_types'][config.FORAGE_TYPES[1]] -= 1
+        board['total_food_types'][config.FORAGE_TYPES[0]] -= 1
         board['total_food'] -= config.ANT_SPAWN_VAL
     # If player only has crumbs take it
-    elif curr_food_types[config.FOOD_TYPES[0]] >= config.ANT_SPAWN_VAL:
-        board['total_food_types'][config.FOOD_TYPES[0]] -= config.ANT_SPAWN_VAL
-    # Player has enough food, but is not evenly divisable by three.
-    elif curr_food_types[config.FOOD_TYPES[1]] >= 2:
+    elif curr_food_types[config.FORAGE_TYPES[0]] >= config.ANT_SPAWN_VAL:
+        board['total_food_types'][config.FORAGE_TYPES[0]] -= config.ANT_SPAWN_VAL
+    # If this case is reached, the player has enough food, but only in berry form (not divisible by 3)
+    elif curr_food_types[config.FORAGE_TYPES[1]] >= 2:
+        board['total_food_types'][config.FORAGE_TYPES[1]] -= 2
+        board['total_food_types'][config.FORAGE_TYPES[0]] += 1;
+        board['total_food'] -= config.ANT_SPAWN_VAL
     else:
-        return Response({'invalid_action': 'cant divide'},
+        return Response({'invalid_action': 'error occurred'},
                         status=status.HTTP_400_BAD_REQUEST)
+
+    # if control reaches here, then spawning an ant is successful. Update both total and surface ant values.
+    board['total_ants'] += 1
+    board['total_surface_ants'] += 1
 
     # Update the board on database
     response_status = utils.update_board_db(board, user_id, token)
