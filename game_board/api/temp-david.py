@@ -188,6 +188,19 @@ def dig_tunnel(request, game_id, origin, destination):
 
     board['time_tracks']['dig_tunnel_track'] -= 1
 
+    
+    user_id = board['player_ids']
+    token = -1
+
+    # Update the board on database
+    response_status = utils.update_board_db(board, user_id, token)
+    if response_status['error']:
+        return Response({'error': response_status['reason']},
+                        status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    board_response = response_status['game_board']
+    return Response(board_response)
+
 @api_view(['GET'])
 def spawn_ant(request, game_id):
     """
@@ -242,6 +255,8 @@ def spawn_ant(request, game_id):
     board['total_ants'] += 1
     board['total_surface_ants'] += 1
 
+    user_id = board['player_ids']
+    token = -1
     # Update the board on database
     response_status = utils.update_board_db(board, user_id, token)
     if response_status['error']:
