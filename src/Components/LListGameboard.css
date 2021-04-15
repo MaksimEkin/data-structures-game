@@ -44,3 +44,16 @@
   justify-content: space-around;
   color: #5f5449;
 }
+
+.button {
+  background: yellow;
+  color:black;
+  position:absolute;
+  top: 47%;
+  left: 27%;
+  padding: 5px 5px;
+  font-size: calc(25px);
+  border: 5px;
+  border-radius: 5px;
+
+}
