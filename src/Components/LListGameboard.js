@@ -29,10 +29,11 @@ class LListGameboard extends Component {
       ds: null,
 
       // in-game stats
-      food: 3,
-      time: 0,
-      numChambers: 0,
-      numAnts: 1,
+      total_food: '',
+      time: '',
+      numChambers: '',
+      total_ants: '',
+      total_surface_ants: '',
 
       loading: true,
       spawningAnt: false,
@@ -83,8 +84,20 @@ class LListGameboard extends Component {
   }
 
   // api call to spawn an ant
-  spawnAnt = () =>{
-    
+  spawnAnt = async () => {
+    this.setState({spawningAnt: true}) // delete this
+    // get request to api
+    let spawn_url = url + "game_board/llist_api/spawn_ant/" + this.state.gameID
+    let response = await fetch(spawn_url);
+    let board = await response.json();
+
+    // set state variables 
+    this.setState({board: board})
+    this.setState({total_ants: board['total_ants']})
+    this.setState({total_surface_ants: board['total_surface_ants']})
+    this.setState({total_food: board['total_food_types']})
+
+    this.setState({spawningAnt: true}) // keep this, state is set after api call 
     
   };
 
@@ -104,7 +117,7 @@ class LListGameboard extends Component {
         </div>
 
         <div className="stats-container">
-          <Stats time={this.state.time} food={this.state.food} ants={this.state.numAnts} chambers={this.state.numChambers}/>
+          <Stats time={this.state.time} food={this.state.total_food} ants={this.state.total_ants} chambers={this.state.numChambers}/>
         </div>
 
         {this.state.hovering? 
@@ -116,9 +129,13 @@ class LListGameboard extends Component {
         <span>
           <button><img src={Queen} width ="130" style={{position:'absolute', top: '45.5%', left:'28%', padding:"5px 5px"}} 
           onMouseOver ={this.startHover} onMouseOut = {this.endHover}
-          onClick={this.spawnAnts}/></button>
+          onClick={this.spawnAnt}/></button>
         </span>
         
+        {this.state.spawningAnt ? 
+        <figure style={{background:"White", borderRadius:"50%", height:"50px", width:"30px", position:'absolute', top: '51%', left:'38%', transform:"rotate(300deg)"}} />
+        : null
+        }
 
       </div>
     );
