@@ -62,7 +62,7 @@ class GameActions(TestCase):
         response = self.client.get('/game_board/llist_api/board/' + str(created_game.data['game_id']))
         # call spawn ant function
         response = self.client.get('/game_board/temp-david/dig_tunnel/' + str(response.data['game_id']) + '/node1/node2')
-
+        
         board = response.data
 
         # make sure there was an error because nodes do not exist

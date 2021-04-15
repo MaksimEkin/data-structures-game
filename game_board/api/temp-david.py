@@ -188,7 +188,6 @@ def dig_tunnel(request, game_id, origin, destination):
 
     board['time_tracks']['dig_tunnel_track'] -= 1
 
-
     user_id = board['player_ids']
     token = -1
 
