@@ -214,7 +214,7 @@ def new_board(difficulty, player_ids, data_structures):
         # this will be replaced when I have the llist_handler class
         graph = {
             'node_list': [],
-            'num_tunnels': {},
+            'num_tunnels': {}, #dict of nodes w/ tunnel info. Ex: node1: {entrance: True, exit: True, next: node2}
             'num_food': {}, #dict of nodes. Each node has a dict. Ex. node1: {crumb:1, berry:1, donut:0, total:3,}
             'num_ants': {}, #dict of nodes with the amount of ants. Ex. node1: 0, node2: 1
             'under_attack': {}, #dict of nodes under attack. Ex. node1: False, node2: True
@@ -224,6 +224,8 @@ def new_board(difficulty, player_ids, data_structures):
             'graph': graph,
             'ant_locations': [],
             'queen_at_head': True,
+            'colony_exit': False,
+            'colony_entrance': False,
             'total_chambers': 0,
             'total_food': config.INIT_NUM_FOOD,
             'total_food_types': {
@@ -233,7 +235,7 @@ def new_board(difficulty, player_ids, data_structures):
             },
             'time_tracks': {
                 'move/forage': 6,
-                'dig_tunnel': 6,
+                'dig_tunnel_track': 6,
                 'dig/fill_chamber': 6,
             },
             'total_ants': 1,
