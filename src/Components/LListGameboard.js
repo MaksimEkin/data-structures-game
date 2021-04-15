@@ -126,14 +126,14 @@ class LListGameboard extends Component {
         {this.state.hovering? 
         <p style={{fontSize:"12px", position:"absolute", top:"44%", left:"27.5%"}}>Click to spawn worker ant</p>
         : null}
-        <span>
-          <button><img src={Queen} width ="130" style={{position:'absolute', top: '45.5%', left:'28%', padding:"5px 5px"}} 
+        <span >
+          <button ><img id="queenAnt" src={Queen} width ="130" style={{position:'absolute', top: '45.5%', left:'28%', padding:"5px 5px"}} 
           onMouseOver ={this.startHover} onMouseOut = {this.endHover}
           onClick={this.spawnAnt}/></button>
         </span>
         
         {this.state.spawningAnt ? 
-        <figure style={{background:"White", borderRadius:"50%", height:"50px", width:"30px", position:'absolute', top: '51%', left:'38%', transform:"rotate(300deg)"}} />
+        <figure id="egg" style={{background:"White", borderRadius:"50%", height:"50px", width:"30px", position:'absolute', top: '51%', left:'38%', transform:"rotate(300deg)"}} />
         : null
         }
 
