@@ -110,13 +110,88 @@ def board(request, game_id):
     return Response(response_status['game_board'])
 
 @api_view(['GET'])
+def dig_tunnel(request, game_id, origin, destination):
+    """
+    Attempts to dig a tunnel from the requested node to a requested destination
+    :param game_id: unique identifier of the board
+    :param origin: the node that the player wishes to dig from
+    :param destination: the place that the player wishes to dig to (node name, 'surface', or 'none'
+    """
+    # Game must exist
+    # Load the game board from database
+    response_status = utils.load_board_db(game_id)
+    if response_status['error']:
+        return Response({'error': response_status['reason']},
+                        status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    board = response_status['game_board']
+
+    # origin and destination MUST be different
+    if origin is destination:
+        return Response({'invalid_action': 'origin cannot match destination'},
+                        status=status.HTTP_400_BAD_REQUEST)
+
+    # Player must still have dig 'energy' for that day
+    if board['time_tracks']['dig_tunnel_track'] == 0:
+        return Response({'invalid_action': 'no dig energy'},
+                        status=status.HTTP_400_BAD_REQUEST)
+    # Origin must exist
+    if origin is not 'surface' and origin not in board['graph']['node_list']:
+        return Response({'invalid_action': 'origin does not exist'},
+                        status=status.HTTP_400_BAD_REQUEST)
+
+    # If destination is NOT 'none', it must exist (node OR surface)
+    if destination is not 'none' and destination not in board['graph']['node_list']:
+        return Response({'invalid_action': 'destination does not exist'},
+                        status=status.HTTP_400_BAD_REQUEST)
+
+    # If Origin is surface, colony_entrance MUST be False
+    if origin is 'surface' and board['colony_entrance'] is True:
+        return Response({'invalid_action': 'colony_entrance already exists'},
+                        status=status.HTTP_400_BAD_REQUEST)
+
+    # There must be at least one ant at origin
+    if origin is 'surface' and board['total_surface_ants'] == 0:
+        return Response({'invalid_action': 'no ants on surface'},
+                        status=status.HTTP_400_BAD_REQUEST)
+    if board['graph']['num_ants'][origin] == 0:
+        return Response({'invalid_action': 'no ants at origin'},
+                        status=status.HTTP_400_BAD_REQUEST)
+
+    # If destination is NOT none, there must be an ant at the destination
+    if destination is not 'none' and board['graph']['num_ants'][destination] == 0:
+        return Response({'invalid_action': 'no ants at destination'},
+                        status=status.HTTP_400_BAD_REQUEST)
+
+    # Origin node must NOT already have an exit tunnel
+    if board['graph']['num_tunnels'][origin]['exit'] is True:
+        return Response({'invalid_action': 'exit tunnel exists'},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+    # destination must NOT already have an entrance tunnel
+    if destination is not 'none' and board['graph']['num_tunnels'][destination]['entrance'] is True:
+        return Response({'invalid_action': 'exit tunnel exists'},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+    # if ALL checks are passed, create new tunnel and update ALL relevant gameboard parameters
+
+    # num_tunnels
+    board['graph']['num_tunnels'][origin]['exit'] = True
+    board['graph']['num_tunnels'][origin]['next'] = destination
+    if destination is not 'none':
+        board['graph']['num_tunnels'][destination]['entrance'] = True
+
+
+    if origin is 'surface':
+        board['colony_entrance'] = True
+    if destination is 'surface':
+        board['colony_exit'] = True
+
+    board['time_tracks']['dig_tunnel_track'] -= 1
+
+@api_view(['GET'])
 def spawn_ant(request, game_id):
     """
     Spawns an ant given the game ID
-
-    :param user_id: username
-    :param token: authentication token
-    :param card: what action to be performed
     :param game_id: unique identifier of the board
     :return game board JSON:
     """
